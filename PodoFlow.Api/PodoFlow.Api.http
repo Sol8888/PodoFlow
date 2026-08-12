@@ -1,0 +1,6 @@
+@PodoFlow.Api_HostAddress = http://localhost:5118
+
+GET {{PodoFlow.Api_HostAddress}}
+Accept: application/json
+
+###
