@@ -12,7 +12,7 @@ public class PodoFlowContext : DbContext
     }
 
     public DbSet<Servicio> Servicios { get; set; }
-
+    public DbSet<Finalidad> Finalidades { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -59,5 +59,42 @@ public class PodoFlowContext : DbContext
                 .HasColumnName("se_version")
                 .IsRowVersion();
         });
+
+        modelBuilder.Entity<Finalidad>(entity =>
+        {
+            entity.ToTable("FINALIDAD", "pri");
+
+            entity.HasKey(e => e.FiId);
+
+            entity.HasIndex(e => e.FiCodigo)
+                .IsUnique();
+
+            entity.Property(e => e.FiId)
+                .HasColumnName("fi_id");
+
+            entity.Property(e => e.FiCodigo)
+                .HasColumnName("fi_codigo")
+                .HasMaxLength(50)
+                .IsRequired();
+
+            entity.Property(e => e.FiNombre)
+                .HasColumnName("fi_nombre")
+                .HasMaxLength(150)
+                .IsRequired();
+
+            entity.Property(e => e.FiDescri)
+                .HasColumnName("fi_descri")
+                .HasMaxLength(1000);
+
+            entity.Property(e => e.FiRequiCons)
+                .HasColumnName("fi_requi_cons")
+                .IsRequired();
+
+            entity.Property(e => e.FiEstatus)
+                .HasColumnName("fi_estatus")
+                .HasDefaultValue(true); 
+        });
     }
+
+
 }
