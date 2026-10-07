@@ -13,6 +13,7 @@ public class PodoFlowContext : DbContext
 
     public DbSet<Servicio> Servicios { get; set; }
     public DbSet<Finalidad> Finalidades { get; set; }
+    public DbSet<Aviso> Avisos { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -93,6 +94,47 @@ public class PodoFlowContext : DbContext
             entity.Property(e => e.FiEstatus)
                 .HasColumnName("fi_estatus")
                 .HasDefaultValue(true); 
+        });
+
+        modelBuilder.Entity<Aviso>(entity =>
+        {
+            entity.ToTable("AVISO", "pri", t =>
+                t.HasCheckConstraint("CK_AVISO_fechas",
+                    "av_fecha_hast IS NULL OR av_fecha_hast >= av_fecha_desd"));
+
+            entity.HasKey(e => e.AvId);
+
+            entity.HasIndex(e => e.AvVersi)
+                .IsUnique();
+
+            entity.Property(e => e.AvId)
+                .HasColumnName("av_id");
+
+            entity.Property(e => e.AvVersi)
+                .HasColumnName("av_versi")
+                .HasMaxLength(30)
+                .IsRequired();
+
+            entity.Property(e => e.AvFechaDesd)
+                .HasColumnName("av_fecha_desd")
+                .HasColumnType("date")
+                .IsRequired();
+
+            entity.Property(e => e.AvFechaHast)
+                .HasColumnName("av_fecha_hast")
+                .HasColumnType("date");
+
+            entity.Property(e => e.AvRutaArch)
+                .HasColumnName("av_ruta_arch")
+                .HasMaxLength(1000);
+
+            entity.Property(e => e.AvHuella)
+                .HasColumnName("av_huella")
+                .HasMaxLength(128);
+
+            entity.Property(e => e.AvEstatus)
+                .HasColumnName("av_estatus")
+                .IsRequired();
         });
     }
 

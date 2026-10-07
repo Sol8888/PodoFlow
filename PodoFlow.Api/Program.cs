@@ -22,6 +22,8 @@ builder.Services.AddScoped<IServicioRepositorio, ServicioRepositorio>();
 builder.Services.AddScoped<IServicioServicio, ServicioServicio>();
 builder.Services.AddScoped<IFinalidadRepositorio, FinalidadRepositorio>();
 builder.Services.AddScoped<IFinalidadServicio, FinalidadServicio>();
+builder.Services.AddScoped<IAvisoRepositorio, AvisoRepositorio>();
+builder.Services.AddScoped<IAvisoServicio, AvisoServicio>(); 
 
 
 
