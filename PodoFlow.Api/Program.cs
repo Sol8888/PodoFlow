@@ -20,8 +20,13 @@ builder.Services.AddDbContext<PodoFlowContext>(options =>
 // Mujer Aqui van los servicios de repositorio y servicio (Si no pones aqui no funciona)
 builder.Services.AddScoped<IServicioRepositorio, ServicioRepositorio>();
 builder.Services.AddScoped<IServicioServicio, ServicioServicio>();
+
 builder.Services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
 builder.Services.AddScoped<IUsuarioServicio, UsuarioServicio>();
+
+builder.Services.AddScoped<IRolRepositorio, RolRepositorio>();
+builder.Services.AddScoped<IRolServicio, RolServicio>();
+
 
 
 

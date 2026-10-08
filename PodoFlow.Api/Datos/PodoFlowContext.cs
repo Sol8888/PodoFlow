@@ -16,6 +16,9 @@ public class PodoFlowContext : DbContext
     public DbSet<Usuario> Usuarios { get; set; }
 
 
+    public DbSet<Rol> Roles { get; set; }
+
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -109,6 +112,44 @@ public class PodoFlowContext : DbContext
             entity.Property(e => e.UsVersion)
                 .HasColumnName("us_version")
                 .IsRowVersion();
+        });
+
+
+        modelBuilder.Entity<Rol>(entity =>
+        {
+            entity.ToTable("ROL", "seg");
+
+            entity.HasKey(e => e.RoId);
+
+            entity.Property(e => e.RoId)
+                .HasColumnName("ro_id")
+                .ValueGeneratedOnAdd();
+
+            entity.Property(e => e.RoCodigo)
+                .HasColumnName("ro_codigo")
+                .HasMaxLength(50)
+                .IsRequired();
+
+            entity.HasIndex(e => e.RoCodigo)
+                .IsUnique();
+
+            entity.Property(e => e.RoNombre)
+                .HasColumnName("ro_nombre")
+                .HasMaxLength(100)
+                .IsRequired();
+
+            entity.Property(e => e.RoDescri)
+                .HasColumnName("ro_descri")
+                .HasMaxLength(500);
+
+            entity.Property(e => e.RoFechaCrea)
+                .HasColumnName("ro_fecha_crea")
+                .HasPrecision(0)
+                .HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.Property(e => e.RoEstatus)
+                .HasColumnName("ro_estatus")
+                .HasDefaultValue(true);
         });
 
     }
