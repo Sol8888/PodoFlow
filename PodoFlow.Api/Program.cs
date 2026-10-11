@@ -28,6 +28,9 @@ builder.Services.AddScoped<IRolRepositorio, RolRepositorio>();
 builder.Services.AddScoped<IRolServicio, RolServicio>();
 
 
+builder.Services.AddScoped<IPermisoRepositorio, PermisoRepositorio>();
+builder.Services.AddScoped<IPermisoServicio, PermisoServicio>();
+
 
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

@@ -15,8 +15,8 @@ public class PodoFlowContext : DbContext
 
     public DbSet<Usuario> Usuarios { get; set; }
 
-
     public DbSet<Rol> Roles { get; set; }
+    public DbSet<Permiso> Permisos { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -151,6 +151,44 @@ public class PodoFlowContext : DbContext
                 .HasColumnName("ro_estatus")
                 .HasDefaultValue(true);
         });
+
+        modelBuilder.Entity<Permiso>(entity =>
+        {
+            entity.ToTable("PERMISO", "seg");
+
+            entity.HasKey(e => e.PeId);
+
+            entity.Property(e => e.PeId)
+                .HasColumnName("pe_id")
+                .ValueGeneratedOnAdd();
+
+            entity.Property(e => e.PeCodigo)
+                .HasColumnName("pe_codigo")
+                .HasMaxLength(80)
+                .IsRequired();
+
+            entity.HasIndex(e => e.PeCodigo)
+                .IsUnique();
+
+            entity.Property(e => e.PeNombre)
+                .HasColumnName("pe_nombre")
+                .HasMaxLength(120)
+                .IsRequired();
+
+            entity.Property(e => e.PeModulo)
+                .HasColumnName("pe_modulo")
+                .HasMaxLength(80)
+                .IsRequired();
+
+            entity.Property(e => e.PeDescri)
+                .HasColumnName("pe_descri")
+                .HasMaxLength(500);
+
+            entity.Property(e => e.PeEstatus)
+                .HasColumnName("pe_estatus")
+                .HasDefaultValue(true);
+        });
+
 
     }
 }
