@@ -16,7 +16,11 @@ public class PodoFlowContext : DbContext
     public DbSet<Usuario> Usuarios { get; set; }
 
     public DbSet<Rol> Roles { get; set; }
+
     public DbSet<Permiso> Permisos { get; set; }
+
+    public DbSet<UsuarioRol> UsuariosRoles { get; set; }
+
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -187,6 +191,47 @@ public class PodoFlowContext : DbContext
             entity.Property(e => e.PeEstatus)
                 .HasColumnName("pe_estatus")
                 .HasDefaultValue(true);
+        });
+
+        modelBuilder.Entity<UsuarioRol>(entity =>
+        {
+            entity.ToTable("US_RO", "seg");
+
+            // Clave primaria compuesta.
+            entity.HasKey(e => new
+            {
+                e.UsId,
+                e.RoId
+            });
+
+            entity.Property(e => e.UsId)
+                .HasColumnName("us_id")
+                .ValueGeneratedNever();
+
+            entity.Property(e => e.RoId)
+                .HasColumnName("ro_id")
+                .ValueGeneratedNever();
+
+            entity.Property(e => e.UrFechaAsig)
+                .HasColumnName("ur_fecha_asig")
+                .HasPrecision(0)
+                .HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.Property(e => e.UrEstatus)
+                .HasColumnName("ur_estatus")
+                .HasDefaultValue(true);
+
+            // Relación con seg.USUARIO.
+            entity.HasOne<Usuario>()
+                .WithMany()
+                .HasForeignKey(e => e.UsId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Relación con seg.ROL.
+            entity.HasOne<Rol>()
+                .WithMany()
+                .HasForeignKey(e => e.RoId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
 
 
