@@ -21,6 +21,8 @@ public class PodoFlowContext : DbContext
 
     public DbSet<UsuarioRol> UsuariosRoles { get; set; }
 
+    public DbSet<RolPermiso> RolesPermisos { get; set; }
+
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -234,6 +236,45 @@ public class PodoFlowContext : DbContext
                 .OnDelete(DeleteBehavior.Restrict);
         });
 
+
+        modelBuilder.Entity<RolPermiso>(entity =>
+        {
+            entity.ToTable("RO_PE", "seg");
+
+            // Clave primaria compuesta
+            entity.HasKey(e => new
+            {
+                e.RoId,
+                e.PeId
+            });
+
+            entity.Property(e => e.RoId)
+                .HasColumnName("ro_id")
+                .ValueGeneratedNever();
+
+            entity.Property(e => e.PeId)
+                .HasColumnName("pe_id")
+                .ValueGeneratedNever();
+
+            entity.Property(e => e.RpFechaAsig)
+                .HasColumnName("rp_fecha_asig")
+                .HasPrecision(0)
+                .HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.Property(e => e.RpEstatus)
+                .HasColumnName("rp_estatus")
+                .HasDefaultValue(true);
+
+            entity.HasOne<Rol>()
+                .WithMany()
+                .HasForeignKey(e => e.RoId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne<Permiso>()
+                .WithMany()
+                .HasForeignKey(e => e.PeId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
 
     }
 }
