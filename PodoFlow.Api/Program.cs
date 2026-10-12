@@ -40,6 +40,10 @@ builder.Services.AddScoped<IRolPermisoRepositorio, RolPermisoRepositorio>();
 builder.Services.AddScoped<IRolPermisoServicio, RolPermisoServicio>();
 
 
+builder.Services.AddScoped<IIntentoAccesoRepositorio, IntentoAccesoRepositorio>();
+builder.Services.AddScoped<IIntentoAccesoServicio, IntentoAccesoServicio>();
+
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

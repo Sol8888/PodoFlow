@@ -23,6 +23,8 @@ public class PodoFlowContext : DbContext
 
     public DbSet<RolPermiso> RolesPermisos { get; set; }
 
+    public DbSet<IntentoAcceso> IntentosAcceso { get; set; }
+
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -274,6 +276,61 @@ public class PodoFlowContext : DbContext
                 .WithMany()
                 .HasForeignKey(e => e.PeId)
                 .OnDelete(DeleteBehavior.Restrict);
+        });
+
+
+        modelBuilder.Entity<IntentoAcceso>(entity =>
+        {
+            entity.ToTable("INTENTO_ACCESO", "seg");
+
+            entity.HasKey(e => e.InId);
+
+            entity.Property(e => e.InId)
+                .HasColumnName("in_id")
+                .ValueGeneratedOnAdd();
+
+            entity.Property(e => e.UsId)
+                .HasColumnName("us_id");
+
+            entity.Property(e => e.InIdentAcce)
+                .HasColumnName("in_ident_acce")
+                .HasMaxLength(320);
+
+            entity.Property(e => e.InFechaHora)
+                .HasColumnName("in_fecha_hora")
+                .HasPrecision(0)
+                .HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.Property(e => e.InExitoso)
+                .HasColumnName("in_exitoso")
+                .IsRequired();
+
+            entity.Property(e => e.InMotivo)
+                .HasColumnName("in_motivo")
+                .HasMaxLength(300);
+
+            entity.Property(e => e.InDirecIp)
+                .HasColumnName("in_direc_ip")
+                .HasMaxLength(45);
+
+            entity.Property(e => e.InAgentUsua)
+                .HasColumnName("in_agent_usua")
+                .HasMaxLength(500);
+
+            // Clave foránea opcional hacia seg.USUARIO.
+            entity.HasOne<Usuario>()
+                .WithMany()
+                .HasForeignKey(e => e.UsId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Índice existente en SQL Server.
+            entity.HasIndex(e => new
+            {
+                e.UsId,
+                e.InFechaHora
+            })
+            .HasDatabaseName("IX_INTENTO_USUARIO_fecha")
+            .IsDescending(false, true);
         });
 
     }
