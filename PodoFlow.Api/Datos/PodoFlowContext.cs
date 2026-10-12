@@ -16,6 +16,10 @@ public class PodoFlowContext : DbContext
     public DbSet<Aviso> Avisos { get; set; }
     public DbSet<Consentimiento> Consentimientos { get; set; }
     public DbSet<EventoConsentimiento> EventosConsentimiento { get; set; } 
+
+    public DbSet<Usuario> Usuarios { get; set; }
+
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -240,6 +244,55 @@ public class PodoFlowContext : DbContext
                 .WithMany()
                 .HasForeignKey(e => e.CoId);
         });
+
+
+        modelBuilder.Entity<Usuario>(entity =>
+        {
+            entity.ToTable("USUARIO", "seg");
+
+            entity.HasKey(e => e.UsId);
+
+            entity.Property(e => e.UsId)
+                .HasColumnName("us_id")
+                .ValueGeneratedOnAdd();
+
+            entity.Property(e => e.UsNombre)
+                .HasColumnName("us_nombre")
+                .HasMaxLength(150)
+                .IsRequired();
+
+            entity.Property(e => e.UsCorreo)
+                .HasColumnName("us_correo")
+                .HasMaxLength(320)
+                .IsRequired();
+
+            entity.HasIndex(e => e.UsCorreo).IsUnique();
+
+            entity.Property(e => e.UsEntraOid)
+                .HasColumnName("us_entra_oid");
+
+            entity.Property(e => e.UsEntraTid)
+                .HasColumnName("us_entra_tid");
+
+            entity.Property(e => e.UsFechaCrea)
+                .HasColumnName("us_fecha_crea")
+                .HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.Property(e => e.UsFechaModi)
+                .HasColumnName("us_fecha_modi");
+
+            entity.Property(e => e.UsUltimAcces)
+                .HasColumnName("us_ultim_acces");
+
+            entity.Property(e => e.UsEstatus)
+                .HasColumnName("us_estatus")
+                .HasDefaultValue(true);
+
+            entity.Property(e => e.UsVersion)
+                .HasColumnName("us_version")
+                .IsRowVersion();
+        });
+
     }
 
 
