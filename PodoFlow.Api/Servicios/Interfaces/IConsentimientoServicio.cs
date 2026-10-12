@@ -1,0 +1,19 @@
+﻿using PodoFlow.Api.DTOs.Consentimiento;
+
+namespace PodoFlow.Api.Servicios.Interfaces
+{
+    public interface IConsentimientoServicio
+    {
+        Task<List<ConsentimientoRespuestaDto>> ObtenerTodosAsync();
+
+        Task<List<ConsentimientoRespuestaDto>> ObtenerPorPacienteAsync(long pacienteId);
+
+        Task<ConsentimientoRespuestaDto?> ObtenerPorIdAsync(long id);
+
+        Task<ConsentimientoRespuestaDto> CrearAsync(ConsentimientoCrearDto dto);
+
+        Task<bool> ActualizarAsync(long id, ConsentimientoActualizarDto dto);
+
+        Task<ConsentimientoRespuestaDto?> CambiarEstadoAsync(long id, ConsentimientoCambiarEstadoDto dto);
+    }
+}

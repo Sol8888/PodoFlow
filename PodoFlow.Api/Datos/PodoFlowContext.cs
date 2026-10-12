@@ -14,6 +14,8 @@ public class PodoFlowContext : DbContext
     public DbSet<Servicio> Servicios { get; set; }
     public DbSet<Finalidad> Finalidades { get; set; }
     public DbSet<Aviso> Avisos { get; set; }
+    public DbSet<Consentimiento> Consentimientos { get; set; }
+    public DbSet<EventoConsentimiento> EventosConsentimiento { get; set; } 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -135,6 +137,108 @@ public class PodoFlowContext : DbContext
             entity.Property(e => e.AvEstatus)
                 .HasColumnName("av_estatus")
                 .IsRequired();
+        });
+
+        modelBuilder.Entity<Consentimiento>(entity =>
+        {
+            entity.ToTable("CONSENTIMIENTO", "pri", t =>
+         t.HasCheckConstraint("CK_CONSENTIMIENTO_estad",
+             "co_estad IN ('ACEPTADO','RECHAZADO','REVOCADO')"));
+
+            entity.HasKey(e => e.CoId);
+
+            entity.HasIndex(e => new { e.PaId, e.FiId })
+                .IsUnique();
+
+            entity.Property(e => e.CoId)
+                .HasColumnName("co_id");
+
+            entity.Property(e => e.PaId)
+                .HasColumnName("pa_id")
+                .IsRequired();
+
+            entity.Property(e => e.FiId)
+                .HasColumnName("fi_id")
+                .IsRequired();
+
+            entity.Property(e => e.AvId)
+                .HasColumnName("av_id")
+                .IsRequired();
+
+            entity.Property(e => e.CoEstad)
+                .HasColumnName("co_estad")
+                .HasMaxLength(15)
+                .IsRequired();
+
+            entity.Property(e => e.CoMedio)
+                .HasColumnName("co_medio")
+                .HasMaxLength(50)
+                .IsRequired();
+
+            entity.Property(e => e.CoFechaObte)
+                .HasColumnName("co_fecha_obte")
+                .HasColumnType("datetime2(0)");
+
+            entity.Property(e => e.CoFechaRevo)
+                .HasColumnName("co_fecha_revo")
+                .HasColumnType("datetime2(0)");
+
+            entity.Property(e => e.CoObser)
+                .HasColumnName("co_obser")
+                .HasMaxLength(1000);
+
+            entity.Property(e => e.CoVersion)
+                .HasColumnName("co_version")
+                .IsRowVersion();
+
+            entity.HasOne<Finalidad>()
+                .WithMany()
+                .HasForeignKey(e => e.FiId);
+
+            entity.HasOne<Aviso>()
+                .WithMany()
+                .HasForeignKey(e => e.AvId);
+        });
+        modelBuilder.Entity<EventoConsentimiento>(entity =>
+        {
+            entity.ToTable("EVENTO_CONSENTIMIENTO", "pri");
+
+            entity.HasKey(e => e.EvId);
+
+            entity.Property(e => e.EvId)
+                .HasColumnName("ev_id");
+
+            entity.Property(e => e.CoId)
+                .HasColumnName("co_id");
+
+            entity.Property(e => e.UsId)
+                .HasColumnName("us_id");
+
+            entity.Property(e => e.EvEstad)
+                .HasColumnName("ev_estad")
+                .HasMaxLength(15)
+                .IsRequired();
+
+            entity.Property(e => e.EvFechaHora)
+                .HasColumnName("ev_fecha_hora")
+                .HasColumnType("datetime2(0)");
+
+            entity.Property(e => e.EvMedio)
+                .HasColumnName("ev_medio")
+                .HasMaxLength(50)
+                .IsRequired();
+
+            entity.Property(e => e.EvRutaEvid)
+                .HasColumnName("ev_ruta_evid")
+                .HasMaxLength(1000);
+
+            entity.Property(e => e.EvObser)
+                .HasColumnName("ev_obser")
+                .HasMaxLength(1000);
+
+            entity.HasOne(e => e.Consentimiento)
+                .WithMany()
+                .HasForeignKey(e => e.CoId);
         });
     }
 

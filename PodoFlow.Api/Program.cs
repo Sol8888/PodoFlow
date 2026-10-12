@@ -23,7 +23,9 @@ builder.Services.AddScoped<IServicioServicio, ServicioServicio>();
 builder.Services.AddScoped<IFinalidadRepositorio, FinalidadRepositorio>();
 builder.Services.AddScoped<IFinalidadServicio, FinalidadServicio>();
 builder.Services.AddScoped<IAvisoRepositorio, AvisoRepositorio>();
-builder.Services.AddScoped<IAvisoServicio, AvisoServicio>(); 
+builder.Services.AddScoped<IAvisoServicio, AvisoServicio>();
+builder.Services.AddScoped<IConsentimientoRepositorio, ConsentimientoRepositorio>();
+builder.Services.AddScoped<IConsentimientoServicio, ConsentimientoServicio>(); 
 
 
 
