@@ -27,6 +27,8 @@ public class PodoFlowContext : DbContext
 
     public DbSet<Paciente> Pacientes { get; set; }
 
+    public DbSet<PacienteUsuario> PacientesUsuarios { get; set; }
+
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -392,6 +394,45 @@ public class PodoFlowContext : DbContext
 
             entity.Property(x => x.PaVersion)
                 .HasColumnName("pa_version").IsRowVersion();
+        });
+
+
+        modelBuilder.Entity<PacienteUsuario>(entity =>
+        {
+            entity.ToTable("PA_US", "pac");
+
+            entity.HasKey(x => new { x.PaId, x.UsId });
+
+            entity.Property(x => x.PaId)
+                .HasColumnName("pa_id").ValueGeneratedNever();
+
+            entity.Property(x => x.UsId)
+                .HasColumnName("us_id").ValueGeneratedNever();
+
+            entity.Property(x => x.PuFechaAsig)
+                .HasColumnName("pu_fecha_asig")
+                .HasPrecision(0)
+                .HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.Property(x => x.PuEstatus)
+                .HasColumnName("pu_estatus")
+                .HasDefaultValue(true);
+
+            entity.HasIndex(x => x.PaId)
+                .IsUnique().HasDatabaseName("UQ_PA_US_pa");
+
+            entity.HasIndex(x => x.UsId)
+                .IsUnique().HasDatabaseName("UQ_PA_US_us");
+
+            entity.HasOne<Paciente>()
+                .WithMany()
+                .HasForeignKey(x => x.PaId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne<Usuario>()
+                .WithMany()
+                .HasForeignKey(x => x.UsId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
 
     }
