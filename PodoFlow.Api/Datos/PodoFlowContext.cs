@@ -37,6 +37,8 @@ public class PodoFlowContext : DbContext
 
     public DbSet<BloqueoAgenda> BloqueosAgenda { get; set; }
 
+    public DbSet<CambioCita> CambiosCita { get; set; }
+
 
 
 
@@ -650,6 +652,63 @@ public class PodoFlowContext : DbContext
                 .WithMany()
                 .HasForeignKey(x => x.UsId)
                 .OnDelete(DeleteBehavior.Restrict);
+        });
+
+
+        modelBuilder.Entity<CambioCita>(entity =>
+        {
+            entity.ToTable("CAMBIO_CITA", "cit");
+
+            entity.HasKey(x => x.CaId);
+
+            entity.Property(x => x.CaId)
+                .HasColumnName("ca_id")
+                .ValueGeneratedOnAdd();
+
+            entity.Property(x => x.CiId)
+                .HasColumnName("ci_id")
+                .IsRequired();
+
+            entity.Property(x => x.UsId)
+                .HasColumnName("us_id");
+
+            entity.Property(x => x.CaEstadAnte)
+                .HasColumnName("ca_estad_ante")
+                .HasMaxLength(20);
+
+            entity.Property(x => x.CaEstadNuev)
+                .HasColumnName("ca_estad_nuev")
+                .HasMaxLength(20);
+
+            entity.Property(x => x.CaFechaAnte)
+                .HasColumnName("ca_fecha_ante")
+                .HasPrecision(0);
+
+            entity.Property(x => x.CaFechaNuev)
+                .HasColumnName("ca_fecha_nuev")
+                .HasPrecision(0);
+
+            entity.Property(x => x.CaMotivo)
+                .HasColumnName("ca_motivo")
+                .HasMaxLength(500);
+
+            entity.Property(x => x.CaFechaCamb)
+                .HasColumnName("ca_fecha_camb")
+                .HasPrecision(0)
+                .HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.HasOne<Usuario>()
+                .WithMany()
+                .HasForeignKey(x => x.UsId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(x => new
+            {
+                x.CiId,
+                x.CaFechaCamb
+            })
+            .HasDatabaseName("IX_CAMBIO_CITA_cita")
+            .IsDescending(false, true);
         });
 
     }
