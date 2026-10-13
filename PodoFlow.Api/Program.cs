@@ -20,9 +20,60 @@ builder.Services.AddDbContext<PodoFlowContext>(options =>
 // Mujer Aqui van los servicios de repositorio y servicio (Si no pones aqui no funciona)
 builder.Services.AddScoped<IServicioRepositorio, ServicioRepositorio>();
 builder.Services.AddScoped<IServicioServicio, ServicioServicio>();
+
 builder.Services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
 builder.Services.AddScoped<IUsuarioServicio, UsuarioServicio>();
 
+builder.Services.AddScoped<IRolRepositorio, RolRepositorio>();
+builder.Services.AddScoped<IRolServicio, RolServicio>();
+
+
+builder.Services.AddScoped<IPermisoRepositorio, PermisoRepositorio>();
+builder.Services.AddScoped<IPermisoServicio, PermisoServicio>();
+
+
+builder.Services.AddScoped<IUsuarioRolRepositorio, UsuarioRolRepositorio>();
+builder.Services.AddScoped<IUsuarioRolServicio, UsuarioRolServicio>();
+
+
+builder.Services.AddScoped<IRolPermisoRepositorio, RolPermisoRepositorio>();
+builder.Services.AddScoped<IRolPermisoServicio, RolPermisoServicio>();
+
+
+builder.Services.AddScoped<IIntentoAccesoRepositorio, IntentoAccesoRepositorio>();
+builder.Services.AddScoped<IIntentoAccesoServicio, IntentoAccesoServicio>();
+
+
+builder.Services.AddScoped<IPacienteRepositorio, PacienteRepositorio>();
+builder.Services.AddScoped<IPacienteServicio, PacienteServicio>();
+
+
+builder.Services.AddScoped<IPacienteUsuarioRepositorio, PacienteUsuarioRepositorio>();
+builder.Services.AddScoped<IPacienteUsuarioServicio, PacienteUsuarioServicio>();
+
+
+builder.Services.AddScoped<IDatoContactoRepositorio, DatoContactoRepositorio>();
+builder.Services.AddScoped<IDatoContactoServicio, DatoContactoServicio>();
+
+
+builder.Services.AddScoped<IEventoAuditoriaRepositorio, EventoAuditoriaRepositorio>();
+builder.Services.AddScoped<IEventoAuditoriaServicio, EventoAuditoriaServicio>();
+
+
+builder.Services.AddScoped<IHorarioAtencionRepositorio, HorarioAtencionRepositorio>();
+builder.Services.AddScoped<IHorarioAtencionServicio, HorarioAtencionServicio>();
+
+
+builder.Services.AddScoped<IBloqueoAgendaRepositorio, BloqueoAgendaRepositorio>();
+builder.Services.AddScoped<IBloqueoAgendaServicio, BloqueoAgendaServicio>();
+
+
+builder.Services.AddScoped<ICambioCitaRepositorio, CambioCitaRepositorio>();
+builder.Services.AddScoped<ICambioCitaServicio, CambioCitaServicio>();
+
+
+builder.Services.AddScoped<ICitaRepositorio, CitaRepositorio>();
+builder.Services.AddScoped<ICitaServicio, CitaServicio>();
 
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
