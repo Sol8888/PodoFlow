@@ -44,6 +44,10 @@ builder.Services.AddScoped<IIntentoAccesoRepositorio, IntentoAccesoRepositorio>(
 builder.Services.AddScoped<IIntentoAccesoServicio, IntentoAccesoServicio>();
 
 
+builder.Services.AddScoped<IPacienteRepositorio, PacienteRepositorio>();
+builder.Services.AddScoped<IPacienteServicio, PacienteServicio>();
+
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

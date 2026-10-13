@@ -25,6 +25,8 @@ public class PodoFlowContext : DbContext
 
     public DbSet<IntentoAcceso> IntentosAcceso { get; set; }
 
+    public DbSet<Paciente> Pacientes { get; set; }
+
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -331,6 +333,65 @@ public class PodoFlowContext : DbContext
             })
             .HasDatabaseName("IX_INTENTO_USUARIO_fecha")
             .IsDescending(false, true);
+        });
+
+
+        modelBuilder.Entity<Paciente>(entity =>
+        {
+            entity.ToTable("PACIENTE", "pac");
+            entity.HasKey(x => x.PaId);
+
+            entity.Property(x => x.PaId)
+                .HasColumnName("pa_id").ValueGeneratedOnAdd();
+
+            entity.Property(x => x.PaTipoIdent)
+                .HasColumnName("pa_tipo_ident")
+                .HasMaxLength(20).IsRequired();
+
+            entity.Property(x => x.PaIdent)
+                .HasColumnName("pa_ident")
+                .HasMaxLength(30).IsRequired();
+
+            entity.HasIndex(x => new { x.PaTipoIdent, x.PaIdent })
+                .IsUnique();
+
+            entity.Property(x => x.PaNombres)
+                .HasColumnName("pa_nombres")
+                .HasMaxLength(100).IsRequired();
+
+            entity.Property(x => x.PaApelli)
+                .HasColumnName("pa_apelli")
+                .HasMaxLength(100).IsRequired();
+
+            entity.Property(x => x.PaFechaNaci)
+                .HasColumnName("pa_fecha_naci")
+                .HasColumnType("date");
+
+            entity.Property(x => x.PaGenero)
+                .HasColumnName("pa_genero").HasMaxLength(30);
+
+            entity.Property(x => x.PaDirec)
+                .HasColumnName("pa_direc").HasMaxLength(300);
+
+            entity.Property(x => x.PaFechaCrea)
+                .HasColumnName("pa_fecha_crea")
+                .HasPrecision(0)
+                .HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.Property(x => x.PaFechaModi)
+                .HasColumnName("pa_fecha_modi").HasPrecision(0);
+
+            entity.Property(x => x.PaFechaBaja)
+                .HasColumnName("pa_fecha_baja").HasPrecision(0);
+
+            entity.Property(x => x.PaMotivBaja)
+                .HasColumnName("pa_motiv_baja").HasMaxLength(500);
+
+            entity.Property(x => x.PaEstatus)
+                .HasColumnName("pa_estatus").HasDefaultValue(true);
+
+            entity.Property(x => x.PaVersion)
+                .HasColumnName("pa_version").IsRowVersion();
         });
 
     }
