@@ -29,6 +29,8 @@ public class PodoFlowContext : DbContext
 
     public DbSet<PacienteUsuario> PacientesUsuarios { get; set; }
 
+    public DbSet<DatoContacto> DatosContacto { get; set; }
+
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -433,6 +435,48 @@ public class PodoFlowContext : DbContext
                 .WithMany()
                 .HasForeignKey(x => x.UsId)
                 .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<DatoContacto>(entity =>
+        {
+            entity.ToTable("DATO_CONTACTO", "pac");
+            entity.HasKey(x => x.DaId);
+
+            entity.Property(x => x.DaId)
+                .HasColumnName("da_id").ValueGeneratedOnAdd();
+
+            entity.Property(x => x.PaId)
+                .HasColumnName("pa_id");
+
+            entity.Property(x => x.DaTipo)
+                .HasColumnName("da_tipo")
+                .HasMaxLength(20).IsRequired();
+
+            entity.Property(x => x.DaValor)
+                .HasColumnName("da_valor")
+                .HasMaxLength(320).IsRequired();
+
+            entity.Property(x => x.DaPrinc)
+                .HasColumnName("da_princ").HasDefaultValue(false);
+
+            entity.Property(x => x.DaVerif)
+                .HasColumnName("da_verif").HasDefaultValue(false);
+
+            entity.Property(x => x.DaFechaCrea)
+                .HasColumnName("da_fecha_crea")
+                .HasPrecision(0)
+                .HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.Property(x => x.DaEstatus)
+                .HasColumnName("da_estatus").HasDefaultValue(true);
+
+            entity.HasOne<Paciente>()
+                .WithMany()
+                .HasForeignKey(x => x.PaId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(x => new { x.PaId, x.DaEstatus })
+                .HasDatabaseName("IX_DATO_CONTACTO_paciente");
         });
 
     }
