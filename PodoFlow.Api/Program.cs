@@ -72,6 +72,9 @@ builder.Services.AddScoped<ICambioCitaRepositorio, CambioCitaRepositorio>();
 builder.Services.AddScoped<ICambioCitaServicio, CambioCitaServicio>();
 
 
+builder.Services.AddScoped<ICitaRepositorio, CitaRepositorio>();
+builder.Services.AddScoped<ICitaServicio, CitaServicio>();
+
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

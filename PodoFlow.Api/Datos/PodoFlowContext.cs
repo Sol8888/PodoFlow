@@ -39,6 +39,8 @@ public class PodoFlowContext : DbContext
 
     public DbSet<CambioCita> CambiosCita { get; set; }
 
+    public DbSet<Cita> Citas { get; set; }
+
 
 
 
@@ -708,6 +710,99 @@ public class PodoFlowContext : DbContext
                 x.CaFechaCamb
             })
             .HasDatabaseName("IX_CAMBIO_CITA_cita")
+            .IsDescending(false, true);
+        });
+
+
+        modelBuilder.Entity<Cita>(entity =>
+        {
+            entity.ToTable("CITA", "cit");
+
+            entity.HasKey(x => x.CiId);
+
+            entity.Property(x => x.CiId)
+                .HasColumnName("ci_id")
+                .ValueGeneratedOnAdd();
+
+            entity.Property(x => x.PaId)
+                .HasColumnName("pa_id")
+                .IsRequired();
+
+            entity.Property(x => x.SeId)
+                .HasColumnName("se_id")
+                .IsRequired();
+
+            entity.Property(x => x.UsId)
+                .HasColumnName("us_id");
+
+            entity.Property(x => x.CiFechaIni)
+                .HasColumnName("ci_fecha_ini")
+                .HasPrecision(0)
+                .IsRequired();
+
+            entity.Property(x => x.CiFechaFin)
+                .HasColumnName("ci_fecha_fin")
+                .HasPrecision(0)
+                .IsRequired();
+
+            entity.Property(x => x.CiEstad)
+                .HasColumnName("ci_estad")
+                .HasMaxLength(20)
+                .HasDefaultValue("SOLICITADA")
+                .IsRequired();
+
+            entity.Property(x => x.CiCanal)
+                .HasColumnName("ci_canal")
+                .HasMaxLength(30)
+                .HasDefaultValue("SISTEMA")
+                .IsRequired();
+
+            entity.Property(x => x.CiObser)
+                .HasColumnName("ci_obser")
+                .HasMaxLength(1000);
+
+            entity.Property(x => x.CiFechaCrea)
+                .HasColumnName("ci_fecha_crea")
+                .HasPrecision(0)
+                .HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.Property(x => x.CiFechaModi)
+                .HasColumnName("ci_fecha_modi")
+                .HasPrecision(0);
+
+            entity.Property(x => x.CiVersion)
+                .HasColumnName("ci_version")
+                .IsRowVersion();
+
+            entity.HasOne<Paciente>()
+                .WithMany()
+                .HasForeignKey(x => x.PaId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne<Servicio>()
+                .WithMany()
+                .HasForeignKey(x => x.SeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne<Usuario>()
+                .WithMany()
+                .HasForeignKey(x => x.UsId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(x => new
+            {
+                x.CiFechaIni,
+                x.CiFechaFin,
+                x.CiEstad
+            })
+            .HasDatabaseName("IX_CITA_agenda");
+
+            entity.HasIndex(x => new
+            {
+                x.PaId,
+                x.CiFechaIni
+            })
+            .HasDatabaseName("IX_CITA_paciente")
             .IsDescending(false, true);
         });
 
