@@ -31,6 +31,8 @@ public class PodoFlowContext : DbContext
 
     public DbSet<DatoContacto> DatosContacto { get; set; }
 
+    public DbSet<EventoAuditoria> EventosAuditoria { get; set; }
+
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -477,6 +479,84 @@ public class PodoFlowContext : DbContext
 
             entity.HasIndex(x => new { x.PaId, x.DaEstatus })
                 .HasDatabaseName("IX_DATO_CONTACTO_paciente");
+        });
+
+        modelBuilder.Entity<EventoAuditoria>(entity =>
+        {
+            entity.ToTable("EVENTO_AUDITORIA", "aud");
+
+            entity.HasKey(x => x.EvId);
+
+            entity.Property(x => x.EvId)
+                .HasColumnName("ev_id")
+                .ValueGeneratedOnAdd();
+
+            entity.Property(x => x.UsId)
+                .HasColumnName("us_id");
+
+            entity.Property(x => x.PaId)
+                .HasColumnName("pa_id");
+
+            entity.Property(x => x.EvFechaHora)
+                .HasColumnName("ev_fecha_hora")
+                .HasPrecision(0)
+                .HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.Property(x => x.EvModulo)
+                .HasColumnName("ev_modulo")
+                .HasMaxLength(80)
+                .IsRequired();
+
+            entity.Property(x => x.EvAccion)
+                .HasColumnName("ev_accion")
+                .HasMaxLength(80)
+                .IsRequired();
+
+            entity.Property(x => x.EvEntid)
+                .HasColumnName("ev_entid")
+                .HasMaxLength(128);
+
+            entity.Property(x => x.EvEntidId)
+                .HasColumnName("ev_entid_id")
+                .HasMaxLength(100);
+
+            entity.Property(x => x.EvResul)
+                .HasColumnName("ev_resul")
+                .HasMaxLength(20)
+                .IsRequired();
+
+            entity.Property(x => x.EvDirecIp)
+                .HasColumnName("ev_direc_ip")
+                .HasMaxLength(45);
+
+            entity.Property(x => x.EvAgentUsua)
+                .HasColumnName("ev_agent_usua")
+                .HasMaxLength(500);
+
+            entity.Property(x => x.EvIdCorre)
+                .HasColumnName("ev_id_corre");
+
+            entity.Property(x => x.EvMetadJson)
+                .HasColumnName("ev_metad_json")
+                .HasColumnType("nvarchar(max)");
+
+            entity.HasOne<Usuario>()
+                .WithMany()
+                .HasForeignKey(x => x.UsId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne<Paciente>()
+                .WithMany()
+                .HasForeignKey(x => x.PaId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(x => new
+            {
+                x.UsId,
+                x.EvFechaHora
+            })
+            .HasDatabaseName("IX_EVENTO_AUD_usuario_fecha")
+            .IsDescending(false, true);
         });
 
     }

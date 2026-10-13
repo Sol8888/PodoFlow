@@ -56,6 +56,11 @@ builder.Services.AddScoped<IDatoContactoRepositorio, DatoContactoRepositorio>();
 builder.Services.AddScoped<IDatoContactoServicio, DatoContactoServicio>();
 
 
+builder.Services.AddScoped<IEventoAuditoriaRepositorio, EventoAuditoriaRepositorio>();
+builder.Services.AddScoped<IEventoAuditoriaServicio, EventoAuditoriaServicio>();
+
+
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
