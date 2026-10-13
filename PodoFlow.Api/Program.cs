@@ -64,6 +64,10 @@ builder.Services.AddScoped<IHorarioAtencionRepositorio, HorarioAtencionRepositor
 builder.Services.AddScoped<IHorarioAtencionServicio, HorarioAtencionServicio>();
 
 
+builder.Services.AddScoped<IBloqueoAgendaRepositorio, BloqueoAgendaRepositorio>();
+builder.Services.AddScoped<IBloqueoAgendaServicio, BloqueoAgendaServicio>();
+
+
 
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

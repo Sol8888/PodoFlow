@@ -35,6 +35,8 @@ public class PodoFlowContext : DbContext
 
     public DbSet<HorarioAtencion> HorariosAtencion { get; set; }
 
+    public DbSet<BloqueoAgenda> BloqueosAgenda { get; set; }
+
 
 
 
@@ -598,6 +600,50 @@ public class PodoFlowContext : DbContext
 
             entity.Property(x => x.HoEstatus)
                 .HasColumnName("ho_estatus")
+                .HasDefaultValue(true);
+
+            entity.HasOne<Usuario>()
+                .WithMany()
+                .HasForeignKey(x => x.UsId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+
+        modelBuilder.Entity<BloqueoAgenda>(entity =>
+        {
+            entity.ToTable("BLOQUEO_AGENDA", "cit");
+
+            entity.HasKey(x => x.BlId);
+
+            entity.Property(x => x.BlId)
+                .HasColumnName("bl_id")
+                .ValueGeneratedOnAdd();
+
+            entity.Property(x => x.UsId)
+                .HasColumnName("us_id");
+
+            entity.Property(x => x.BlFechaIni)
+                .HasColumnName("bl_fecha_ini")
+                .HasPrecision(0)
+                .IsRequired();
+
+            entity.Property(x => x.BlFechaFin)
+                .HasColumnName("bl_fecha_fin")
+                .HasPrecision(0)
+                .IsRequired();
+
+            entity.Property(x => x.BlMotivo)
+                .HasColumnName("bl_motivo")
+                .HasMaxLength(300)
+                .IsRequired();
+
+            entity.Property(x => x.BlFechaCrea)
+                .HasColumnName("bl_fecha_crea")
+                .HasPrecision(0)
+                .HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.Property(x => x.BlEstatus)
+                .HasColumnName("bl_estatus")
                 .HasDefaultValue(true);
 
             entity.HasOne<Usuario>()
