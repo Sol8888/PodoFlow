@@ -33,6 +33,10 @@ public class PodoFlowContext : DbContext
 
     public DbSet<EventoAuditoria> EventosAuditoria { get; set; }
 
+    public DbSet<HorarioAtencion> HorariosAtencion { get; set; }
+
+
+
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -557,6 +561,49 @@ public class PodoFlowContext : DbContext
             })
             .HasDatabaseName("IX_EVENTO_AUD_usuario_fecha")
             .IsDescending(false, true);
+        });
+
+
+        modelBuilder.Entity<HorarioAtencion>(entity =>
+        {
+            entity.ToTable("HORARIO_ATENCION", "cit");
+
+            entity.HasKey(x => x.HoId);
+
+            entity.Property(x => x.HoId)
+                .HasColumnName("ho_id")
+                .ValueGeneratedOnAdd();
+
+            entity.Property(x => x.UsId)
+                .HasColumnName("us_id");
+
+            entity.Property(x => x.HoDiaSem)
+                .HasColumnName("ho_dia_sem");
+
+            entity.Property(x => x.HoHoraIni)
+                .HasColumnName("ho_hora_ini")
+                .HasColumnType("time(0)");
+
+            entity.Property(x => x.HoHoraFin)
+                .HasColumnName("ho_hora_fin")
+                .HasColumnType("time(0)");
+
+            entity.Property(x => x.HoFechaDesd)
+                .HasColumnName("ho_fecha_desd")
+                .HasColumnType("date");
+
+            entity.Property(x => x.HoFechaHast)
+                .HasColumnName("ho_fecha_hast")
+                .HasColumnType("date");
+
+            entity.Property(x => x.HoEstatus)
+                .HasColumnName("ho_estatus")
+                .HasDefaultValue(true);
+
+            entity.HasOne<Usuario>()
+                .WithMany()
+                .HasForeignKey(x => x.UsId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
 
     }
