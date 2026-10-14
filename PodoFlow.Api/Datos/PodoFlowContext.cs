@@ -43,6 +43,8 @@ public class PodoFlowContext : DbContext
 
     public DbSet<Historia> Historias { get; set; }
 
+    public DbSet<Antecedente> Antecedentes { get; set; }
+
 
 
 
@@ -854,6 +856,54 @@ public class PodoFlowContext : DbContext
             entity.HasOne<Paciente>()
                 .WithMany()
                 .HasForeignKey(x => x.PaId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne<Usuario>()
+                .WithMany()
+                .HasForeignKey(x => x.UsId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+
+        modelBuilder.Entity<Antecedente>(entity =>
+        {
+            entity.ToTable("ANTECEDENTE", "cli");
+
+            entity.HasKey(x => x.AnId);
+
+            entity.Property(x => x.AnId)
+                .HasColumnName("an_id")
+                .ValueGeneratedOnAdd();
+
+            entity.Property(x => x.HiId)
+                .HasColumnName("hi_id")
+                .IsRequired();
+
+            entity.Property(x => x.UsId)
+                .HasColumnName("us_id");
+
+            entity.Property(x => x.AnTipo)
+                .HasColumnName("an_tipo")
+                .HasMaxLength(80)
+                .IsRequired();
+
+            entity.Property(x => x.AnDescri)
+                .HasColumnName("an_descri")
+                .HasMaxLength(2000)
+                .IsRequired();
+
+            entity.Property(x => x.AnFechaReg)
+                .HasColumnName("an_fecha_reg")
+                .HasPrecision(0)
+                .HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.Property(x => x.AnEstatus)
+                .HasColumnName("an_estatus")
+                .HasDefaultValue(true);
+
+            entity.HasOne<Historia>()
+                .WithMany()
+                .HasForeignKey(x => x.HiId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             entity.HasOne<Usuario>()

@@ -31,57 +31,48 @@ builder.Services.AddScoped<IUsuarioServicio, UsuarioServicio>();
 builder.Services.AddScoped<IRolRepositorio, RolRepositorio>();
 builder.Services.AddScoped<IRolServicio, RolServicio>();
 
-
 builder.Services.AddScoped<IPermisoRepositorio, PermisoRepositorio>();
 builder.Services.AddScoped<IPermisoServicio, PermisoServicio>();
-
 
 builder.Services.AddScoped<IUsuarioRolRepositorio, UsuarioRolRepositorio>();
 builder.Services.AddScoped<IUsuarioRolServicio, UsuarioRolServicio>();
 
-
 builder.Services.AddScoped<IRolPermisoRepositorio, RolPermisoRepositorio>();
 builder.Services.AddScoped<IRolPermisoServicio, RolPermisoServicio>();
-
 
 builder.Services.AddScoped<IIntentoAccesoRepositorio, IntentoAccesoRepositorio>();
 builder.Services.AddScoped<IIntentoAccesoServicio, IntentoAccesoServicio>();
 
-
 builder.Services.AddScoped<IPacienteRepositorio, PacienteRepositorio>();
 builder.Services.AddScoped<IPacienteServicio, PacienteServicio>();
-
 
 builder.Services.AddScoped<IPacienteUsuarioRepositorio, PacienteUsuarioRepositorio>();
 builder.Services.AddScoped<IPacienteUsuarioServicio, PacienteUsuarioServicio>();
 
-
 builder.Services.AddScoped<IDatoContactoRepositorio, DatoContactoRepositorio>();
 builder.Services.AddScoped<IDatoContactoServicio, DatoContactoServicio>();
-
 
 builder.Services.AddScoped<IEventoAuditoriaRepositorio, EventoAuditoriaRepositorio>();
 builder.Services.AddScoped<IEventoAuditoriaServicio, EventoAuditoriaServicio>();
 
-
 builder.Services.AddScoped<IHorarioAtencionRepositorio, HorarioAtencionRepositorio>();
 builder.Services.AddScoped<IHorarioAtencionServicio, HorarioAtencionServicio>();
-
 
 builder.Services.AddScoped<IBloqueoAgendaRepositorio, BloqueoAgendaRepositorio>();
 builder.Services.AddScoped<IBloqueoAgendaServicio, BloqueoAgendaServicio>();
 
-
 builder.Services.AddScoped<ICambioCitaRepositorio, CambioCitaRepositorio>();
 builder.Services.AddScoped<ICambioCitaServicio, CambioCitaServicio>();
-
 
 builder.Services.AddScoped<ICitaRepositorio, CitaRepositorio>();
 builder.Services.AddScoped<ICitaServicio, CitaServicio>();
 
-
 builder.Services.AddScoped<IHistoriaRepositorio, HistoriaRepositorio>();
 builder.Services.AddScoped<IHistoriaServicio, HistoriaServicio>();
+
+builder.Services.AddScoped<IAntecedenteRepositorio, AntecedenteRepositorio>();
+builder.Services.AddScoped<IAntecedenteServicio, AntecedenteServicio>();
+
 
 // Esto de aqui esta porque necesito hacer mock de la seguridad para probar algunas cosas :) la carpeta de seguridad esta conectada a esto y es por hacer mock a la Autenticacion
 if (builder.Environment.IsDevelopment())
