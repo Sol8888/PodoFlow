@@ -29,7 +29,9 @@ builder.Services.AddScoped<IFinalidadServicio, FinalidadServicio>();
 builder.Services.AddScoped<IAvisoRepositorio, AvisoRepositorio>();
 builder.Services.AddScoped<IAvisoServicio, AvisoServicio>();
 builder.Services.AddScoped<IConsentimientoRepositorio, ConsentimientoRepositorio>();
-builder.Services.AddScoped<IConsentimientoServicio, ConsentimientoServicio>(); 
+builder.Services.AddScoped<IConsentimientoServicio, ConsentimientoServicio>();
+builder.Services.AddScoped<IExportacionRepositorio, ExportacionRepositorio>();
+builder.Services.AddScoped<IExportacionServicio, ExportacionServicio>();
 
 builder.Services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
 builder.Services.AddScoped<IUsuarioServicio, UsuarioServicio>();

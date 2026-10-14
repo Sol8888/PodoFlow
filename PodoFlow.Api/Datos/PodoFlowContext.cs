@@ -49,7 +49,7 @@ public class PodoFlowContext : DbContext
 
     public DbSet<Historia> Historias { get; set; }
 
-
+    public DbSet<Exportacion> Exportaciones { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -1188,6 +1188,59 @@ public class PodoFlowContext : DbContext
             entity.Property(e => e.EvFechaCarg)
                 .HasColumnName("ev_fecha_carg")
                 .HasColumnType("datetime2(0)");
+
+            entity.HasOne<Solicitud>()
+                .WithMany()
+                .HasForeignKey(e => e.SoId);
+        });
+
+        modelBuilder.Entity<Exportacion>(entity =>
+        {
+            entity.ToTable("EXPORTACION", "pri", t =>
+            {
+                t.HasCheckConstraint("CK_EXPORTACION_format", "ex_forma IN ('JSON','CSV','PDF','ZIP')");
+                t.HasCheckConstraint("CK_EXPORTACION_estad", "ex_estad IN ('GENERADA','ENTREGADA','ANULADA')");
+            });
+
+            entity.HasKey(e => e.ExId);
+
+            entity.Property(e => e.ExId)
+                .HasColumnName("ex_id");
+
+            entity.Property(e => e.SoId)
+                .HasColumnName("so_id")
+                .IsRequired();
+
+            entity.Property(e => e.UsId)
+                .HasColumnName("us_id")
+                .IsRequired();
+
+            entity.Property(e => e.ExForma)
+                .HasColumnName("ex_forma")
+                .HasMaxLength(20)
+                .IsRequired();
+
+            entity.Property(e => e.ExRutaArch)
+                .HasColumnName("ex_ruta_arch")
+                .HasMaxLength(1000)
+                .IsRequired();
+
+            entity.Property(e => e.ExHuella)
+                .HasColumnName("ex_huella")
+                .HasMaxLength(128);
+
+            entity.Property(e => e.ExFechaGene)
+                .HasColumnName("ex_fecha_gene")
+                .HasColumnType("datetime2(0)");
+
+            entity.Property(e => e.ExFechaEntr)
+                .HasColumnName("ex_fecha_entr")
+                .HasColumnType("datetime2(0)");
+
+            entity.Property(e => e.ExEstad)
+                .HasColumnName("ex_estad")
+                .HasMaxLength(20)
+                .IsRequired();
 
             entity.HasOne<Solicitud>()
                 .WithMany()

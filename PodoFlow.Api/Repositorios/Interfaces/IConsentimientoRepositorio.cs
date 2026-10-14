@@ -4,7 +4,7 @@ namespace PodoFlow.Api.Repositorios.Interfaces
 {
     public interface IConsentimientoRepositorio
     {
-        Task<List<Consentimiento>> ObtenerTodosAsync();
+        Task<List<Consentimiento>> ObtenerTodosAsync(int pagina, int tamano);
 
         Task<List<Consentimiento>> ObtenerPorPacienteAsync(long pacienteId);
 

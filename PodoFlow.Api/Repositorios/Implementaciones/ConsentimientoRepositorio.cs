@@ -14,11 +14,13 @@ namespace PodoFlow.Api.Repositorios.Implementaciones
             _context = context;
         }
 
-        public async Task<List<Consentimiento>> ObtenerTodosAsync()
+        public async Task<List<Consentimiento>> ObtenerTodosAsync(int pagina, int tamano)
         {
             return await _context.Consentimientos
                 .AsNoTracking()
                 .OrderByDescending(x => x.CoFechaObte)
+                .Skip((pagina - 1) * tamano)
+                .Take(tamano)
                 .ToListAsync();
         }
 

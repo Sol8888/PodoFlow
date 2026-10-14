@@ -32,9 +32,9 @@ namespace PodoFlow.Api.Servicios.Implementaciones
             _avisoRepositorio = avisoRepositorio;
         }
 
-        public async Task<List<ConsentimientoRespuestaDto>> ObtenerTodosAsync()
+        public async Task<List<ConsentimientoRespuestaDto>> ObtenerTodosAsync(int pagina, int tamano)
         {
-            var consentimientos = await _repositorio.ObtenerTodosAsync();
+            var consentimientos = await _repositorio.ObtenerTodosAsync(pagina, tamano);
 
             return consentimientos.Select(MapearRespuesta).ToList();
         }
