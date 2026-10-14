@@ -45,6 +45,7 @@ public class PodoFlowContext : DbContext
 
     public DbSet<Antecedente> Antecedentes { get; set; }
     public DbSet<Atencion> Atenciones { get; set; }
+    public DbSet<Evolucion> Evoluciones { get; set; }
 
 
 
@@ -999,6 +1000,49 @@ public class PodoFlowContext : DbContext
                 .HasDatabaseName("IX_ATENCION_historia");
         });
 
+
+        modelBuilder.Entity<Evolucion>(entity =>
+        {
+            entity.ToTable("EVOLUCION", "cli");
+
+            entity.HasKey(x => x.EvId);
+
+            entity.Property(x => x.EvId)
+                .HasColumnName("ev_id")
+                .ValueGeneratedOnAdd();
+
+            entity.Property(x => x.AtId)
+                .HasColumnName("at_id")
+                .IsRequired();
+
+            entity.Property(x => x.UsId)
+                .HasColumnName("us_id")
+                .IsRequired();
+
+            entity.Property(x => x.EvFecha)
+                .HasColumnName("ev_fecha")
+                .HasPrecision(0)
+                .HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.Property(x => x.EvDescri)
+                .HasColumnName("ev_descri")
+                .HasMaxLength(3000)
+                .IsRequired();
+
+            entity.Property(x => x.EvEstatus)
+                .HasColumnName("ev_estatus")
+                .HasDefaultValue(true);
+
+            entity.HasOne<Atencion>()
+                .WithMany()
+                .HasForeignKey(x => x.AtId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne<Usuario>()
+                .WithMany()
+                .HasForeignKey(x => x.UsId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
 
     }
 }
