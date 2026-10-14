@@ -79,6 +79,8 @@ builder.Services.AddScoped<IAtencionServicio, AtencionServicio>();
 builder.Services.AddScoped<IEvolucionRepositorio, EvolucionRepositorio>();
 builder.Services.AddScoped<IEvolucionServicio, EvolucionServicio>();
 
+builder.Services.AddScoped<IAdjuntoRepositorio, AdjuntoRepositorio>();
+builder.Services.AddScoped<IAdjuntoServicio, AdjuntoServicio>();
 
 // Esto de aqui esta porque necesito hacer mock de la seguridad para probar algunas cosas :) la carpeta de seguridad esta conectada a esto y es por hacer mock a la Autenticacion
 if (builder.Environment.IsDevelopment())

@@ -44,9 +44,12 @@ public class PodoFlowContext : DbContext
     public DbSet<Historia> Historias { get; set; }
 
     public DbSet<Antecedente> Antecedentes { get; set; }
+
     public DbSet<Atencion> Atenciones { get; set; }
+
     public DbSet<Evolucion> Evoluciones { get; set; }
 
+    public DbSet<Adjunto> Adjuntos { get; set; }
 
 
 
@@ -1031,6 +1034,66 @@ public class PodoFlowContext : DbContext
 
             entity.Property(x => x.EvEstatus)
                 .HasColumnName("ev_estatus")
+                .HasDefaultValue(true);
+
+            entity.HasOne<Atencion>()
+                .WithMany()
+                .HasForeignKey(x => x.AtId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne<Usuario>()
+                .WithMany()
+                .HasForeignKey(x => x.UsId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+
+        modelBuilder.Entity<Adjunto>(entity =>
+        {
+            entity.ToTable("ADJUNTO", "cli");
+
+            entity.HasKey(x => x.AdId);
+
+            entity.Property(x => x.AdId)
+                .HasColumnName("ad_id")
+                .ValueGeneratedOnAdd();
+
+            entity.Property(x => x.AtId)
+                .HasColumnName("at_id")
+                .IsRequired();
+
+            entity.Property(x => x.UsId)
+                .HasColumnName("us_id")
+                .IsRequired();
+
+            entity.Property(x => x.AdNombre)
+                .HasColumnName("ad_nombre")
+                .HasMaxLength(255)
+                .IsRequired();
+
+            entity.Property(x => x.AdRutaArch)
+                .HasColumnName("ad_ruta_arch")
+                .HasMaxLength(1000)
+                .IsRequired();
+
+            entity.Property(x => x.AdTipoMime)
+                .HasColumnName("ad_tipo_mime")
+                .HasMaxLength(150);
+
+            entity.Property(x => x.AdHuella)
+                .HasColumnName("ad_huella")
+                .HasMaxLength(128);
+
+            entity.Property(x => x.AdTamanByte)
+                .HasColumnName("ad_taman_byte");
+
+            entity.Property(x => x.AdFechaCarg)
+                .HasColumnName("ad_fecha_carg")
+                .HasPrecision(0)
+                .HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.Property(x => x.AdEstatus)
+                .HasColumnName("ad_estatus")
                 .HasDefaultValue(true);
 
             entity.HasOne<Atencion>()
