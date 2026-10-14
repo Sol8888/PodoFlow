@@ -4,7 +4,7 @@ namespace PodoFlow.Api.Repositorios.Interfaces
 {
     public interface IAvisoRepositorio
     {
-        Task<List<Aviso>> ObtenerTodosAsync();
+        Task<List<Aviso>> ObtenerTodosAsync(bool incluirInactivos, int pagina, int tamano);
 
         Task<Aviso?> ObtenerPorIdAsync(int id);
 
@@ -12,8 +12,6 @@ namespace PodoFlow.Api.Repositorios.Interfaces
 
         Task<Aviso> CrearAsync(Aviso aviso);
 
-        Task ActualizarAsync(Aviso aviso);
-
-        Task EliminarAsync(Aviso aviso);
+        Task GuardarCambiosAsync();
     }
 }

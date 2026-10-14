@@ -16,11 +16,16 @@ namespace PodoFlow.Api.Controladores
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<FinalidadRespuestaDto>>> ObtenerTodos()
+        public async Task<ActionResult<List<FinalidadRespuestaDto>>> ObtenerTodos(
+            [FromQuery] bool incluirInactivos = false,
+            [FromQuery] int pagina = 1,
+            [FromQuery] int tamano = 10)
         {
-            return Ok(await _servicio.ObtenerTodosAsync());
-        }
+            if (pagina < 1 || tamano < 1 || tamano > 100)
+                return BadRequest(new { mensaje = "Paginación inválida." });
 
+            return Ok(await _servicio.ObtenerTodosAsync(incluirInactivos, pagina, tamano));
+        }
         [HttpGet("{id:int}")]
         public async Task<ActionResult<FinalidadRespuestaDto>> ObtenerPorId(int id)
         {
@@ -57,13 +62,22 @@ namespace PodoFlow.Api.Controladores
 
             return NoContent();
         }
-
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Eliminar(int id)
         {
             var eliminado = await _servicio.EliminarAsync(id);
 
             if (!eliminado)
+                return NotFound();
+
+            return NoContent();
+        }
+        [HttpPatch("{id:int}/reactivar")]
+        public async Task<IActionResult> Reactivar(int id)
+        {
+            var reactivado = await _servicio.ReactivarAsync(id);
+
+            if (!reactivado)
                 return NotFound();
 
             return NoContent();

@@ -14,9 +14,10 @@ namespace PodoFlow.Api.Servicios.Implementaciones
             _repositorio = repositorio;
         }
 
-        public async Task<List<FinalidadRespuestaDto>> ObtenerTodosAsync()
+        public async Task<List<FinalidadRespuestaDto>> ObtenerTodosAsync(
+            bool incluirInactivos, int pagina, int tamano)
         {
-            var finalidades = await _repositorio.ObtenerTodosAsync();
+            var finalidades = await _repositorio.ObtenerTodosAsync(incluirInactivos, pagina, tamano);
 
             return finalidades.Select(MapearRespuesta).ToList();
         }
@@ -25,10 +26,7 @@ namespace PodoFlow.Api.Servicios.Implementaciones
         {
             var finalidad = await _repositorio.ObtenerPorIdAsync(id);
 
-            if (finalidad == null)
-                return null;
-
-            return MapearRespuesta(finalidad);
+            return finalidad == null ? null : MapearRespuesta(finalidad);
         }
 
         public async Task<FinalidadRespuestaDto> CrearAsync(
@@ -49,7 +47,7 @@ namespace PodoFlow.Api.Servicios.Implementaciones
                 existente.FiRequiCons = dto.RequiereConsentimiento;
                 existente.FiEstatus = true;
 
-                await _repositorio.ActualizarAsync(existente);
+                await _repositorio.GuardarCambiosAsync();
 
                 return MapearRespuesta(existente);
             }
@@ -80,9 +78,8 @@ namespace PodoFlow.Api.Servicios.Implementaciones
             finalidad.FiNombre = dto.Nombre.Trim();
             finalidad.FiDescri = dto.Descripcion?.Trim();
             finalidad.FiRequiCons = dto.RequiereConsentimiento;
-            finalidad.FiEstatus = dto.Estatus;
 
-            await _repositorio.ActualizarAsync(finalidad);
+            await _repositorio.GuardarCambiosAsync();
 
             return true;
         }
@@ -94,11 +91,35 @@ namespace PodoFlow.Api.Servicios.Implementaciones
             if (finalidad == null)
                 return false;
 
-            await _repositorio.EliminarAsync(finalidad);
+            if (!finalidad.FiEstatus)
+                return true;
+
+            finalidad.FiEstatus = false;
+
+            await _repositorio.GuardarCambiosAsync();
 
             return true;
         }
-        private static FinalidadRespuestaDto MapearRespuesta(Finalidad finalidad)
+
+        public async Task<bool> ReactivarAsync(int id)
+        {
+            var finalidad = await _repositorio.ObtenerPorIdAsync(id);
+
+            if (finalidad == null)
+                return false;
+
+            if (finalidad.FiEstatus)
+                return true;
+
+            finalidad.FiEstatus = true;
+
+            await _repositorio.GuardarCambiosAsync();
+
+            return true;
+        }
+
+        private static FinalidadRespuestaDto MapearRespuesta(
+            Finalidad finalidad)
         {
             return new FinalidadRespuestaDto
             {
@@ -112,4 +133,3 @@ namespace PodoFlow.Api.Servicios.Implementaciones
         }
     }
 }
-    

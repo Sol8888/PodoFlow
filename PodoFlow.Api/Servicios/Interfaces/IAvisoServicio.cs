@@ -4,7 +4,7 @@ namespace PodoFlow.Api.Servicios.Interfaces
 {
     public interface IAvisoServicio
     {
-        Task<List<AvisoRespuestaDto>> ObtenerTodosAsync();
+        Task<List<AvisoRespuestaDto>> ObtenerTodosAsync(bool incluirInactivos, int pagina, int tamano);
 
         Task<AvisoRespuestaDto?> ObtenerPorIdAsync(int id);
 
@@ -13,5 +13,7 @@ namespace PodoFlow.Api.Servicios.Interfaces
         Task<bool> ActualizarAsync(int id, AvisoActualizarDto dto);
 
         Task<bool> EliminarAsync(int id);
+
+        Task<bool> ReactivarAsync(int id);
     }
 }

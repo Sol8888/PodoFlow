@@ -14,7 +14,6 @@ namespace PodoFlow.Api.DTOs.Aviso
 
         [MaxLength(128)]
         public string? Huella { get; set; }
-
-        public bool Estatus { get; set; }
     }
 }
+

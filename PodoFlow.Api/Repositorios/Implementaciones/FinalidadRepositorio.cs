@@ -13,14 +13,19 @@ namespace PodoFlow.Api.Repositorios.Implementaciones
             _context = context;
         }
 
-        public async Task<List<Finalidad>> ObtenerTodosAsync()
+        public async Task<List<Finalidad>> ObtenerTodosAsync(bool incluirInactivos, int pagina, int tamano)
         {
-            return await _context.Finalidades
-                .AsNoTracking()
+            var consulta = _context.Finalidades.AsNoTracking();
+
+            if (!incluirInactivos)
+                consulta = consulta.Where(x => x.FiEstatus);
+
+            return await consulta
                 .OrderBy(x => x.FiNombre)
+                .Skip((pagina - 1) * tamano)
+                .Take(tamano)
                 .ToListAsync();
         }
-
         public async Task<Finalidad?> ObtenerPorIdAsync(int id)
         {
             return await _context.Finalidades
@@ -42,17 +47,8 @@ namespace PodoFlow.Api.Repositorios.Implementaciones
             return finalidad;
         }
 
-        public async Task ActualizarAsync(Finalidad finalidad)
+        public async Task GuardarCambiosAsync()
         {
-            _context.Finalidades.Update(finalidad);
-
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task EliminarAsync(Finalidad finalidad)
-        {
-            finalidad.FiEstatus = false;
-
             await _context.SaveChangesAsync();
         }
     }

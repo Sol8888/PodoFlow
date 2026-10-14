@@ -14,9 +14,10 @@ namespace PodoFlow.Api.Servicios.Implementaciones
             _repositorio = repositorio;
         }
 
-        public async Task<List<AvisoRespuestaDto>> ObtenerTodosAsync()
+        public async Task<List<AvisoRespuestaDto>> ObtenerTodosAsync(
+            bool incluirInactivos, int pagina, int tamano)
         {
-            var avisos = await _repositorio.ObtenerTodosAsync();
+            var avisos = await _repositorio.ObtenerTodosAsync(incluirInactivos, pagina, tamano);
 
             return avisos.Select(MapearRespuesta).ToList();
         }
@@ -25,10 +26,7 @@ namespace PodoFlow.Api.Servicios.Implementaciones
         {
             var aviso = await _repositorio.ObtenerPorIdAsync(id);
 
-            if (aviso == null)
-                return null;
-
-            return MapearRespuesta(aviso);
+            return aviso == null ? null : MapearRespuesta(aviso);
         }
 
         public async Task<AvisoRespuestaDto> CrearAsync(
@@ -52,7 +50,7 @@ namespace PodoFlow.Api.Servicios.Implementaciones
                 existente.AvHuella = dto.Huella?.Trim();
                 existente.AvEstatus = true;
 
-                await _repositorio.ActualizarAsync(existente);
+                await _repositorio.GuardarCambiosAsync();
 
                 return MapearRespuesta(existente);
             }
@@ -87,9 +85,8 @@ namespace PodoFlow.Api.Servicios.Implementaciones
             aviso.AvFechaHast = dto.FechaHasta;
             aviso.AvRutaArch = dto.RutaArchivo?.Trim();
             aviso.AvHuella = dto.Huella?.Trim();
-            aviso.AvEstatus = dto.Estatus;
 
-            await _repositorio.ActualizarAsync(aviso);
+            await _repositorio.GuardarCambiosAsync();
 
             return true;
         }
@@ -101,7 +98,29 @@ namespace PodoFlow.Api.Servicios.Implementaciones
             if (aviso == null)
                 return false;
 
-            await _repositorio.EliminarAsync(aviso);
+            if (!aviso.AvEstatus)
+                return true;
+
+            aviso.AvEstatus = false;
+
+            await _repositorio.GuardarCambiosAsync();
+
+            return true;
+        }
+
+        public async Task<bool> ReactivarAsync(int id)
+        {
+            var aviso = await _repositorio.ObtenerPorIdAsync(id);
+
+            if (aviso == null)
+                return false;
+
+            if (aviso.AvEstatus)
+                return true;
+
+            aviso.AvEstatus = true;
+
+            await _repositorio.GuardarCambiosAsync();
 
             return true;
         }

@@ -14,11 +14,18 @@ namespace PodoFlow.Api.Repositorios.Implementaciones
             _context = context;
         }
 
-        public async Task<List<Aviso>> ObtenerTodosAsync()
+        public async Task<List<Aviso>> ObtenerTodosAsync(bool incluirInactivos, int pagina, int tamano)
         {
-            return await _context.Avisos
-                .AsNoTracking()
+            var consulta = _context.Avisos.AsNoTracking();
+
+            if (!incluirInactivos)
+                consulta = consulta.Where(x => x.AvEstatus);
+
+            return await consulta
                 .OrderByDescending(x => x.AvFechaDesd)
+                .ThenByDescending(x => x.AvId)
+                .Skip((pagina - 1) * tamano)
+                .Take(tamano)
                 .ToListAsync();
         }
 
@@ -43,17 +50,8 @@ namespace PodoFlow.Api.Repositorios.Implementaciones
             return aviso;
         }
 
-        public async Task ActualizarAsync(Aviso aviso)
+        public async Task GuardarCambiosAsync()
         {
-            _context.Avisos.Update(aviso);
-
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task EliminarAsync(Aviso aviso)
-        {
-            aviso.AvEstatus = false;
-
             await _context.SaveChangesAsync();
         }
     }
