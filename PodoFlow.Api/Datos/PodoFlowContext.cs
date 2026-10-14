@@ -20,6 +20,8 @@ public class PodoFlowContext : DbContext
     public DbSet<Solicitud> Solicitudes { get; set; }
     public DbSet<AccionSolicitud> AccionesSolicitud { get; set; }
     public DbSet<EvidenciaSolicitud> EvidenciasSolicitud { get; set; }
+    public DbSet<CategoriaDato> CategoriasDato { get; set; }
+
 
     public DbSet<Rol> Roles { get; set; }
 
@@ -1245,6 +1247,36 @@ public class PodoFlowContext : DbContext
             entity.HasOne<Solicitud>()
                 .WithMany()
                 .HasForeignKey(e => e.SoId);
+        });
+
+        modelBuilder.Entity<CategoriaDato>(entity =>
+        {
+            entity.ToTable("CATEGORIA_DATO", "pri");
+
+            entity.HasKey(e => e.CaId);
+
+            entity.HasIndex(e => e.CaNombre)
+                .IsUnique();
+
+            entity.Property(e => e.CaId)
+                .HasColumnName("ca_id");
+
+            entity.Property(e => e.CaNombre)
+                .HasColumnName("ca_nombre")
+                .HasMaxLength(150)
+                .IsRequired();
+
+            entity.Property(e => e.CaDescri)
+                .HasColumnName("ca_descri")
+                .HasMaxLength(1000);
+
+            entity.Property(e => e.CaSensi)
+                .HasColumnName("ca_sensi")
+                .IsRequired();
+
+            entity.Property(e => e.CaEstatus)
+                .HasColumnName("ca_estatus")
+                .IsRequired();
         });
 
     }

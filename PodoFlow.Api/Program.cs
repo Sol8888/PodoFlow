@@ -32,6 +32,8 @@ builder.Services.AddScoped<IConsentimientoRepositorio, ConsentimientoRepositorio
 builder.Services.AddScoped<IConsentimientoServicio, ConsentimientoServicio>();
 builder.Services.AddScoped<IExportacionRepositorio, ExportacionRepositorio>();
 builder.Services.AddScoped<IExportacionServicio, ExportacionServicio>();
+builder.Services.AddScoped<ICategoriaDatoRepositorio, CategoriaDatoRepositorio>();
+builder.Services.AddScoped<ICategoriaDatoServicio, CategoriaDatoServicio>();
 
 builder.Services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
 builder.Services.AddScoped<IUsuarioServicio, UsuarioServicio>();
