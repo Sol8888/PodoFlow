@@ -23,6 +23,7 @@ public class PodoFlowContext : DbContext
     public DbSet<CategoriaDato> CategoriasDato { get; set; }
     public DbSet<Encargado> Encargados { get; set; }
     public DbSet<TratamientoDatos> TratamientosDatos { get; set; }
+    public DbSet<TratamientoCategoria> TratamientosCategorias { get; set; } 
 
 
     public DbSet<Rol> Roles { get; set; }
@@ -1388,6 +1389,39 @@ public class PodoFlowContext : DbContext
             entity.HasOne<Finalidad>()
                 .WithMany()
                 .HasForeignKey(e => e.FiId);
+        });
+        modelBuilder.Entity<TratamientoCategoria>(entity =>
+        {
+            entity.ToTable("TR_CA", "pri");
+
+            // Clave primaria compuesta.
+            entity.HasKey(e => new { e.TrId, e.CaId });
+
+            entity.Property(e => e.TrId)
+                .HasColumnName("tr_id")
+                .ValueGeneratedNever();
+
+            entity.Property(e => e.CaId)
+                .HasColumnName("ca_id")
+                .ValueGeneratedNever();
+
+            entity.Property(e => e.TcFechaAsig)
+                .HasColumnName("tc_fecha_asig")
+                .HasColumnType("datetime2(0)");
+
+            entity.Property(e => e.TcEstatus)
+                .HasColumnName("tc_estatus")
+                .IsRequired();
+
+            entity.HasOne<TratamientoDatos>()
+                .WithMany()
+                .HasForeignKey(e => e.TrId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne<CategoriaDato>()
+                .WithMany()
+                .HasForeignKey(e => e.CaId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
 
     }
