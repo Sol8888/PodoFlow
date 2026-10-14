@@ -41,6 +41,7 @@ public class PodoFlowContext : DbContext
 
     public DbSet<Cita> Citas { get; set; }
 
+    public DbSet<Historia> Historias { get; set; }
 
 
 
@@ -804,6 +805,61 @@ public class PodoFlowContext : DbContext
             })
             .HasDatabaseName("IX_CITA_paciente")
             .IsDescending(false, true);
+        });
+
+        modelBuilder.Entity<Historia>(entity =>
+        {
+            entity.ToTable("HISTORIA", "cli");
+
+            entity.HasKey(x => x.HiId);
+
+            entity.Property(x => x.HiId)
+                .HasColumnName("hi_id")
+                .ValueGeneratedOnAdd();
+
+            entity.Property(x => x.PaId)
+                .HasColumnName("pa_id")
+                .IsRequired();
+
+            entity.HasIndex(x => x.PaId)
+                .IsUnique()
+                .HasDatabaseName("UQ_HISTORIA_paciente");
+
+            entity.Property(x => x.UsId)
+                .HasColumnName("us_id");
+
+            entity.Property(x => x.HiFechaAper)
+                .HasColumnName("hi_fecha_aper")
+                .HasPrecision(0)
+                .HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.Property(x => x.HiEstad)
+                .HasColumnName("hi_estad")
+                .HasMaxLength(20)
+                .HasDefaultValue("ACTIVA")
+                .IsRequired();
+
+            entity.Property(x => x.HiFechaBloq)
+                .HasColumnName("hi_fecha_bloq")
+                .HasPrecision(0);
+
+            entity.Property(x => x.HiMotivBloq)
+                .HasColumnName("hi_motiv_bloq")
+                .HasMaxLength(500);
+
+            entity.Property(x => x.HiVersion)
+                .HasColumnName("hi_version")
+                .IsRowVersion();
+
+            entity.HasOne<Paciente>()
+                .WithMany()
+                .HasForeignKey(x => x.PaId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne<Usuario>()
+                .WithMany()
+                .HasForeignKey(x => x.UsId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
 
     }
