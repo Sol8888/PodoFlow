@@ -44,6 +44,7 @@ public class PodoFlowContext : DbContext
     public DbSet<Historia> Historias { get; set; }
 
     public DbSet<Antecedente> Antecedentes { get; set; }
+    public DbSet<Atencion> Atenciones { get; set; }
 
 
 
@@ -911,6 +912,93 @@ public class PodoFlowContext : DbContext
                 .HasForeignKey(x => x.UsId)
                 .OnDelete(DeleteBehavior.Restrict);
         });
+
+
+        modelBuilder.Entity<Atencion>(entity =>
+        {
+            entity.ToTable("ATENCION", "cli");
+
+            entity.HasKey(x => x.AtId);
+
+            entity.Property(x => x.AtId)
+                .HasColumnName("at_id")
+                .ValueGeneratedOnAdd();
+
+            entity.Property(x => x.HiId)
+                .HasColumnName("hi_id")
+                .IsRequired();
+
+            entity.Property(x => x.CiId)
+                .HasColumnName("ci_id");
+
+            entity.Property(x => x.UsId)
+                .HasColumnName("us_id")
+                .IsRequired();
+
+            entity.Property(x => x.AtFecha)
+                .HasColumnName("at_fecha")
+                .HasPrecision(0)
+                .HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.Property(x => x.AtMotivCons)
+                .HasColumnName("at_motiv_cons")
+                .HasMaxLength(1000);
+
+            entity.Property(x => x.AtValorClin)
+                .HasColumnName("at_valor_clin")
+                .HasMaxLength(3000);
+
+            entity.Property(x => x.AtDiagn)
+                .HasColumnName("at_diagn")
+                .HasMaxLength(2000);
+
+            entity.Property(x => x.AtTrata)
+                .HasColumnName("at_trata")
+                .HasMaxLength(3000);
+
+            entity.Property(x => x.AtObser)
+                .HasColumnName("at_obser")
+                .HasMaxLength(3000);
+
+            entity.Property(x => x.AtEstad)
+                .HasColumnName("at_estad")
+                .HasMaxLength(20)
+                .HasDefaultValue("ABIERTA")
+                .IsRequired();
+
+            entity.Property(x => x.AtFechaModi)
+                .HasColumnName("at_fecha_modi")
+                .HasPrecision(0);
+
+            entity.Property(x => x.AtVersion)
+                .HasColumnName("at_version")
+                .IsRowVersion();
+
+            entity.HasOne<Historia>()
+                .WithMany()
+                .HasForeignKey(x => x.HiId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne<Cita>()
+                .WithMany()
+                .HasForeignKey(x => x.CiId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne<Usuario>()
+                .WithMany()
+                .HasForeignKey(x => x.UsId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(x => x.CiId)
+                .IsUnique()
+                .HasFilter("[ci_id] IS NOT NULL")
+                .HasDatabaseName("UX_ATENCION_cita");
+
+            entity.HasIndex(x => new { x.HiId, x.AtFecha })
+                .IsDescending(false, true)
+                .HasDatabaseName("IX_ATENCION_historia");
+        });
+
 
     }
 }
