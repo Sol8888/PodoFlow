@@ -51,6 +51,8 @@ public class PodoFlowContext : DbContext
 
     public DbSet<Adjunto> Adjuntos { get; set; }
 
+    public DbSet<Insumo> Insumos { get; set; }
+
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -1105,6 +1107,60 @@ public class PodoFlowContext : DbContext
                 .WithMany()
                 .HasForeignKey(x => x.UsId)
                 .OnDelete(DeleteBehavior.Restrict);
+        });
+
+
+        modelBuilder.Entity<Insumo>(entity =>
+        {
+            entity.ToTable("INSUMO", "inv");
+
+            entity.HasKey(x => x.InId);
+
+            entity.Property(x => x.InId)
+                .HasColumnName("in_id")
+                .ValueGeneratedOnAdd();
+
+            entity.Property(x => x.InNombre)
+                .HasColumnName("in_nombre")
+                .HasMaxLength(150)
+                .IsRequired();
+
+            entity.Property(x => x.InCateg)
+                .HasColumnName("in_categ")
+                .HasMaxLength(80)
+                .IsRequired();
+
+            entity.Property(x => x.InUnidad)
+                .HasColumnName("in_unidad")
+                .HasMaxLength(30)
+                .IsRequired();
+
+            entity.Property(x => x.InStockActu)
+                .HasColumnName("in_stock_actu")
+                .HasColumnType("decimal(12,2)")
+                .HasDefaultValue(0m);
+
+            entity.Property(x => x.InStockMini)
+                .HasColumnName("in_stock_mini")
+                .HasColumnType("decimal(12,2)")
+                .HasDefaultValue(0m);
+
+            entity.Property(x => x.InFechaCrea)
+                .HasColumnName("in_fecha_crea")
+                .HasPrecision(0)
+                .HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.Property(x => x.InFechaModi)
+                .HasColumnName("in_fecha_modi")
+                .HasPrecision(0);
+
+            entity.Property(x => x.InEstatus)
+                .HasColumnName("in_estatus")
+                .HasDefaultValue(true);
+
+            entity.Property(x => x.InVersion)
+                .HasColumnName("in_version")
+                .IsRowVersion();
         });
 
     }
