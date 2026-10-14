@@ -21,6 +21,7 @@ public class PodoFlowContext : DbContext
     public DbSet<AccionSolicitud> AccionesSolicitud { get; set; }
     public DbSet<EvidenciaSolicitud> EvidenciasSolicitud { get; set; }
     public DbSet<CategoriaDato> CategoriasDato { get; set; }
+    public DbSet<Encargado> Encargados { get; set; } 
 
 
     public DbSet<Rol> Roles { get; set; }
@@ -1276,6 +1277,49 @@ public class PodoFlowContext : DbContext
 
             entity.Property(e => e.CaEstatus)
                 .HasColumnName("ca_estatus")
+                .IsRequired();
+        });
+        modelBuilder.Entity<Encargado>(entity =>
+        {
+            entity.ToTable("ENCARGADO", "pri");
+
+            entity.HasKey(e => e.EnId);
+
+            entity.Property(e => e.EnId)
+                .HasColumnName("en_id");
+
+            entity.Property(e => e.EnNombre)
+                .HasColumnName("en_nombre")
+                .HasMaxLength(200)
+                .IsRequired();
+
+            entity.Property(e => e.EnServi)
+                .HasColumnName("en_servi")
+                .HasMaxLength(200)
+                .IsRequired();
+
+            entity.Property(e => e.EnRolTrata)
+                .HasColumnName("en_rol_trata")
+                .HasMaxLength(100);
+
+            entity.Property(e => e.EnDescri)
+                .HasColumnName("en_descri")
+                .HasMaxLength(1500);
+
+            entity.Property(e => e.EnRiesgo)
+                .HasColumnName("en_riesgo")
+                .HasMaxLength(1000);
+
+            entity.Property(e => e.EnMediContr)
+                .HasColumnName("en_medi_contr")
+                .HasMaxLength(2000);
+
+            entity.Property(e => e.EnMediTecni)
+                .HasColumnName("en_medi_tecni")
+                .HasMaxLength(2000);
+
+            entity.Property(e => e.EnEstatus)
+                .HasColumnName("en_estatus")
                 .IsRequired();
         });
 
