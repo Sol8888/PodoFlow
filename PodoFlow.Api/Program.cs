@@ -42,6 +42,9 @@ builder.Services.AddScoped<ITratamientoCategoriaRepositorio, TratamientoCategori
 builder.Services.AddScoped<ITratamientoCategoriaServicio, TratamientoCategoriaServicio>();
 builder.Services.AddScoped<ITratamientoEncargadoRepositorio, TratamientoEncargadoRepositorio>();
 builder.Services.AddScoped<ITratamientoEncargadoServicio, TratamientoEncargadoServicio>();
+builder.Services.AddScoped<IRiesgoRepositorio, RiesgoRepositorio>();
+builder.Services.AddScoped<IRiesgoServicio, RiesgoServicio>();
+
 
 builder.Services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
 builder.Services.AddScoped<IUsuarioServicio, UsuarioServicio>();

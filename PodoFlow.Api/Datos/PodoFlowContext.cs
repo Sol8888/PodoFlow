@@ -25,6 +25,7 @@ public class PodoFlowContext : DbContext
     public DbSet<TratamientoDatos> TratamientosDatos { get; set; }
     public DbSet<TratamientoCategoria> TratamientosCategorias { get; set; }
     public DbSet<TratamientoEncargado> TratamientosEncargados { get; set; }
+    public DbSet<Riesgo> Riesgos { get; set; } 
 
 
     public DbSet<Rol> Roles { get; set; }
@@ -1454,6 +1455,64 @@ public class PodoFlowContext : DbContext
             entity.HasOne<Encargado>()
                 .WithMany()
                 .HasForeignKey(e => e.EnId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+        modelBuilder.Entity<Riesgo>(entity =>
+        {
+            entity.ToTable("RIESGO", "pri", t =>
+            {
+                t.HasCheckConstraint("CK_RIESGO_proba", "ri_proba BETWEEN 1 AND 5");
+                t.HasCheckConstraint("CK_RIESGO_impac", "ri_impac BETWEEN 1 AND 5");
+                t.HasCheckConstraint("CK_RIESGO_nivel", "ri_nivel BETWEEN 1 AND 25");
+                t.HasCheckConstraint("CK_RIESGO_resid", "ri_riesg_resid IS NULL OR ri_riesg_resid BETWEEN 1 AND 25");
+                t.HasCheckConstraint("CK_RIESGO_estad", "ri_estad IN ('ABIERTO','MITIGADO','ACEPTADO','CERRADO')");
+            });
+
+            entity.HasKey(e => e.RiId);
+
+            entity.Property(e => e.RiId)
+                .HasColumnName("ri_id");
+
+            entity.Property(e => e.TrId)
+                .HasColumnName("tr_id")
+                .IsRequired();
+
+            entity.Property(e => e.RiDescri)
+                .HasColumnName("ri_descri")
+                .HasMaxLength(2000)
+                .IsRequired();
+
+            entity.Property(e => e.RiProba)
+                .HasColumnName("ri_proba")
+                .IsRequired();
+
+            entity.Property(e => e.RiImpac)
+                .HasColumnName("ri_impac")
+                .IsRequired();
+
+            entity.Property(e => e.RiNivel)
+                .HasColumnName("ri_nivel")
+                .IsRequired();
+
+            entity.Property(e => e.RiMediMitig)
+                .HasColumnName("ri_medi_mitig")
+                .HasMaxLength(2000);
+
+            entity.Property(e => e.RiRiesgResid)
+                .HasColumnName("ri_riesg_resid");
+
+            entity.Property(e => e.RiEstad)
+                .HasColumnName("ri_estad")
+                .HasMaxLength(20)
+                .IsRequired();
+
+            entity.Property(e => e.RiFechaRevi)
+                .HasColumnName("ri_fecha_revi")
+                .HasColumnType("date");
+
+            entity.HasOne<TratamientoDatos>()
+                .WithMany()
+                .HasForeignKey(e => e.TrId)
                 .OnDelete(DeleteBehavior.Restrict);
         });
 
