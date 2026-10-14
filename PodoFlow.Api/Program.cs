@@ -28,6 +28,10 @@ builder.Services.AddScoped<IConsentimientoRepositorio, ConsentimientoRepositorio
 builder.Services.AddScoped<IConsentimientoServicio, ConsentimientoServicio>(); 
 builder.Services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
 builder.Services.AddScoped<IUsuarioServicio, UsuarioServicio>();
+builder.Services.AddScoped<ISolicitudRepositorio, SolicitudRepositorio>();
+builder.Services.AddScoped<ISolicitudServicio, SolicitudServicio>();
+
+
 
 
 

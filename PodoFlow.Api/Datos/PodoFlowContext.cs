@@ -16,9 +16,9 @@ public class PodoFlowContext : DbContext
     public DbSet<Aviso> Avisos { get; set; }
     public DbSet<Consentimiento> Consentimientos { get; set; }
     public DbSet<EventoConsentimiento> EventosConsentimiento { get; set; } 
-
     public DbSet<Usuario> Usuarios { get; set; }
-
+    public DbSet<Solicitud> Solicitudes { get; set; }
+    public DbSet<AccionSolicitud> AccionesSolicitud { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -245,7 +245,6 @@ public class PodoFlowContext : DbContext
                 .HasForeignKey(e => e.CoId);
         });
 
-
         modelBuilder.Entity<Usuario>(entity =>
         {
             entity.ToTable("USUARIO", "seg");
@@ -291,6 +290,116 @@ public class PodoFlowContext : DbContext
             entity.Property(e => e.UsVersion)
                 .HasColumnName("us_version")
                 .IsRowVersion();
+        });
+
+        modelBuilder.Entity<Solicitud>(entity =>
+        {
+            entity.ToTable("SOLICITUD", "pri");
+
+            entity.HasKey(e => e.SoId);
+
+            entity.HasIndex(e => new { e.PaId, e.SoFechaRece });
+
+            entity.Property(e => e.SoId)
+                .HasColumnName("so_id");
+
+            entity.Property(e => e.PaId)
+                .HasColumnName("pa_id")
+                .IsRequired();
+
+            entity.Property(e => e.UsId)
+                .HasColumnName("us_id");
+
+            entity.Property(e => e.SoTipoDere)
+                .HasColumnName("so_tipo_dere")
+                .HasMaxLength(25)
+                .IsRequired();
+
+            entity.Property(e => e.SoTipoSoli)
+                .HasColumnName("so_tipo_soli")
+                .HasMaxLength(20)
+                .IsRequired();
+
+            entity.Property(e => e.SoNombrSoli)
+                .HasColumnName("so_nombr_soli")
+                .HasMaxLength(200)
+                .IsRequired();
+
+            entity.Property(e => e.SoIdentSoli)
+                .HasColumnName("so_ident_soli")
+                .HasMaxLength(50)
+                .IsRequired();
+
+            entity.Property(e => e.SoFechaRece)
+                .HasColumnName("so_fecha_rece")
+                .HasColumnType("datetime2(0)");
+
+            entity.Property(e => e.SoEstad)
+                .HasColumnName("so_estad")
+                .HasMaxLength(20)
+                .IsRequired();
+
+            entity.Property(e => e.SoMedioResp)
+                .HasColumnName("so_medio_resp")
+                .HasMaxLength(50);
+
+            entity.Property(e => e.SoDetal)
+                .HasColumnName("so_detal")
+                .HasMaxLength(3000);
+
+            entity.Property(e => e.SoRespue)
+                .HasColumnName("so_respue")
+                .HasMaxLength(3000);
+
+            entity.Property(e => e.SoFechaCier)
+                .HasColumnName("so_fecha_cier")
+                .HasColumnType("datetime2(0)");
+
+            entity.Property(e => e.SoVersion)
+                .HasColumnName("so_version")
+                .IsRowVersion();
+        });
+
+        modelBuilder.Entity<AccionSolicitud>(entity =>
+        {
+            entity.ToTable("ACCION_SOLICITUD", "pri");
+
+            entity.HasKey(e => e.AcId);
+
+            entity.Property(e => e.AcId)
+                .HasColumnName("ac_id");
+
+            entity.Property(e => e.SoId)
+                .HasColumnName("so_id");
+
+            entity.Property(e => e.UsId)
+                .HasColumnName("us_id")
+                .IsRequired();
+
+            entity.Property(e => e.AcFechaHora)
+                .HasColumnName("ac_fecha_hora")
+                .HasColumnType("datetime2(0)");
+
+            entity.Property(e => e.AcEstadAnte)
+                .HasColumnName("ac_estad_ante")
+                .HasMaxLength(20);
+
+            entity.Property(e => e.AcEstadNuev)
+                .HasColumnName("ac_estad_nuev")
+                .HasMaxLength(20);
+
+            entity.Property(e => e.AcAccion)
+                .HasColumnName("ac_accion")
+                .HasMaxLength(1000)
+                .IsRequired();
+
+            entity.Property(e => e.AcObser)
+                .HasColumnName("ac_obser")
+                .HasMaxLength(2000);
+
+            entity.HasOne(e => e.Solicitud)
+                .WithMany()
+                .HasForeignKey(e => e.SoId);
         });
 
     }
