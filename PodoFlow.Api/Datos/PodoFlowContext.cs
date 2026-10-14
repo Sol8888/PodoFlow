@@ -19,6 +19,7 @@ public class PodoFlowContext : DbContext
     public DbSet<Usuario> Usuarios { get; set; }
     public DbSet<Solicitud> Solicitudes { get; set; }
     public DbSet<AccionSolicitud> AccionesSolicitud { get; set; }
+    public DbSet<EvidenciaSolicitud> EvidenciasSolicitud { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -398,6 +399,45 @@ public class PodoFlowContext : DbContext
                 .HasMaxLength(2000);
 
             entity.HasOne(e => e.Solicitud)
+                .WithMany()
+                .HasForeignKey(e => e.SoId);
+        });
+        modelBuilder.Entity<EvidenciaSolicitud>(entity =>
+        {
+            entity.ToTable("EVIDENCIA_SOLICITUD", "pri");
+
+            entity.HasKey(e => e.EvId);
+
+            entity.Property(e => e.EvId)
+                .HasColumnName("ev_id");
+
+            entity.Property(e => e.SoId)
+                .HasColumnName("so_id")
+                .IsRequired();
+
+            entity.Property(e => e.UsId)
+                .HasColumnName("us_id")
+                .IsRequired();
+
+            entity.Property(e => e.EvTipo)
+                .HasColumnName("ev_tipo")
+                .HasMaxLength(80)
+                .IsRequired();
+
+            entity.Property(e => e.EvRutaArch)
+                .HasColumnName("ev_ruta_arch")
+                .HasMaxLength(1000)
+                .IsRequired();
+
+            entity.Property(e => e.EvHuella)
+                .HasColumnName("ev_huella")
+                .HasMaxLength(128);
+
+            entity.Property(e => e.EvFechaCarg)
+                .HasColumnName("ev_fecha_carg")
+                .HasColumnType("datetime2(0)");
+
+            entity.HasOne<Solicitud>()
                 .WithMany()
                 .HasForeignKey(e => e.SoId);
         });

@@ -30,6 +30,8 @@ builder.Services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
 builder.Services.AddScoped<IUsuarioServicio, UsuarioServicio>();
 builder.Services.AddScoped<ISolicitudRepositorio, SolicitudRepositorio>();
 builder.Services.AddScoped<ISolicitudServicio, SolicitudServicio>();
+builder.Services.AddScoped<IEvidenciaSolicitudRepositorio, EvidenciaSolicitudRepositorio>();
+builder.Services.AddScoped<IEvidenciaSolicitudServicio, EvidenciaSolicitudServicio>();
 
 
 
