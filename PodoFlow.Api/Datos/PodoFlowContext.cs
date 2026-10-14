@@ -21,7 +21,8 @@ public class PodoFlowContext : DbContext
     public DbSet<AccionSolicitud> AccionesSolicitud { get; set; }
     public DbSet<EvidenciaSolicitud> EvidenciasSolicitud { get; set; }
     public DbSet<CategoriaDato> CategoriasDato { get; set; }
-    public DbSet<Encargado> Encargados { get; set; } 
+    public DbSet<Encargado> Encargados { get; set; }
+    public DbSet<TratamientoDatos> TratamientosDatos { get; set; }
 
 
     public DbSet<Rol> Roles { get; set; }
@@ -1321,6 +1322,72 @@ public class PodoFlowContext : DbContext
             entity.Property(e => e.EnEstatus)
                 .HasColumnName("en_estatus")
                 .IsRequired();
+        });
+        modelBuilder.Entity<TratamientoDatos>(entity =>
+        {
+            entity.ToTable("TRATAMIENTO_DATOS", "pri");
+
+            entity.HasKey(e => e.TrId);
+
+            entity.HasIndex(e => e.TrCodigo)
+                .IsUnique();
+
+            entity.Property(e => e.TrId)
+                .HasColumnName("tr_id");
+
+            entity.Property(e => e.FiId)
+                .HasColumnName("fi_id")
+                .IsRequired();
+
+            entity.Property(e => e.UsId)
+                .HasColumnName("us_id");
+
+            entity.Property(e => e.TrCodigo)
+                .HasColumnName("tr_codigo")
+                .HasMaxLength(50)
+                .IsRequired();
+
+            entity.Property(e => e.TrNombre)
+                .HasColumnName("tr_nombre")
+                .HasMaxLength(200)
+                .IsRequired();
+
+            entity.Property(e => e.TrModulo)
+                .HasColumnName("tr_modulo")
+                .HasMaxLength(80)
+                .IsRequired();
+
+            entity.Property(e => e.TrDescri)
+                .HasColumnName("tr_descri")
+                .HasMaxLength(2000);
+
+            entity.Property(e => e.TrCategTitu)
+                .HasColumnName("tr_categ_titu")
+                .HasMaxLength(500);
+
+            entity.Property(e => e.TrBaseLegit)
+                .HasColumnName("tr_base_legit")
+                .HasMaxLength(1000);
+
+            entity.Property(e => e.TrPlazoConse)
+                .HasColumnName("tr_plazo_conse")
+                .HasMaxLength(500);
+
+            entity.Property(e => e.TrMediSegur)
+                .HasColumnName("tr_medi_segur")
+                .HasMaxLength(2000);
+
+            entity.Property(e => e.TrFechaRevi)
+                .HasColumnName("tr_fecha_revi")
+                .HasColumnType("date");
+
+            entity.Property(e => e.TrEstatus)
+                .HasColumnName("tr_estatus")
+                .IsRequired();
+
+            entity.HasOne<Finalidad>()
+                .WithMany()
+                .HasForeignKey(e => e.FiId);
         });
 
     }

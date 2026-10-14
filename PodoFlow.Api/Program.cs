@@ -36,6 +36,8 @@ builder.Services.AddScoped<ICategoriaDatoRepositorio, CategoriaDatoRepositorio>(
 builder.Services.AddScoped<ICategoriaDatoServicio, CategoriaDatoServicio>();
 builder.Services.AddScoped<IEncargadoRepositorio, EncargadoRepositorio>();
 builder.Services.AddScoped<IEncargadoServicio, EncargadoServicio>();
+builder.Services.AddScoped<ITratamientoDatosRepositorio, TratamientoDatosRepositorio>();
+builder.Services.AddScoped<ITratamientoDatosServicio, TratamientoDatosServicio>();
 
 builder.Services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
 builder.Services.AddScoped<IUsuarioServicio, UsuarioServicio>();
