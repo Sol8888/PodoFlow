@@ -4,6 +4,10 @@ using PodoFlow.Api.Repositorios.Interfaces;
 using PodoFlow.Api.Repositorios.Implementaciones;
 using PodoFlow.Api.Servicios.Interfaces;
 using PodoFlow.Api.Servicios.Implementaciones;
+using Microsoft.AspNetCore.Authentication;
+using PodoFlow.Api.Seguridad;
+using Microsoft.OpenApi.Models;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -76,13 +80,78 @@ builder.Services.AddScoped<ICitaRepositorio, CitaRepositorio>();
 builder.Services.AddScoped<ICitaServicio, CitaServicio>();
 
 
+builder.Services.AddScoped<IHistoriaRepositorio, HistoriaRepositorio>();
+builder.Services.AddScoped<IHistoriaServicio, HistoriaServicio>();
+
+// Esto de aqui esta porque necesito hacer mock de la seguridad para probar algunas cosas :) la carpeta de seguridad esta conectada a esto y es por hacer mock a la Autenticacion
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services
+        .AddAuthentication("Desarrollo")
+        .AddScheme<AuthenticationSchemeOptions,
+            AutenticacionDesarrolloHandler>(
+            "Desarrollo", options => { });
+}
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("HistoriaClinicaGestionar", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireClaim(
+            "permiso", "HISTORIA_GESTIONAR");
+    });
+
+    options.AddPolicy("AuditoriaLeer", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireClaim(
+            "permiso", "AUDITORIA_VER");
+    });
+});
+
+
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+
+builder.Services.AddSwaggerGen(options =>
+{
+    if (builder.Environment.IsDevelopment())
+    {
+        options.AddSecurityDefinition(
+            "DevToken",
+            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            {
+                Description = "Token para pruebas locales",
+                Name = "X-Dev-Token",
+                In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+                Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey
+            });
+
+        options.AddSecurityRequirement(
+            new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+            {
+                {
+                    new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+                    {
+                        Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                        {
+                            Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                            Id = "DevToken"
+                        }
+                    },
+                    Array.Empty<string>()
+                }
+            });
+    }
+});
+
+
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -90,6 +159,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseAuthentication();
+}
 
 app.UseAuthorization();
 
