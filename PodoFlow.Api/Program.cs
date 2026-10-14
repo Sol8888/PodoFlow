@@ -82,6 +82,9 @@ builder.Services.AddScoped<IEvolucionServicio, EvolucionServicio>();
 builder.Services.AddScoped<IAdjuntoRepositorio, AdjuntoRepositorio>();
 builder.Services.AddScoped<IAdjuntoServicio, AdjuntoServicio>();
 
+builder.Services.AddScoped<IMovimientoRepositorio, MovimientoRepositorio>();
+builder.Services.AddScoped<IMovimientoServicio, MovimientoServicio>();
+
 // Esto de aqui esta porque necesito hacer mock de la seguridad para probar algunas cosas :) la carpeta de seguridad esta conectada a esto y es por hacer mock a la Autenticacion
 if (builder.Environment.IsDevelopment())
 {
@@ -106,6 +109,13 @@ builder.Services.AddAuthorization(options =>
         policy.RequireAuthenticatedUser();
         policy.RequireClaim(
             "permiso", "AUDITORIA_VER");
+    });
+
+    options.AddPolicy("InventarioGestionar", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireClaim(
+            "permiso", "INVENTARIO_GESTIONAR");
     });
 });
 
@@ -144,6 +154,7 @@ builder.Services.AddSwaggerGen(options =>
                     Array.Empty<string>()
                 }
             });
+
     }
 });
 

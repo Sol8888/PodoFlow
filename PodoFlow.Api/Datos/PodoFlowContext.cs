@@ -53,6 +53,7 @@ public class PodoFlowContext : DbContext
 
     public DbSet<Insumo> Insumos { get; set; }
 
+    public DbSet<Movimiento> Movimientos { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -1161,6 +1162,82 @@ public class PodoFlowContext : DbContext
             entity.Property(x => x.InVersion)
                 .HasColumnName("in_version")
                 .IsRowVersion();
+        });
+
+
+        modelBuilder.Entity<Movimiento>(entity =>
+        {
+            entity.ToTable("MOVIMIENTO", "inv");
+
+            entity.HasKey(x => x.MoId);
+
+            entity.Property(x => x.MoId)
+                .HasColumnName("mo_id")
+                .ValueGeneratedOnAdd();
+
+            entity.Property(x => x.InId)
+                .HasColumnName("in_id")
+                .IsRequired();
+
+            entity.Property(x => x.AtId)
+                .HasColumnName("at_id");
+
+            entity.Property(x => x.UsId)
+                .HasColumnName("us_id")
+                .IsRequired();
+
+            entity.Property(x => x.MoTipo)
+                .HasColumnName("mo_tipo")
+                .HasMaxLength(20)
+                .IsRequired();
+
+            entity.Property(x => x.MoCant)
+                .HasColumnName("mo_cant")
+                .HasColumnType("decimal(12,2)")
+                .IsRequired();
+
+            entity.Property(x => x.MoStockAnte)
+                .HasColumnName("mo_stock_ante")
+                .HasColumnType("decimal(12,2)")
+                .IsRequired();
+
+            entity.Property(x => x.MoStockNuev)
+                .HasColumnName("mo_stock_nuev")
+                .HasColumnType("decimal(12,2)")
+                .IsRequired();
+
+            entity.Property(x => x.MoFechaHora)
+                .HasColumnName("mo_fecha_hora")
+                .HasPrecision(0)
+                .HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.Property(x => x.MoMotivo)
+                .HasColumnName("mo_motivo")
+                .HasMaxLength(500)
+                .IsRequired();
+
+            entity.HasOne<Insumo>()
+                .WithMany()
+                .HasForeignKey(x => x.InId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne<Atencion>()
+                .WithMany()
+                .HasForeignKey(x => x.AtId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne<Usuario>()
+                .WithMany()
+                .HasForeignKey(x => x.UsId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(x => new
+            {
+                x.InId,
+                x.MoFechaHora
+            })
+                .IsDescending(false, true)
+                .HasDatabaseName("IX_MOVIMIENTO_insumo");
         });
 
     }
