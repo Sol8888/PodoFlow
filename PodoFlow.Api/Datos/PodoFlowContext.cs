@@ -43,7 +43,23 @@ public class PodoFlowContext : DbContext
 
     public DbSet<Historia> Historias { get; set; }
 
+    public DbSet<Antecedente> Antecedentes { get; set; }
 
+    public DbSet<Atencion> Atenciones { get; set; }
+
+    public DbSet<Evolucion> Evoluciones { get; set; }
+
+    public DbSet<Adjunto> Adjuntos { get; set; }
+
+    public DbSet<Insumo> Insumos { get; set; }
+
+    public DbSet<Movimiento> Movimientos { get; set; }
+
+    public DbSet<FormaPago> FormasPago { get; set; }
+
+    public DbSet<Prestacion> Prestaciones { get; set; }
+
+    public DbSet<Cobro> Cobros { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -860,6 +876,558 @@ public class PodoFlowContext : DbContext
                 .WithMany()
                 .HasForeignKey(x => x.UsId)
                 .OnDelete(DeleteBehavior.Restrict);
+        });
+
+
+        modelBuilder.Entity<Antecedente>(entity =>
+        {
+            entity.ToTable("ANTECEDENTE", "cli");
+
+            entity.HasKey(x => x.AnId);
+
+            entity.Property(x => x.AnId)
+                .HasColumnName("an_id")
+                .ValueGeneratedOnAdd();
+
+            entity.Property(x => x.HiId)
+                .HasColumnName("hi_id")
+                .IsRequired();
+
+            entity.Property(x => x.UsId)
+                .HasColumnName("us_id");
+
+            entity.Property(x => x.AnTipo)
+                .HasColumnName("an_tipo")
+                .HasMaxLength(80)
+                .IsRequired();
+
+            entity.Property(x => x.AnDescri)
+                .HasColumnName("an_descri")
+                .HasMaxLength(2000)
+                .IsRequired();
+
+            entity.Property(x => x.AnFechaReg)
+                .HasColumnName("an_fecha_reg")
+                .HasPrecision(0)
+                .HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.Property(x => x.AnEstatus)
+                .HasColumnName("an_estatus")
+                .HasDefaultValue(true);
+
+            entity.HasOne<Historia>()
+                .WithMany()
+                .HasForeignKey(x => x.HiId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne<Usuario>()
+                .WithMany()
+                .HasForeignKey(x => x.UsId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+
+        modelBuilder.Entity<Atencion>(entity =>
+        {
+            entity.ToTable("ATENCION", "cli");
+
+            entity.HasKey(x => x.AtId);
+
+            entity.Property(x => x.AtId)
+                .HasColumnName("at_id")
+                .ValueGeneratedOnAdd();
+
+            entity.Property(x => x.HiId)
+                .HasColumnName("hi_id")
+                .IsRequired();
+
+            entity.Property(x => x.CiId)
+                .HasColumnName("ci_id");
+
+            entity.Property(x => x.UsId)
+                .HasColumnName("us_id")
+                .IsRequired();
+
+            entity.Property(x => x.AtFecha)
+                .HasColumnName("at_fecha")
+                .HasPrecision(0)
+                .HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.Property(x => x.AtMotivCons)
+                .HasColumnName("at_motiv_cons")
+                .HasMaxLength(1000);
+
+            entity.Property(x => x.AtValorClin)
+                .HasColumnName("at_valor_clin")
+                .HasMaxLength(3000);
+
+            entity.Property(x => x.AtDiagn)
+                .HasColumnName("at_diagn")
+                .HasMaxLength(2000);
+
+            entity.Property(x => x.AtTrata)
+                .HasColumnName("at_trata")
+                .HasMaxLength(3000);
+
+            entity.Property(x => x.AtObser)
+                .HasColumnName("at_obser")
+                .HasMaxLength(3000);
+
+            entity.Property(x => x.AtEstad)
+                .HasColumnName("at_estad")
+                .HasMaxLength(20)
+                .HasDefaultValue("ABIERTA")
+                .IsRequired();
+
+            entity.Property(x => x.AtFechaModi)
+                .HasColumnName("at_fecha_modi")
+                .HasPrecision(0);
+
+            entity.Property(x => x.AtVersion)
+                .HasColumnName("at_version")
+                .IsRowVersion();
+
+            entity.HasOne<Historia>()
+                .WithMany()
+                .HasForeignKey(x => x.HiId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne<Cita>()
+                .WithMany()
+                .HasForeignKey(x => x.CiId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne<Usuario>()
+                .WithMany()
+                .HasForeignKey(x => x.UsId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(x => x.CiId)
+                .IsUnique()
+                .HasFilter("[ci_id] IS NOT NULL")
+                .HasDatabaseName("UX_ATENCION_cita");
+
+            entity.HasIndex(x => new { x.HiId, x.AtFecha })
+                .IsDescending(false, true)
+                .HasDatabaseName("IX_ATENCION_historia");
+        });
+
+
+        modelBuilder.Entity<Evolucion>(entity =>
+        {
+            entity.ToTable("EVOLUCION", "cli");
+
+            entity.HasKey(x => x.EvId);
+
+            entity.Property(x => x.EvId)
+                .HasColumnName("ev_id")
+                .ValueGeneratedOnAdd();
+
+            entity.Property(x => x.AtId)
+                .HasColumnName("at_id")
+                .IsRequired();
+
+            entity.Property(x => x.UsId)
+                .HasColumnName("us_id")
+                .IsRequired();
+
+            entity.Property(x => x.EvFecha)
+                .HasColumnName("ev_fecha")
+                .HasPrecision(0)
+                .HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.Property(x => x.EvDescri)
+                .HasColumnName("ev_descri")
+                .HasMaxLength(3000)
+                .IsRequired();
+
+            entity.Property(x => x.EvEstatus)
+                .HasColumnName("ev_estatus")
+                .HasDefaultValue(true);
+
+            entity.HasOne<Atencion>()
+                .WithMany()
+                .HasForeignKey(x => x.AtId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne<Usuario>()
+                .WithMany()
+                .HasForeignKey(x => x.UsId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+
+        modelBuilder.Entity<Adjunto>(entity =>
+        {
+            entity.ToTable("ADJUNTO", "cli");
+
+            entity.HasKey(x => x.AdId);
+
+            entity.Property(x => x.AdId)
+                .HasColumnName("ad_id")
+                .ValueGeneratedOnAdd();
+
+            entity.Property(x => x.AtId)
+                .HasColumnName("at_id")
+                .IsRequired();
+
+            entity.Property(x => x.UsId)
+                .HasColumnName("us_id")
+                .IsRequired();
+
+            entity.Property(x => x.AdNombre)
+                .HasColumnName("ad_nombre")
+                .HasMaxLength(255)
+                .IsRequired();
+
+            entity.Property(x => x.AdRutaArch)
+                .HasColumnName("ad_ruta_arch")
+                .HasMaxLength(1000)
+                .IsRequired();
+
+            entity.Property(x => x.AdTipoMime)
+                .HasColumnName("ad_tipo_mime")
+                .HasMaxLength(150);
+
+            entity.Property(x => x.AdHuella)
+                .HasColumnName("ad_huella")
+                .HasMaxLength(128);
+
+            entity.Property(x => x.AdTamanByte)
+                .HasColumnName("ad_taman_byte");
+
+            entity.Property(x => x.AdFechaCarg)
+                .HasColumnName("ad_fecha_carg")
+                .HasPrecision(0)
+                .HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.Property(x => x.AdEstatus)
+                .HasColumnName("ad_estatus")
+                .HasDefaultValue(true);
+
+            entity.HasOne<Atencion>()
+                .WithMany()
+                .HasForeignKey(x => x.AtId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne<Usuario>()
+                .WithMany()
+                .HasForeignKey(x => x.UsId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+
+        modelBuilder.Entity<Insumo>(entity =>
+        {
+            entity.ToTable("INSUMO", "inv");
+
+            entity.HasKey(x => x.InId);
+
+            entity.Property(x => x.InId)
+                .HasColumnName("in_id")
+                .ValueGeneratedOnAdd();
+
+            entity.Property(x => x.InNombre)
+                .HasColumnName("in_nombre")
+                .HasMaxLength(150)
+                .IsRequired();
+
+            entity.Property(x => x.InCateg)
+                .HasColumnName("in_categ")
+                .HasMaxLength(80)
+                .IsRequired();
+
+            entity.Property(x => x.InUnidad)
+                .HasColumnName("in_unidad")
+                .HasMaxLength(30)
+                .IsRequired();
+
+            entity.Property(x => x.InStockActu)
+                .HasColumnName("in_stock_actu")
+                .HasColumnType("decimal(12,2)")
+                .HasDefaultValue(0m);
+
+            entity.Property(x => x.InStockMini)
+                .HasColumnName("in_stock_mini")
+                .HasColumnType("decimal(12,2)")
+                .HasDefaultValue(0m);
+
+            entity.Property(x => x.InFechaCrea)
+                .HasColumnName("in_fecha_crea")
+                .HasPrecision(0)
+                .HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.Property(x => x.InFechaModi)
+                .HasColumnName("in_fecha_modi")
+                .HasPrecision(0);
+
+            entity.Property(x => x.InEstatus)
+                .HasColumnName("in_estatus")
+                .HasDefaultValue(true);
+
+            entity.Property(x => x.InVersion)
+                .HasColumnName("in_version")
+                .IsRowVersion();
+        });
+
+
+        modelBuilder.Entity<Movimiento>(entity =>
+        {
+            entity.ToTable("MOVIMIENTO", "inv");
+
+            entity.HasKey(x => x.MoId);
+
+            entity.Property(x => x.MoId)
+                .HasColumnName("mo_id")
+                .ValueGeneratedOnAdd();
+
+            entity.Property(x => x.InId)
+                .HasColumnName("in_id")
+                .IsRequired();
+
+            entity.Property(x => x.AtId)
+                .HasColumnName("at_id");
+
+            entity.Property(x => x.UsId)
+                .HasColumnName("us_id")
+                .IsRequired();
+
+            entity.Property(x => x.MoTipo)
+                .HasColumnName("mo_tipo")
+                .HasMaxLength(20)
+                .IsRequired();
+
+            entity.Property(x => x.MoCant)
+                .HasColumnName("mo_cant")
+                .HasColumnType("decimal(12,2)")
+                .IsRequired();
+
+            entity.Property(x => x.MoStockAnte)
+                .HasColumnName("mo_stock_ante")
+                .HasColumnType("decimal(12,2)")
+                .IsRequired();
+
+            entity.Property(x => x.MoStockNuev)
+                .HasColumnName("mo_stock_nuev")
+                .HasColumnType("decimal(12,2)")
+                .IsRequired();
+
+            entity.Property(x => x.MoFechaHora)
+                .HasColumnName("mo_fecha_hora")
+                .HasPrecision(0)
+                .HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.Property(x => x.MoMotivo)
+                .HasColumnName("mo_motivo")
+                .HasMaxLength(500)
+                .IsRequired();
+
+            entity.HasOne<Insumo>()
+                .WithMany()
+                .HasForeignKey(x => x.InId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne<Atencion>()
+                .WithMany()
+                .HasForeignKey(x => x.AtId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne<Usuario>()
+                .WithMany()
+                .HasForeignKey(x => x.UsId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(x => new
+            {
+                x.InId,
+                x.MoFechaHora
+            })
+                .IsDescending(false, true)
+                .HasDatabaseName("IX_MOVIMIENTO_insumo");
+        });
+
+
+        modelBuilder.Entity<FormaPago>(entity =>
+        {
+            entity.ToTable("FORMA_PAGO", "fin");
+
+            entity.HasKey(x => x.FoId);
+
+            entity.Property(x => x.FoId)
+                .HasColumnName("fo_id")
+                .ValueGeneratedOnAdd();
+
+            entity.Property(x => x.FoCodigo)
+                .HasColumnName("fo_codigo")
+                .HasMaxLength(30)
+                .IsRequired();
+
+            entity.Property(x => x.FoNombre)
+                .HasColumnName("fo_nombre")
+                .HasMaxLength(100)
+                .IsRequired();
+
+            entity.Property(x => x.FoEstatus)
+                .HasColumnName("fo_estatus")
+                .HasDefaultValue(true);
+
+            entity.HasIndex(x => x.FoCodigo)
+                .IsUnique()
+                .HasDatabaseName("UQ_FORMA_PAGO_codigo");
+        });
+
+
+        modelBuilder.Entity<Prestacion>(entity =>
+        {
+            entity.ToTable("PRESTACION", "fin");
+
+            entity.HasKey(x => x.PrId);
+
+            entity.Property(x => x.PrId)
+                .HasColumnName("pr_id")
+                .ValueGeneratedOnAdd();
+
+            entity.Property(x => x.PaId)
+                .HasColumnName("pa_id")
+                .IsRequired();
+
+            entity.Property(x => x.CiId)
+                .HasColumnName("ci_id");
+
+            entity.Property(x => x.AtId)
+                .HasColumnName("at_id");
+
+            entity.Property(x => x.SeId)
+                .HasColumnName("se_id")
+                .IsRequired();
+
+            entity.Property(x => x.UsId)
+                .HasColumnName("us_id")
+                .IsRequired();
+
+            entity.Property(x => x.PrFechaPres)
+                .HasColumnName("pr_fecha_pres")
+                .HasPrecision(0)
+                .HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.Property(x => x.PrPrecioApli)
+                .HasColumnName("pr_precio_apli")
+                .HasColumnType("decimal(12,2)")
+                .IsRequired();
+
+            entity.Property(x => x.PrCant)
+                .HasColumnName("pr_cant")
+                .HasColumnType("decimal(10,2)")
+                .HasDefaultValue(1m);
+
+            entity.Property(x => x.PrTotal)
+                .HasColumnName("pr_total")
+                .HasColumnType("decimal(12,2)")
+                .HasComputedColumnSql(
+                    "CONVERT(DECIMAL(12,2), [pr_precio_apli] * [pr_cant])",
+                    stored: true);
+
+            entity.Property(x => x.PrEstad)
+                .HasColumnName("pr_estad")
+                .HasMaxLength(20)
+                .HasDefaultValue("PENDIENTE")
+                .IsRequired();
+
+            entity.Property(x => x.PrObser)
+                .HasColumnName("pr_obser")
+                .HasMaxLength(1000);
+
+            entity.HasOne<Paciente>()
+                .WithMany()
+                .HasForeignKey(x => x.PaId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne<Cita>()
+                .WithMany()
+                .HasForeignKey(x => x.CiId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne<Atencion>()
+                .WithMany()
+                .HasForeignKey(x => x.AtId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne<Servicio>()
+                .WithMany()
+                .HasForeignKey(x => x.SeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne<Usuario>()
+                .WithMany()
+                .HasForeignKey(x => x.UsId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+
+        modelBuilder.Entity<Cobro>(entity =>
+        {
+            entity.ToTable("COBRO", "fin");
+
+            entity.HasKey(x => x.CoId);
+
+            entity.Property(x => x.CoId)
+                .HasColumnName("co_id")
+                .ValueGeneratedOnAdd();
+
+            entity.Property(x => x.PrId)
+                .HasColumnName("pr_id")
+                .IsRequired();
+
+            entity.Property(x => x.FoId)
+                .HasColumnName("fo_id")
+                .IsRequired();
+
+            entity.Property(x => x.UsId)
+                .HasColumnName("us_id")
+                .IsRequired();
+
+            entity.Property(x => x.CoFechaPago)
+                .HasColumnName("co_fecha_pago")
+                .HasPrecision(0)
+                .HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.Property(x => x.CoValor)
+                .HasColumnName("co_valor")
+                .HasColumnType("decimal(12,2)")
+                .IsRequired();
+
+            entity.Property(x => x.CoRefe)
+                .HasColumnName("co_refe")
+                .HasMaxLength(150);
+
+            entity.Property(x => x.CoObser)
+                .HasColumnName("co_obser")
+                .HasMaxLength(1000);
+
+            entity.Property(x => x.CoEstad)
+                .HasColumnName("co_estad")
+                .HasMaxLength(20)
+                .HasDefaultValue("REGISTRADO")
+                .IsRequired();
+
+            entity.HasOne<Prestacion>()
+                .WithMany()
+                .HasForeignKey(x => x.PrId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne<FormaPago>()
+                .WithMany()
+                .HasForeignKey(x => x.FoId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne<Usuario>()
+                .WithMany()
+                .HasForeignKey(x => x.UsId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(x => x.CoFechaPago)
+                .IsDescending(true)
+                .HasDatabaseName("IX_COBRO_fecha");
         });
 
     }
