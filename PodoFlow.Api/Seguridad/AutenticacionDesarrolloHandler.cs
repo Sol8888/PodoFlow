@@ -61,7 +61,9 @@ public class AutenticacionDesarrolloHandler
             new Claim(ClaimTypes.NameIdentifier, "desarrollo-local"),
             new Claim(ClaimTypes.Name, "Usuario de pruebas"),
             new Claim("permiso", "HISTORIA_GESTIONAR"),
-            new Claim("permiso", "AUDITORIA_VER")
+            new Claim("permiso", "AUDITORIA_VER"),
+            new Claim("permiso", "FINANZAS_GESTIONAR"),
+
         };
 
         var identidad = new ClaimsIdentity(claims, Scheme.Name);

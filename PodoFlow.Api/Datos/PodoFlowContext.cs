@@ -55,6 +55,8 @@ public class PodoFlowContext : DbContext
 
     public DbSet<Movimiento> Movimientos { get; set; }
 
+    public DbSet<FormaPago> FormasPago { get; set; }
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -1238,6 +1240,36 @@ public class PodoFlowContext : DbContext
             })
                 .IsDescending(false, true)
                 .HasDatabaseName("IX_MOVIMIENTO_insumo");
+        });
+
+
+        modelBuilder.Entity<FormaPago>(entity =>
+        {
+            entity.ToTable("FORMA_PAGO", "fin");
+
+            entity.HasKey(x => x.FoId);
+
+            entity.Property(x => x.FoId)
+                .HasColumnName("fo_id")
+                .ValueGeneratedOnAdd();
+
+            entity.Property(x => x.FoCodigo)
+                .HasColumnName("fo_codigo")
+                .HasMaxLength(30)
+                .IsRequired();
+
+            entity.Property(x => x.FoNombre)
+                .HasColumnName("fo_nombre")
+                .HasMaxLength(100)
+                .IsRequired();
+
+            entity.Property(x => x.FoEstatus)
+                .HasColumnName("fo_estatus")
+                .HasDefaultValue(true);
+
+            entity.HasIndex(x => x.FoCodigo)
+                .IsUnique()
+                .HasDatabaseName("UQ_FORMA_PAGO_codigo");
         });
 
     }
