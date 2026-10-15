@@ -57,6 +57,8 @@ public class PodoFlowContext : DbContext
 
     public DbSet<FormaPago> FormasPago { get; set; }
 
+    public DbSet<Prestacion> Prestaciones { get; set; }
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -1270,6 +1272,93 @@ public class PodoFlowContext : DbContext
             entity.HasIndex(x => x.FoCodigo)
                 .IsUnique()
                 .HasDatabaseName("UQ_FORMA_PAGO_codigo");
+        });
+
+
+        modelBuilder.Entity<Prestacion>(entity =>
+        {
+            entity.ToTable("PRESTACION", "fin");
+
+            entity.HasKey(x => x.PrId);
+
+            entity.Property(x => x.PrId)
+                .HasColumnName("pr_id")
+                .ValueGeneratedOnAdd();
+
+            entity.Property(x => x.PaId)
+                .HasColumnName("pa_id")
+                .IsRequired();
+
+            entity.Property(x => x.CiId)
+                .HasColumnName("ci_id");
+
+            entity.Property(x => x.AtId)
+                .HasColumnName("at_id");
+
+            entity.Property(x => x.SeId)
+                .HasColumnName("se_id")
+                .IsRequired();
+
+            entity.Property(x => x.UsId)
+                .HasColumnName("us_id")
+                .IsRequired();
+
+            entity.Property(x => x.PrFechaPres)
+                .HasColumnName("pr_fecha_pres")
+                .HasPrecision(0)
+                .HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.Property(x => x.PrPrecioApli)
+                .HasColumnName("pr_precio_apli")
+                .HasColumnType("decimal(12,2)")
+                .IsRequired();
+
+            entity.Property(x => x.PrCant)
+                .HasColumnName("pr_cant")
+                .HasColumnType("decimal(10,2)")
+                .HasDefaultValue(1m);
+
+            entity.Property(x => x.PrTotal)
+                .HasColumnName("pr_total")
+                .HasColumnType("decimal(12,2)")
+                .HasComputedColumnSql(
+                    "CONVERT(DECIMAL(12,2), [pr_precio_apli] * [pr_cant])",
+                    stored: true);
+
+            entity.Property(x => x.PrEstad)
+                .HasColumnName("pr_estad")
+                .HasMaxLength(20)
+                .HasDefaultValue("PENDIENTE")
+                .IsRequired();
+
+            entity.Property(x => x.PrObser)
+                .HasColumnName("pr_obser")
+                .HasMaxLength(1000);
+
+            entity.HasOne<Paciente>()
+                .WithMany()
+                .HasForeignKey(x => x.PaId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne<Cita>()
+                .WithMany()
+                .HasForeignKey(x => x.CiId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne<Atencion>()
+                .WithMany()
+                .HasForeignKey(x => x.AtId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne<Servicio>()
+                .WithMany()
+                .HasForeignKey(x => x.SeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne<Usuario>()
+                .WithMany()
+                .HasForeignKey(x => x.UsId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
 
     }
