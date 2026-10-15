@@ -27,6 +27,8 @@ public class PodoFlowContext : DbContext
     public DbSet<TratamientoEncargado> TratamientosEncargados { get; set; }
     public DbSet<Riesgo> Riesgos { get; set; }
     public DbSet<EvaluacionImpacto> EvaluacionesImpacto { get; set; }
+    public DbSet<EvaluacionRiesgo> EvaluacionesRiesgos { get; set; }
+
 
 
     public DbSet<Rol> Roles { get; set; }
@@ -1568,6 +1570,39 @@ public class PodoFlowContext : DbContext
             entity.Property(e => e.EvFechaModi)
                 .HasColumnName("ev_fecha_modi")
                 .HasColumnType("datetime2(0)");
+        });
+        modelBuilder.Entity<EvaluacionRiesgo>(entity =>
+        {
+            entity.ToTable("EV_RI", "pri");
+
+            // Clave primaria compuesta.
+            entity.HasKey(e => new { e.EvId, e.RiId });
+
+            entity.Property(e => e.EvId)
+                .HasColumnName("ev_id")
+                .ValueGeneratedNever();
+
+            entity.Property(e => e.RiId)
+                .HasColumnName("ri_id")
+                .ValueGeneratedNever();
+
+            entity.Property(e => e.ErFechaAsig)
+                .HasColumnName("er_fecha_asig")
+                .HasColumnType("datetime2(0)");
+
+            entity.Property(e => e.ErObser)
+                .HasColumnName("er_obser")
+                .HasMaxLength(1000);
+
+            entity.HasOne<EvaluacionImpacto>()
+                .WithMany()
+                .HasForeignKey(e => e.EvId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne<Riesgo>()
+                .WithMany()
+                .HasForeignKey(e => e.RiId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
 
     }

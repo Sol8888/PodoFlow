@@ -46,6 +46,8 @@ builder.Services.AddScoped<IRiesgoRepositorio, RiesgoRepositorio>();
 builder.Services.AddScoped<IRiesgoServicio, RiesgoServicio>();
 builder.Services.AddScoped<IEvaluacionImpactoRepositorio, EvaluacionImpactoRepositorio>();
 builder.Services.AddScoped<IEvaluacionImpactoServicio, EvaluacionImpactoServicio>();
+builder.Services.AddScoped<IEvaluacionRiesgoRepositorio, EvaluacionRiesgoRepositorio>();
+builder.Services.AddScoped<IEvaluacionRiesgoServicio, EvaluacionRiesgoServicio>();
 
 builder.Services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
 builder.Services.AddScoped<IUsuarioServicio, UsuarioServicio>();
