@@ -31,6 +31,8 @@ public class PodoFlowContext : DbContext
     public DbSet<Documento> Documentos { get; set; }
     public DbSet<Incidente> Incidentes { get; set; }
     public DbSet<AccionIncidente> AccionesIncidente { get; set; }
+    public DbSet<Plantilla> Plantillas { get; set; }
+    public DbSet<OpcionComunicacion> OpcionesComunicacion { get; set; }
 
 
 
@@ -63,6 +65,8 @@ public class PodoFlowContext : DbContext
     public DbSet<Historia> Historias { get; set; }
 
     public DbSet<Exportacion> Exportaciones { get; set; }
+    public DbSet<Notificacion> Notificaciones { get; set; }
+    public DbSet<Envio> Envios { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -1685,7 +1689,84 @@ public class PodoFlowContext : DbContext
             entity.Property(e => e.AcObser).HasColumnName("ac_obser").HasMaxLength(1500);
             entity.HasOne(e => e.Incidente).WithMany().HasForeignKey(e => e.InId);
         });
+        modelBuilder.Entity<Plantilla>(entity =>
+        {
+            entity.ToTable("PLANTILLA", "com", t =>
+                t.HasCheckConstraint("CK_PLANTILLA_canal", "pl_canal IN ('CORREO','WHATSAPP')"));
+            entity.HasKey(e => e.PlId);
+            entity.Property(e => e.PlId).HasColumnName("pl_id");
+            entity.Property(e => e.PlNombre).HasColumnName("pl_nombre").HasMaxLength(150).IsRequired();
+            entity.Property(e => e.PlCanal).HasColumnName("pl_canal").HasMaxLength(20).IsRequired();
+            entity.Property(e => e.PlTipo).HasColumnName("pl_tipo").HasMaxLength(50).IsRequired();
+            entity.Property(e => e.PlAsunto).HasColumnName("pl_asunto").HasMaxLength(250);
+            entity.Property(e => e.PlConte).HasColumnName("pl_conte").HasColumnType("nvarchar(max)").IsRequired();
+            entity.Property(e => e.PlVersi).HasColumnName("pl_versi").HasMaxLength(20).IsRequired();
+            entity.Property(e => e.PlFechaCrea).HasColumnName("pl_fecha_crea").HasColumnType("datetime2(0)");
+            entity.Property(e => e.PlEstatus).HasColumnName("pl_estatus").IsRequired();
+        });
 
+        modelBuilder.Entity<OpcionComunicacion>(entity =>
+        {
+            entity.ToTable("OPCION_COMUNICACION", "com", t =>
+                t.HasCheckConstraint("CK_OPCION_canal", "op_canal IN ('CORREO','WHATSAPP')"));
+            entity.HasKey(e => e.OpId);
+            entity.HasIndex(e => new { e.PaId, e.OpCanal, e.FiId }).IsUnique();
+            entity.Property(e => e.OpId).HasColumnName("op_id");
+            entity.Property(e => e.PaId).HasColumnName("pa_id").IsRequired();
+            entity.Property(e => e.FiId).HasColumnName("fi_id").IsRequired();
+            entity.Property(e => e.CoId).HasColumnName("co_id");
+            entity.Property(e => e.OpCanal).HasColumnName("op_canal").HasMaxLength(20).IsRequired();
+            entity.Property(e => e.OpPermi).HasColumnName("op_permi").IsRequired();
+            entity.Property(e => e.OpFechaActu).HasColumnName("op_fecha_actu").HasColumnType("datetime2(0)");
+            entity.Property(e => e.OpEstatus).HasColumnName("op_estatus").IsRequired();
+            entity.HasOne<Finalidad>().WithMany().HasForeignKey(e => e.FiId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne<Consentimiento>().WithMany().HasForeignKey(e => e.CoId).OnDelete(DeleteBehavior.Restrict);
+        });
+        modelBuilder.Entity<Notificacion>(entity =>
+        {
+            entity.ToTable("NOTIFICACION", "com", t =>
+            {
+                t.HasCheckConstraint("CK_NOTIFICACION_canal", "no_canal IN ('CORREO','WHATSAPP')");
+                t.HasCheckConstraint("CK_NOTIFICACION_estad",
+                    "no_estad IN ('PENDIENTE','PROCESANDO','ENVIADA','ERROR','CANCELADA')");
+            });
+            entity.HasKey(e => e.NoId);
+            entity.HasIndex(e => new { e.NoEstad, e.NoFechaProg });
+            entity.Property(e => e.NoId).HasColumnName("no_id");
+            entity.Property(e => e.PaId).HasColumnName("pa_id").IsRequired();
+            entity.Property(e => e.CiId).HasColumnName("ci_id");
+            entity.Property(e => e.PlId).HasColumnName("pl_id").IsRequired();
+            entity.Property(e => e.OpId).HasColumnName("op_id");
+            entity.Property(e => e.UsId).HasColumnName("us_id");
+            entity.Property(e => e.NoTipo).HasColumnName("no_tipo").HasMaxLength(50).IsRequired();
+            entity.Property(e => e.NoCanal).HasColumnName("no_canal").HasMaxLength(20).IsRequired();
+            entity.Property(e => e.NoFechaProg).HasColumnName("no_fecha_prog").HasColumnType("datetime2(0)").IsRequired();
+            entity.Property(e => e.NoEstad).HasColumnName("no_estad").HasMaxLength(20).IsRequired();
+            entity.Property(e => e.NoFechaCrea).HasColumnName("no_fecha_crea").HasColumnType("datetime2(0)");
+            entity.Property(e => e.NoVersion).HasColumnName("no_version").IsRowVersion();
+            entity.HasOne<Plantilla>().WithMany().HasForeignKey(e => e.PlId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne<OpcionComunicacion>().WithMany().HasForeignKey(e => e.OpId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<Envio>(entity =>
+        {
+            entity.ToTable("ENVIO", "com", t =>
+            {
+                t.HasCheckConstraint("CK_ENVIO_intento", "en_num_inten > 0");
+                t.HasCheckConstraint("CK_ENVIO_result", "en_resul IN ('ENVIADO','ERROR')");
+            });
+            entity.HasKey(e => e.EnId);
+            entity.HasIndex(e => new { e.NoId, e.EnNumInten }).IsUnique();
+            entity.Property(e => e.EnId).HasColumnName("en_id");
+            entity.Property(e => e.NoId).HasColumnName("no_id").IsRequired();
+            entity.Property(e => e.EnNumInten).HasColumnName("en_num_inten").IsRequired();
+            entity.Property(e => e.EnFechaHora).HasColumnName("en_fecha_hora").HasColumnType("datetime2(0)");
+            entity.Property(e => e.EnResul).HasColumnName("en_resul").HasMaxLength(20).IsRequired();
+            entity.Property(e => e.EnIdProve).HasColumnName("en_id_prove").HasMaxLength(300);
+            entity.Property(e => e.EnCodError).HasColumnName("en_cod_error").HasMaxLength(100);
+            entity.Property(e => e.EnDetalError).HasColumnName("en_detal_error").HasMaxLength(2000);
+            entity.HasOne<Notificacion>().WithMany().HasForeignKey(e => e.NoId).OnDelete(DeleteBehavior.Restrict);
+        });
     }
 
 

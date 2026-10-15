@@ -52,6 +52,13 @@ builder.Services.AddScoped<IDocumentoRepositorio, DocumentoRepositorio>();
 builder.Services.AddScoped<IDocumentoServicio, DocumentoServicio>();
 builder.Services.AddScoped<IIncidenteRepositorio, IncidenteRepositorio>();
 builder.Services.AddScoped<IIncidenteServicio, IncidenteServicio>();
+builder.Services.AddScoped<IPlantillaRepositorio, PlantillaRepositorio>();
+builder.Services.AddScoped<IPlantillaServicio, PlantillaServicio>();
+builder.Services.AddScoped<IOpcionComunicacionRepositorio, OpcionComunicacionRepositorio>();
+builder.Services.AddScoped<IOpcionComunicacionServicio, OpcionComunicacionServicio>();
+builder.Services.AddScoped<INotificacionRepositorio, NotificacionRepositorio>();
+builder.Services.AddScoped<INotificacionServicio, NotificacionServicio>();
+
 
 builder.Services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
 builder.Services.AddScoped<IUsuarioServicio, UsuarioServicio>();
