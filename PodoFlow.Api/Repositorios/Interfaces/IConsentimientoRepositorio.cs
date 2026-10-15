@@ -19,5 +19,6 @@ namespace PodoFlow.Api.Repositorios.Interfaces
         Task ActualizarAsync(Consentimiento consentimiento, byte[] versionLeida);
 
         Task CambiarEstadoAsync(Consentimiento consentimiento, EventoConsentimiento evento, byte[] versionLeida);
+        Task<List<EventoConsentimiento>> ObtenerEventosAsync(long consentimientoId);
     }
 }

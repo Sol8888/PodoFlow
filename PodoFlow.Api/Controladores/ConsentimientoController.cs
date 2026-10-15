@@ -110,5 +110,15 @@ namespace PodoFlow.Api.Controladores
                 return Conflict(new { mensaje = ex.Message });
             }
         }
+        [HttpGet("{id:long}/eventos")]
+        public async Task<ActionResult<List<EventoConsentimientoRespuestaDto>>> ObtenerEventos(long id)
+        {
+            var eventos = await _servicio.ObtenerEventosAsync(id);
+
+            if (eventos == null)
+                return NotFound();
+
+            return Ok(eventos);
+        }
     }
 }

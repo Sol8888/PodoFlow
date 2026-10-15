@@ -25,7 +25,8 @@ public class PodoFlowContext : DbContext
     public DbSet<TratamientoDatos> TratamientosDatos { get; set; }
     public DbSet<TratamientoCategoria> TratamientosCategorias { get; set; }
     public DbSet<TratamientoEncargado> TratamientosEncargados { get; set; }
-    public DbSet<Riesgo> Riesgos { get; set; } 
+    public DbSet<Riesgo> Riesgos { get; set; }
+    public DbSet<EvaluacionImpacto> EvaluacionesImpacto { get; set; }
 
 
     public DbSet<Rol> Roles { get; set; }
@@ -1514,6 +1515,59 @@ public class PodoFlowContext : DbContext
                 .WithMany()
                 .HasForeignKey(e => e.TrId)
                 .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<EvaluacionImpacto>(entity =>
+        {
+            entity.ToTable("EVALUACION_IMPACTO", "pri", t =>
+            {
+                t.HasCheckConstraint("CK_EVALUACION_nivel", "ev_nivel_resid IS NULL OR ev_nivel_resid BETWEEN 1 AND 25");
+                t.HasCheckConstraint("CK_EVALUACION_estad", "ev_estad IN ('BORRADOR','APROBADA','REVISADA','CERRADA')");
+            });
+
+            entity.HasKey(e => e.EvId);
+
+            entity.Property(e => e.EvId)
+                .HasColumnName("ev_id");
+
+            entity.Property(e => e.UsId)
+                .HasColumnName("us_id")
+                .IsRequired();
+
+            entity.Property(e => e.EvVersi)
+                .HasColumnName("ev_versi")
+                .HasMaxLength(30)
+                .IsRequired();
+
+            entity.Property(e => e.EvFecha)
+                .HasColumnName("ev_fecha")
+                .HasColumnType("date")
+                .IsRequired();
+
+            entity.Property(e => e.EvAlcan)
+                .HasColumnName("ev_alcan")
+                .HasMaxLength(2000)
+                .IsRequired();
+
+            entity.Property(e => e.EvDescri)
+                .HasColumnName("ev_descri")
+                .HasMaxLength(3000);
+
+            entity.Property(e => e.EvConclu)
+                .HasColumnName("ev_conclu")
+                .HasMaxLength(3000);
+
+            entity.Property(e => e.EvNivelResid)
+                .HasColumnName("ev_nivel_resid");
+
+            entity.Property(e => e.EvEstad)
+                .HasColumnName("ev_estad")
+                .HasMaxLength(20)
+                .IsRequired();
+
+            entity.Property(e => e.EvFechaModi)
+                .HasColumnName("ev_fecha_modi")
+                .HasColumnType("datetime2(0)");
         });
 
     }

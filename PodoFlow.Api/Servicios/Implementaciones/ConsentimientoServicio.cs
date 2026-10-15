@@ -220,5 +220,26 @@ namespace PodoFlow.Api.Servicios.Implementaciones
                 Version = consentimiento.CoVersion
             };
         }
+        public async Task<List<EventoConsentimientoRespuestaDto>?> ObtenerEventosAsync(long id)
+        {
+            var consentimiento = await _repositorio.ObtenerPorIdAsync(id);
+
+            if (consentimiento == null)
+                return null;
+
+            var eventos = await _repositorio.ObtenerEventosAsync(id);
+
+            return eventos.Select(e => new EventoConsentimientoRespuestaDto
+            {
+                Id = e.EvId,
+                ConsentimientoId = e.CoId,
+                UsuarioId = e.UsId,
+                Estado = e.EvEstad,
+                FechaHora = e.EvFechaHora,
+                Medio = e.EvMedio,
+                RutaEvidencia = e.EvRutaEvid,
+                Observacion = e.EvObser
+            }).ToList();
+        }
     }
 }

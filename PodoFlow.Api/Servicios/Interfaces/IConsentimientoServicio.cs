@@ -15,5 +15,6 @@ namespace PodoFlow.Api.Servicios.Interfaces
         Task<bool> ActualizarAsync(long id, ConsentimientoActualizarDto dto);
 
         Task<ConsentimientoRespuestaDto?> CambiarEstadoAsync(long id, ConsentimientoCambiarEstadoDto dto);
+        Task<List<EventoConsentimientoRespuestaDto>?> ObtenerEventosAsync(long id);
     }
 }

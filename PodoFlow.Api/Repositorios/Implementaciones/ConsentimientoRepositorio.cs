@@ -86,5 +86,14 @@ namespace PodoFlow.Api.Repositorios.Implementaciones
                 .Property(x => x.CoVersion)
                 .OriginalValue = versionLeida;
         }
+
+        public async Task<List<EventoConsentimiento>> ObtenerEventosAsync(long consentimientoId)
+        {
+            return await _context.EventosConsentimiento
+                .AsNoTracking()
+                .Where(x => x.CoId == consentimientoId)
+                .OrderBy(x => x.EvId)
+                .ToListAsync();
+        }
     }
 }
