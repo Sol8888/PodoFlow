@@ -48,6 +48,8 @@ builder.Services.AddScoped<IEvaluacionImpactoRepositorio, EvaluacionImpactoRepos
 builder.Services.AddScoped<IEvaluacionImpactoServicio, EvaluacionImpactoServicio>();
 builder.Services.AddScoped<IEvaluacionRiesgoRepositorio, EvaluacionRiesgoRepositorio>();
 builder.Services.AddScoped<IEvaluacionRiesgoServicio, EvaluacionRiesgoServicio>();
+builder.Services.AddScoped<IDocumentoRepositorio, DocumentoRepositorio>();
+builder.Services.AddScoped<IDocumentoServicio, DocumentoServicio>();
 
 builder.Services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
 builder.Services.AddScoped<IUsuarioServicio, UsuarioServicio>();

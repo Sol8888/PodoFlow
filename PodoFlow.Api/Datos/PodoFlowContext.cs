@@ -28,6 +28,8 @@ public class PodoFlowContext : DbContext
     public DbSet<Riesgo> Riesgos { get; set; }
     public DbSet<EvaluacionImpacto> EvaluacionesImpacto { get; set; }
     public DbSet<EvaluacionRiesgo> EvaluacionesRiesgos { get; set; }
+    public DbSet<Documento> Documentos { get; set; }
+
 
 
 
@@ -1603,6 +1605,52 @@ public class PodoFlowContext : DbContext
                 .WithMany()
                 .HasForeignKey(e => e.RiId)
                 .OnDelete(DeleteBehavior.Restrict);
+        });
+        modelBuilder.Entity<Documento>(entity =>
+        {
+            entity.ToTable("DOCUMENTO", "pri", t =>
+                t.HasCheckConstraint("CK_DOCUMENTO_tipo",
+                    "do_tipo IN ('RAT','EIPD','MATRIZ_RIESGO','MATRIZ_ENCARGADO','EVIDENCIA_CONTROL','AVISO_PRIVACIDAD','OTRO')"));
+
+            entity.HasKey(e => e.DoId);
+
+            entity.Property(e => e.DoId)
+                .HasColumnName("do_id");
+
+            entity.Property(e => e.UsId)
+                .HasColumnName("us_id")
+                .IsRequired();
+
+            entity.Property(e => e.DoTipo)
+                .HasColumnName("do_tipo")
+                .HasMaxLength(50)
+                .IsRequired();
+
+            entity.Property(e => e.DoVersi)
+                .HasColumnName("do_versi")
+                .HasMaxLength(30);
+
+            entity.Property(e => e.DoNombre)
+                .HasColumnName("do_nombre")
+                .HasMaxLength(255)
+                .IsRequired();
+
+            entity.Property(e => e.DoRutaArch)
+                .HasColumnName("do_ruta_arch")
+                .HasMaxLength(1000)
+                .IsRequired();
+
+            entity.Property(e => e.DoHuella)
+                .HasColumnName("do_huella")
+                .HasMaxLength(128);
+
+            entity.Property(e => e.DoFechaCarg)
+                .HasColumnName("do_fecha_carg")
+                .HasColumnType("datetime2(0)");
+
+            entity.Property(e => e.DoEstatus)
+                .HasColumnName("do_estatus")
+                .IsRequired();
         });
 
     }
