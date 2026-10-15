@@ -50,6 +50,8 @@ builder.Services.AddScoped<IEvaluacionRiesgoRepositorio, EvaluacionRiesgoReposit
 builder.Services.AddScoped<IEvaluacionRiesgoServicio, EvaluacionRiesgoServicio>();
 builder.Services.AddScoped<IDocumentoRepositorio, DocumentoRepositorio>();
 builder.Services.AddScoped<IDocumentoServicio, DocumentoServicio>();
+builder.Services.AddScoped<IIncidenteRepositorio, IncidenteRepositorio>();
+builder.Services.AddScoped<IIncidenteServicio, IncidenteServicio>();
 
 builder.Services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
 builder.Services.AddScoped<IUsuarioServicio, UsuarioServicio>();

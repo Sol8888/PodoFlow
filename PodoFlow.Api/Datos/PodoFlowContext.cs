@@ -29,7 +29,8 @@ public class PodoFlowContext : DbContext
     public DbSet<EvaluacionImpacto> EvaluacionesImpacto { get; set; }
     public DbSet<EvaluacionRiesgo> EvaluacionesRiesgos { get; set; }
     public DbSet<Documento> Documentos { get; set; }
-
+    public DbSet<Incidente> Incidentes { get; set; }
+    public DbSet<AccionIncidente> AccionesIncidente { get; set; }
 
 
 
@@ -1651,6 +1652,38 @@ public class PodoFlowContext : DbContext
             entity.Property(e => e.DoEstatus)
                 .HasColumnName("do_estatus")
                 .IsRequired();
+        });
+        modelBuilder.Entity<Incidente>(entity =>
+        {
+            entity.ToTable("INCIDENTE", "pri", t =>
+                t.HasCheckConstraint("CK_INCIDENTE_estad",
+                    "in_estad IN ('ABIERTO','ANALISIS','CONTENIDO','RECUPERADO','CERRADO')"));
+            entity.HasKey(e => e.InId);
+            entity.Property(e => e.InId).HasColumnName("in_id");
+            entity.Property(e => e.UsId).HasColumnName("us_id").IsRequired();
+            entity.Property(e => e.InFechaDete).HasColumnName("in_fecha_dete").HasColumnType("datetime2(0)").IsRequired();
+            entity.Property(e => e.InTipo).HasColumnName("in_tipo").HasMaxLength(100).IsRequired();
+            entity.Property(e => e.InModulo).HasColumnName("in_modulo").HasMaxLength(80).IsRequired();
+            entity.Property(e => e.InDescri).HasColumnName("in_descri").HasMaxLength(3000).IsRequired();
+            entity.Property(e => e.InDatosAfec).HasColumnName("in_datos_afec").HasMaxLength(2000);
+            entity.Property(e => e.InImpacPreli).HasColumnName("in_impac_preli").HasMaxLength(1500);
+            entity.Property(e => e.InEstad).HasColumnName("in_estad").HasMaxLength(20).IsRequired();
+            entity.Property(e => e.InFechaCier).HasColumnName("in_fecha_cier").HasColumnType("datetime2(0)");
+            entity.Property(e => e.InVersion).HasColumnName("in_version").IsRowVersion();
+        });
+
+        modelBuilder.Entity<AccionIncidente>(entity =>
+        {
+            entity.ToTable("ACCION_INCIDENTE", "pri");
+            entity.HasKey(e => e.AcId);
+            entity.Property(e => e.AcId).HasColumnName("ac_id");
+            entity.Property(e => e.InId).HasColumnName("in_id");
+            entity.Property(e => e.UsId).HasColumnName("us_id").IsRequired();
+            entity.Property(e => e.AcFechaHora).HasColumnName("ac_fecha_hora").HasColumnType("datetime2(0)");
+            entity.Property(e => e.AcTipo).HasColumnName("ac_tipo").HasMaxLength(50).IsRequired();
+            entity.Property(e => e.AcAccion).HasColumnName("ac_accion").HasMaxLength(2000).IsRequired();
+            entity.Property(e => e.AcObser).HasColumnName("ac_obser").HasMaxLength(1500);
+            entity.HasOne(e => e.Incidente).WithMany().HasForeignKey(e => e.InId);
         });
 
     }
