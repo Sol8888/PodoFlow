@@ -59,6 +59,8 @@ public class PodoFlowContext : DbContext
 
     public DbSet<Prestacion> Prestaciones { get; set; }
 
+    public DbSet<Cobro> Cobros { get; set; }
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -1359,6 +1361,73 @@ public class PodoFlowContext : DbContext
                 .WithMany()
                 .HasForeignKey(x => x.UsId)
                 .OnDelete(DeleteBehavior.Restrict);
+        });
+
+
+        modelBuilder.Entity<Cobro>(entity =>
+        {
+            entity.ToTable("COBRO", "fin");
+
+            entity.HasKey(x => x.CoId);
+
+            entity.Property(x => x.CoId)
+                .HasColumnName("co_id")
+                .ValueGeneratedOnAdd();
+
+            entity.Property(x => x.PrId)
+                .HasColumnName("pr_id")
+                .IsRequired();
+
+            entity.Property(x => x.FoId)
+                .HasColumnName("fo_id")
+                .IsRequired();
+
+            entity.Property(x => x.UsId)
+                .HasColumnName("us_id")
+                .IsRequired();
+
+            entity.Property(x => x.CoFechaPago)
+                .HasColumnName("co_fecha_pago")
+                .HasPrecision(0)
+                .HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.Property(x => x.CoValor)
+                .HasColumnName("co_valor")
+                .HasColumnType("decimal(12,2)")
+                .IsRequired();
+
+            entity.Property(x => x.CoRefe)
+                .HasColumnName("co_refe")
+                .HasMaxLength(150);
+
+            entity.Property(x => x.CoObser)
+                .HasColumnName("co_obser")
+                .HasMaxLength(1000);
+
+            entity.Property(x => x.CoEstad)
+                .HasColumnName("co_estad")
+                .HasMaxLength(20)
+                .HasDefaultValue("REGISTRADO")
+                .IsRequired();
+
+            entity.HasOne<Prestacion>()
+                .WithMany()
+                .HasForeignKey(x => x.PrId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne<FormaPago>()
+                .WithMany()
+                .HasForeignKey(x => x.FoId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne<Usuario>()
+                .WithMany()
+                .HasForeignKey(x => x.UsId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(x => x.CoFechaPago)
+                .IsDescending(true)
+                .HasDatabaseName("IX_COBRO_fecha");
         });
 
     }

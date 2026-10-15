@@ -91,6 +91,9 @@ builder.Services.AddScoped<IFormaPagoServicio, FormaPagoServicio>();
 builder.Services.AddScoped<IPrestacionRepositorio, PrestacionRepositorio>();
 builder.Services.AddScoped<IPrestacionServicio, PrestacionServicio>();
 
+builder.Services.AddScoped<ICobroRepositorio, CobroRepositorio>();
+builder.Services.AddScoped<ICobroServicio, CobroServicio>();
+
 
 // Esto de aqui esta porque necesito hacer mock de la seguridad para probar algunas cosas :) la carpeta de seguridad esta conectada a esto y es por hacer mock a la Autenticacion
 if (builder.Environment.IsDevelopment())
