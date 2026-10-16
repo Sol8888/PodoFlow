@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PodoFlow.Api.DTOs.Plantilla;
 using PodoFlow.Api.Servicios.Interfaces;
@@ -5,6 +6,7 @@ using PodoFlow.Api.Servicios.Interfaces;
 namespace PodoFlow.Api.Controladores
 {
     [ApiController]
+    [Authorize(Policy = "ComunicacionGestionar")]
     [Route("api/[controller]")]
     public class PlantillaController : ControllerBase
     {

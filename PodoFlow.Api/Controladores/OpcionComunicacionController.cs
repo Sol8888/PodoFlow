@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PodoFlow.Api.DTOs.OpcionComunicacion;
 using PodoFlow.Api.Servicios.Interfaces;
@@ -5,6 +6,7 @@ using PodoFlow.Api.Servicios.Interfaces;
 namespace PodoFlow.Api.Controladores
 {
     [ApiController]
+    [Authorize(Policy = "ComunicacionGestionar")]
     [Route("api/[controller]")]
     public class OpcionComunicacionController : ControllerBase
     {

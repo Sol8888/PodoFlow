@@ -178,6 +178,27 @@ builder.Services.AddAuthorization(options =>
         policy.RequireClaim("permiso", "FINANZAS_GESTIONAR");
     });
 
+    // Estas politicas son para lo de seguridad, comunicacion y lo de IA
+
+
+    options.AddPolicy("PrivacidadGestionar", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireClaim("permiso", "PRIVACIDAD_GESTIONAR");
+    });
+
+    options.AddPolicy("ComunicacionGestionar", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireClaim("permiso", "COMUNICACION_GESTIONAR");
+    });
+
+    options.AddPolicy("AnaliticaVer", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireClaim("permiso", "ANALITICA_VER");
+    });
+
 });
 
 

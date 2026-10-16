@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PodoFlow.Api.DTOs.Aviso;
 using PodoFlow.Api.Servicios.Interfaces;
 
 namespace PodoFlow.Api.Controladores
 {
     [ApiController]
+    [Authorize(Policy = "PrivacidadGestionar")]
     [Route("api/[controller]")]
     public class AvisoController : ControllerBase
     {
