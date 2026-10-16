@@ -1,6 +1,4 @@
-﻿using System.Globalization;
-using System.Text;
-using PodoFlow.Api.DTOs.Solicitud;
+﻿using PodoFlow.Api.DTOs.Solicitud;
 using PodoFlow.Api.Modelos;
 using PodoFlow.Api.Repositorios.Interfaces;
 using PodoFlow.Api.Servicios.Interfaces;
@@ -44,9 +42,9 @@ namespace PodoFlow.Api.Servicios.Implementaciones
             _repositorio = repositorio;
         }
 
-        public async Task<List<SolicitudRespuestaDto>> ObtenerTodosAsync()
+        public async Task<List<SolicitudRespuestaDto>> ObtenerTodosAsync(int pagina, int tamano)
         {
-            var solicitudes = await _repositorio.ObtenerTodosAsync();
+            var solicitudes = await _repositorio.ObtenerTodosAsync(pagina, tamano);
 
             return solicitudes.Select(MapearRespuesta).ToList();
         }
@@ -99,8 +97,8 @@ namespace PodoFlow.Api.Servicios.Implementaciones
             if (dto.UsuarioId.HasValue)
                 await ValidarUsuarioAsync(dto.UsuarioId.Value);
 
-            var identificacion = await ValidarSolicitanteAsync(dto.PacienteId, tipoSolicitante, dto.NombreSolicitante,dto.IdentificacionSolicitante, dto.TipoIdentificacion);
-            
+            var identificacion = await ValidarSolicitanteAsync(dto.PacienteId, tipoSolicitante, dto.IdentificacionSolicitante, dto.TipoIdentificacion);
+
             var ahora = DateTime.UtcNow;
 
             var solicitud = new Solicitud
@@ -149,7 +147,7 @@ namespace PodoFlow.Api.Servicios.Implementaciones
                 throw new InvalidOperationException(
                     $"La solicitud está {solicitud.SoEstad} y ya no se puede modificar.");
             var identificacion = await ValidarSolicitanteAsync(
-                solicitud.PaId, solicitud.SoTipoSoli, dto.NombreSolicitante,
+                solicitud.PaId, solicitud.SoTipoSoli,
                 dto.IdentificacionSolicitante, dto.TipoIdentificacion);
 
             solicitud.SoNombrSoli = dto.NombreSolicitante.Trim();
@@ -233,7 +231,7 @@ namespace PodoFlow.Api.Servicios.Implementaciones
         }
 
         private async Task<string> ValidarSolicitanteAsync(
-            long pacienteId, string tipoSolicitante, string nombre,
+            long pacienteId, string tipoSolicitante,
             string identificacion, string? tipoIdentificacion)
         {
             var paciente = await _repositorio.ObtenerIdentidadPacienteAsync(pacienteId)
@@ -242,16 +240,15 @@ namespace PodoFlow.Api.Servicios.Implementaciones
             var identificacionLimpia = LimpiarIdentificacion(identificacion);
 
             if (tipoSolicitante == Titular)
-                ValidarTitular(identificacionLimpia, nombre, paciente);
+                ValidarTitular(identificacionLimpia, paciente);
             else
                 ValidarRepresentante(identificacionLimpia, tipoIdentificacion, paciente.Identificacion);
 
             return identificacionLimpia;
         }
 
-        // TITULAR: el tipo sale del paciente; identificación y nombre deben coincidir con los suyos.
         private static void ValidarTitular(
-            string identificacion, string nombre,
+            string identificacion,
             (string TipoIdentificacion, string Identificacion, string Nombre) paciente)
         {
             var tipo = Normalizar(paciente.TipoIdentificacion);
@@ -264,9 +261,6 @@ namespace PodoFlow.Api.Servicios.Implementaciones
 
             if (identificacion != LimpiarIdentificacion(paciente.Identificacion))
                 throw new ArgumentException("La identificación del titular no coincide con la del paciente.");
-
-            if (!NombresCoinciden(nombre, paciente.Nombre))
-                throw new ArgumentException("El nombre del titular no coincide con el del paciente.");
         }
 
         // REPRESENTANTE: tipo obligatorio, formato válido y distinto del paciente.
@@ -339,25 +333,6 @@ namespace PodoFlow.Api.Servicios.Implementaciones
         {
             return pasaporte.Length is >= 6 and <= 9
                 && pasaporte.All(char.IsAsciiLetterOrDigit);
-        }
-
-        private static bool NombresCoinciden(string nombre1, string nombre2)
-        {
-            return PalabrasNombre(nombre1).SequenceEqual(PalabrasNombre(nombre2));
-        }
-
-        private static List<string> PalabrasNombre(string nombre)
-        {
-            var sinTildes = new string(nombre
-                .Normalize(NormalizationForm.FormD)
-                .Where(c => CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
-                .ToArray());
-
-            return sinTildes
-                .ToUpperInvariant()
-                .Split(' ', StringSplitOptions.RemoveEmptyEntries)
-                .OrderBy(palabra => palabra, StringComparer.Ordinal)
-                .ToList();
         }
 
         private static bool EsFinal(string estado)

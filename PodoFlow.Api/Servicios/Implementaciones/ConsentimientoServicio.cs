@@ -69,6 +69,7 @@ namespace PodoFlow.Api.Servicios.Implementaciones
 
             await ValidarFinalidadAsync(dto.FinalidadId);
             await ValidarAvisoVigenteAsync(dto.AvisoId);
+            await ValidarUsuarioAsync(dto.UsuarioId);
 
             // UQ_CONSENTIMIENTO_pac_fin. Aquí no hay estatus que reactivar:
             // si ya existe, lo que corresponde es cambiarle el estado.
@@ -128,6 +129,8 @@ namespace PodoFlow.Api.Servicios.Implementaciones
                 throw new InvalidOperationException(
                     $"No se puede pasar de {consentimiento.CoEstad} a {nuevoEstado}.");
 
+            await ValidarUsuarioAsync(dto.UsuarioId);
+
             var ahora = DateTime.UtcNow;
 
             if (nuevoEstado == Aceptado)
@@ -157,6 +160,12 @@ namespace PodoFlow.Api.Servicios.Implementaciones
             await _repositorio.CambiarEstadoAsync(consentimiento, evento, dto.Version);
 
             return MapearRespuesta(consentimiento);
+        }
+
+        private async Task ValidarUsuarioAsync(long? usuarioId)
+        {
+            if (usuarioId.HasValue && !await _repositorio.ExisteUsuarioActivoAsync(usuarioId.Value))
+                throw new ArgumentException($"No existe un usuario activo con id {usuarioId.Value}.");
         }
 
         private async Task ValidarFinalidadAsync(int finalidadId)

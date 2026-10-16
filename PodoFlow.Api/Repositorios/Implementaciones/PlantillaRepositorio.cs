@@ -60,14 +60,12 @@ namespace PodoFlow.Api.Repositorios.Implementaciones
         // Cuando exista el DbSet de Notificacion se puede cambiar por LINQ.
         public async Task<int> ContarNotificacionesAsync(int plantillaId, bool soloPendientes)
         {
-            if (soloPendientes)
-                return await _context.Database
-                    .SqlQuery<long>($"SELECT no_id AS Value FROM com.NOTIFICACION WHERE pl_id = {plantillaId} AND no_estad IN ('PENDIENTE','PROCESANDO')")
-                    .CountAsync();
+            var consulta = _context.Notificaciones.Where(x => x.PlId == plantillaId);
 
-            return await _context.Database
-                .SqlQuery<long>($"SELECT no_id AS Value FROM com.NOTIFICACION WHERE pl_id = {plantillaId}")
-                .CountAsync();
+            if (soloPendientes)
+                consulta = consulta.Where(x => x.NoEstad == "PENDIENTE" || x.NoEstad == "PROCESANDO");
+
+            return await consulta.CountAsync();
         }
 
         public async Task<Plantilla> CrearAsync(Plantilla plantilla)

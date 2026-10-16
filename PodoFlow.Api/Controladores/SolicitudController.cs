@@ -20,9 +20,14 @@ namespace PodoFlow.Api.Controladores
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<SolicitudRespuestaDto>>> ObtenerTodos()
+        public async Task<ActionResult<List<SolicitudRespuestaDto>>> ObtenerTodos(
+            [FromQuery] int pagina = 1,
+            [FromQuery] int tamano = 10)
         {
-            return Ok(await _servicio.ObtenerTodosAsync());
+            if (pagina < 1 || tamano < 1 || tamano > 100)
+                return BadRequest(new { mensaje = "Paginación inválida." });
+
+            return Ok(await _servicio.ObtenerTodosAsync(pagina, tamano));
         }
 
         [HttpGet("paciente/{pacienteId:long}")]

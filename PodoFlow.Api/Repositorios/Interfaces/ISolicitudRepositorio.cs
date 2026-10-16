@@ -4,7 +4,7 @@ namespace PodoFlow.Api.Repositorios.Interfaces
 {
     public interface ISolicitudRepositorio
     {
-        Task<List<Solicitud>> ObtenerTodosAsync();
+        Task<List<Solicitud>> ObtenerTodosAsync(int pagina, int tamano);
 
         Task<List<Solicitud>> ObtenerPorPacienteAsync(long pacienteId);
 

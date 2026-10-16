@@ -1,11 +1,10 @@
-﻿
-using PodoFlow.Api.DTOs.Solicitud;
+﻿using PodoFlow.Api.DTOs.Solicitud;
 
 namespace PodoFlow.Api.Servicios.Interfaces
 {
     public interface ISolicitudServicio
     {
-        Task<List<SolicitudRespuestaDto>> ObtenerTodosAsync();
+        Task<List<SolicitudRespuestaDto>> ObtenerTodosAsync(int pagina, int tamano);
 
         Task<List<SolicitudRespuestaDto>> ObtenerPorPacienteAsync(long pacienteId);
 

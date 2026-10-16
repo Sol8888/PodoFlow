@@ -5,10 +5,6 @@ using PodoFlow.Api.Servicios.Interfaces;
 
 namespace PodoFlow.Api.Servicios.Implementaciones
 {
-    // Caso B: la "baja" es CANCELAR, y solo si todavía no se envió.
-    // La API no envía mensajes: un proceso externo la pasa a PROCESANDO (aquí se vuelve a verificar
-    // el permiso y el consentimiento), envía y registra el intento en ENVIO, que la deja ENVIADA o ERROR.
-    // Convención: null/false → 404 · ArgumentException → 400 · InvalidOperationException → 409.
     public class NotificacionServicio : INotificacionServicio
     {
         private const string Pendiente = "PENDIENTE";
@@ -25,9 +21,6 @@ namespace PodoFlow.Api.Servicios.Implementaciones
 
         private const string MensajeEstadoInvalido =
             "El estado debe ser PENDIENTE, PROCESANDO, ENVIADA, ERROR o CANCELADA.";
-
-        // Todas las transiciones válidas. ENVIADA y CANCELADA son finales.
-        // ERROR → PENDIENTE es el reintento; ERROR → CANCELADA, desistir.
         private static readonly Dictionary<string, string[]> TransicionesPermitidas = new()
         {
             [Pendiente] = [Procesando, Cancelada],
@@ -37,10 +30,8 @@ namespace PodoFlow.Api.Servicios.Implementaciones
             [Cancelada] = []
         };
 
-        // ENVIADA y ERROR solo salen de registrar un intento, para que siempre quede su ENVIO.
         private static readonly HashSet<string> EstadosPorEnvio = [Enviada, Error];
 
-        // Se puede reprogramar o cambiar de plantilla mientras no haya salido.
         private static readonly HashSet<string> EstadosEditables = [Pendiente, Error];
 
         private readonly INotificacionRepositorio _repositorio;
@@ -163,7 +154,6 @@ namespace PodoFlow.Api.Servicios.Implementaciones
             if (notificacion.CiId.HasValue)
                 await ValidarCitaAsync(notificacion.CiId.Value, notificacion.PaId, fechaProgramada);
 
-            // Nunca se tocan NoId, PaId, CiId, OpId, UsId, NoCanal, NoEstad ni NoFechaCrea.
             notificacion.PlId = plantilla.PlId;
             notificacion.NoTipo = ObtenerTipo(dto.Tipo, plantilla);
             notificacion.NoFechaProg = fechaProgramada;
@@ -203,8 +193,6 @@ namespace PodoFlow.Api.Servicios.Implementaciones
                 throw new InvalidOperationException($"No se puede pasar de {estadoAnterior} a {nuevoEstado}.");
             }
 
-            // Justo antes de enviar se vuelve a verificar todo: desde que se programó,
-            // el paciente pudo revocar el consentimiento, quitar el permiso o cancelar la cita.
             if (nuevoEstado == Procesando)
                 await VerificarAntesDeEnviarAsync(notificacion);
 
@@ -248,7 +236,6 @@ namespace PodoFlow.Api.Servicios.Implementaciones
                 EnFechaHora = DateTime.UtcNow,
                 EnResul = resultado,
                 EnIdProve = Limpiar(dto.IdProveedor),
-                // En un envío correcto no se guardan datos de error.
                 EnCodError = resultado == ResultadoError ? codigoError : null,
                 EnDetalError = resultado == ResultadoError ? detalleError : null
             };
@@ -258,8 +245,6 @@ namespace PodoFlow.Api.Servicios.Implementaciones
             return MapearEnvio(creado);
         }
 
-        // Paciente activo, opción activa y con permiso, finalidad activa y, si la finalidad lo pide,
-        // consentimiento ACEPTADO. Es la misma cadena que exige OPCION_COMUNICACION.
         private async Task VerificarAutorizacionAsync(OpcionComunicacion opcion)
         {
             if (!await _opcionRepositorio.ExistePacienteActivoAsync(opcion.PaId))
@@ -334,7 +319,6 @@ namespace PodoFlow.Api.Servicios.Implementaciones
             return plantilla;
         }
 
-        // La cita tiene que ser del mismo paciente, seguir vigente, y el recordatorio debe salir antes.
         private async Task ValidarCitaAsync(long citaId, long pacienteId, DateTime fechaProgramada)
         {
             var fechaCita = await _repositorio.ObtenerFechaCitaVigenteAsync(citaId, pacienteId);
@@ -348,21 +332,19 @@ namespace PodoFlow.Api.Servicios.Implementaciones
                     $"La notificación debe programarse antes de la cita ({fechaCita.Value:yyyy-MM-dd HH:mm} UTC).");
         }
 
-        // No se programa en el pasado (5 minutos de margen por diferencias de reloj).
-        // Fechas en UTC como el resto de la API: con zona horaria se convierte; sin zona se toma como UTC.
         private static DateTime ValidarFechaProgramada(DateTime? fecha)
         {
             if (!fecha.HasValue)
                 throw new ArgumentException("La fecha programada es obligatoria.");
 
-            var valor = fecha.Value.Kind == DateTimeKind.Local
-                ? fecha.Value.ToUniversalTime()
-                : DateTime.SpecifyKind(fecha.Value, DateTimeKind.Utc);
+            if (fecha.Value.Kind != DateTimeKind.Utc)
+                throw new ArgumentException("La fecha programada debe enviarse en UTC, terminada en Z.");
+
+            var valor = fecha.Value;
 
             if (valor < DateTime.UtcNow.AddMinutes(-5))
                 throw new ArgumentException("La fecha programada no puede estar en el pasado.");
 
-            // no_fecha_prog es DATETIME2(0): sin fracciones de segundo.
             return valor.AddTicks(-(valor.Ticks % TimeSpan.TicksPerSecond));
         }
 

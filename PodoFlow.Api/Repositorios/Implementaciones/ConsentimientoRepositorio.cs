@@ -1,7 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore; 
+﻿using Microsoft.EntityFrameworkCore;
 using PodoFlow.Api.Datos;
 using PodoFlow.Api.Modelos;
-using PodoFlow.Api.Repositorios.Interfaces; 
+using PodoFlow.Api.Repositorios.Interfaces;
 
 namespace PodoFlow.Api.Repositorios.Implementaciones
 {
@@ -50,7 +50,14 @@ namespace PodoFlow.Api.Repositorios.Implementaciones
                 .AnyAsync();
         }
 
-    
+        public async Task<bool> ExisteUsuarioActivoAsync(long usuarioId)
+        {
+            return await _context.Database
+                .SqlQuery<long>($"SELECT us_id AS Value FROM seg.USUARIO WHERE us_id = {usuarioId} AND us_estatus = 1")
+                .AnyAsync();
+        }
+
+
         public async Task<Consentimiento> CrearAsync(Consentimiento consentimiento, EventoConsentimiento evento)
         {
             evento.Consentimiento = consentimiento;
@@ -79,7 +86,7 @@ namespace PodoFlow.Api.Repositorios.Implementaciones
             await _context.SaveChangesAsync();
         }
 
-       
+
         private void AplicarVersionLeida(Consentimiento consentimiento, byte[] versionLeida)
         {
             _context.Entry(consentimiento)

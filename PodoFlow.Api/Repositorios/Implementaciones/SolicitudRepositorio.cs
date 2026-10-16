@@ -15,11 +15,14 @@ namespace PodoFlow.Api.Repositorios.Implementaciones
             _context = context;
         }
 
-        public async Task<List<Solicitud>> ObtenerTodosAsync()
+        public async Task<List<Solicitud>> ObtenerTodosAsync(int pagina, int tamano)
         {
             return await _context.Solicitudes
                 .AsNoTracking()
                 .OrderByDescending(x => x.SoFechaRece)
+                .ThenByDescending(x => x.SoId)
+                .Skip((pagina - 1) * tamano)
+                .Take(tamano)
                 .ToListAsync();
         }
         public async Task<List<Solicitud>> ObtenerPorPacienteAsync(long pacienteId)

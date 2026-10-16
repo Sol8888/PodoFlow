@@ -5,8 +5,6 @@ using PodoFlow.Api.Servicios.Interfaces;
 
 namespace PodoFlow.Api.Servicios.Implementaciones
 {
-    // Caso B: la "baja" es CERRAR. Cada paso queda en ACCION_INCIDENTE.
-    // Convención: null/false → 404 · ArgumentException → 400 · InvalidOperationException → 409.
     public class IncidenteServicio : IIncidenteServicio
     {
         private const string Abierto = "ABIERTO";
@@ -22,10 +20,6 @@ namespace PodoFlow.Api.Servicios.Implementaciones
 
         private const string MensajeEstadoInvalido =
             "El estado debe ser ABIERTO, ANALISIS, CONTENIDO, RECUPERADO o CERRADO.";
-
-        // Estado actual → estados a los que puede pasar. CERRADO es final.
-        // ABIERTO → CONTENIDO: a veces se contiene antes de analizar (ej. bloquear un equipo perdido).
-        // ABIERTO / ANALISIS → CERRADO: incidente descartado (falso positivo); exige observación.
         private static readonly Dictionary<string, string[]> TransicionesPermitidas = new()
         {
             [Abierto] = [Analisis, Contenido, Cerrado],
@@ -99,7 +93,6 @@ namespace PodoFlow.Api.Servicios.Implementaciones
                 InEstad = Abierto
             };
 
-            // us_id es NOT NULL en las dos tablas, así que la primera acción siempre se puede registrar.
             var accion = new AccionIncidente
             {
                 UsId = dto.UsuarioId,
@@ -127,7 +120,6 @@ namespace PodoFlow.Api.Servicios.Implementaciones
 
             var fechaDeteccion = ValidarFechaDeteccion(dto.FechaDeteccion);
 
-            // Nunca se tocan InId, UsId, InEstad ni InFechaCier.
             incidente.InFechaDete = fechaDeteccion;
             incidente.InTipo = Normalizar(dto.Tipo);
             incidente.InModulo = Normalizar(dto.Modulo);
@@ -239,23 +231,19 @@ namespace PodoFlow.Api.Servicios.Implementaciones
                 throw new ArgumentException($"No existe un usuario activo con id {usuarioId}.");
         }
 
-        // Un incidente no se puede detectar en el futuro. Se dan 5 minutos de margen por
-        // diferencias de reloj. Las fechas se manejan en UTC como el resto de la API:
-        // si llega con zona horaria (ej. "-05:00") se convierte; sin zona se toma como UTC.
         private static DateTime ValidarFechaDeteccion(DateTime? fecha)
         {
             if (!fecha.HasValue)
                 throw new ArgumentException("La fecha de detección es obligatoria.");
 
-            var valor = fecha.Value.Kind == DateTimeKind.Local
-                ? fecha.Value.ToUniversalTime()
-                : DateTime.SpecifyKind(fecha.Value, DateTimeKind.Utc);
+            if (fecha.Value.Kind != DateTimeKind.Utc)
+                throw new ArgumentException("La fecha de detección debe enviarse en UTC, terminada en Z.");
+
+            var valor = fecha.Value;
 
             if (valor > DateTime.UtcNow.AddMinutes(5))
                 throw new ArgumentException("La fecha de detección no puede estar en el futuro.");
 
-            // in_fecha_dete es DATETIME2(0): se quitan las fracciones de segundo para que
-            // la respuesta muestre lo mismo que queda guardado.
             return valor.AddTicks(-(valor.Ticks % TimeSpan.TicksPerSecond));
         }
 
@@ -264,7 +252,6 @@ namespace PodoFlow.Api.Servicios.Implementaciones
             return valor.Trim().ToUpperInvariant();
         }
 
-        // Texto opcional: vacío o solo espacios se guarda como NULL.
         private static string? Limpiar(string? valor)
         {
             return string.IsNullOrWhiteSpace(valor) ? null : valor.Trim();
