@@ -5,9 +5,6 @@ using PodoFlow.Api.Servicios.Interfaces;
 
 namespace PodoFlow.Api.Servicios.Implementaciones
 {
-    // Caso C. Como no hay baja, solo se agregan riesgos a evaluaciones en BORRADOR:
-    // una evaluación aprobada queda tal como se aprobó, y los cambios van en una versión nueva.
-    // Convención: null → 404 · ArgumentException → 400 · InvalidOperationException → 409.
     public class EvaluacionRiesgoServicio : IEvaluacionRiesgoServicio
     {
         private const string Borrador = "BORRADOR";
@@ -52,11 +49,9 @@ namespace PodoFlow.Api.Servicios.Implementaciones
             if (riesgo == null)
                 throw new ArgumentException($"No existe el riesgo {dto.RiesgoId}.");
 
-            // Un riesgo cerrado ya no aplica: no tiene sentido evaluarlo en una EIPD nueva.
             if (riesgo.RiEstad == RiesgoCerrado)
                 throw new InvalidOperationException($"El riesgo {dto.RiesgoId} está CERRADO.");
 
-            // PK (ev_id, ri_id): la misma pareja no se repite.
             if (await _repositorio.ObtenerAsync(dto.EvaluacionId, dto.RiesgoId) != null)
                 throw new InvalidOperationException("El riesgo ya está incluido en esta evaluación.");
 
@@ -97,11 +92,9 @@ namespace PodoFlow.Api.Servicios.Implementaciones
 
             foreach (var item in deOrigen)
             {
-                // Se saltan los excluidos y los que ya estén en el destino.
                 if (excluidos.Contains(item.RiId) || yaEnDestino.Contains(item.RiId))
                     continue;
 
-                // Los riesgos que se cerraron desde la versión anterior tampoco pasan.
                 var riesgo = await _riesgoRepositorio.ObtenerPorIdAsync(item.RiId);
 
                 if (riesgo == null || riesgo.RiEstad == RiesgoCerrado)

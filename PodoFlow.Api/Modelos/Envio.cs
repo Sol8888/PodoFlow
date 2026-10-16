@@ -1,6 +1,5 @@
 namespace PodoFlow.Api.Modelos
 {
-    // Cada intento de entrega de una notificación (bitácora, Caso C).
     public class Envio
     {
         public long EnId { get; set; }

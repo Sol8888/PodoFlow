@@ -4,7 +4,6 @@ using PodoFlow.Api.Servicios.Interfaces;
 
 namespace PodoFlow.Api.Controladores
 {
-    // Caso B: no hay DELETE; la "baja" es pasar a CERRADO con PATCH {id}/estado.
     [ApiController]
     [Route("api/[controller]")]
     public class RiesgoController : ControllerBase

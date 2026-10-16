@@ -9,8 +9,6 @@ namespace PodoFlow.Api.DTOs.Consentimiento
 
         [Required, MaxLength(50)]
         public string Medio { get; set; } = string.Empty;
-
-        // Obligatorio al pasar a ACEPTADO: el paciente acepta una versión concreta del aviso.
         public int? AvisoId { get; set; }
 
         [MaxLength(1000)]

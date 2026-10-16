@@ -5,8 +5,6 @@ using PodoFlow.Api.Servicios.Interfaces;
 
 namespace PodoFlow.Api.Controladores
 {
-    // Caso B: no hay DELETE; la "baja" es pasar a CERRADO con PATCH {id}/estado.
-    // ACCION_INCIDENTE (Caso C) se lista y se inserta desde {id}/acciones.
     [ApiController]
     [Route("api/[controller]")]
     public class IncidenteController : ControllerBase

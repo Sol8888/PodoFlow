@@ -1,6 +1,5 @@
 namespace PodoFlow.Api.Modelos
 {
-    // Texto base de los mensajes que se envían a los pacientes (correo o WhatsApp).
     public class Plantilla
     {
         public int PlId { get; set; }

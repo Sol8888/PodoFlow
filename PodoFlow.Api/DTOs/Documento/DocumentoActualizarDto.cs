@@ -2,9 +2,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace PodoFlow.Api.DTOs.Documento
 {
-    // Solo datos descriptivos. Sin RutaArchivo ni Huella: si cambia el archivo,
-    // se carga como documento nuevo (otra versión), para no perder el original.
-    // Sin Estatus: la baja y la reactivación tienen sus propios endpoints.
     public class DocumentoActualizarDto
     {
         [Required, MaxLength(50)]

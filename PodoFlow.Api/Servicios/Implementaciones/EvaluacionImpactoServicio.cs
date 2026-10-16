@@ -93,7 +93,6 @@ namespace PodoFlow.Api.Servicios.Implementaciones
                 throw new InvalidOperationException(
                     $"La evaluación está {evaluacion.EvEstad}. Solo se edita en BORRADOR; para cambiarla cree una versión nueva.");
 
-            // Nunca se tocan EvId, UsId ni EvEstad.
             evaluacion.EvVersi = dto.Version.Trim();
             evaluacion.EvFecha = dto.Fecha;
             evaluacion.EvAlcan = dto.Alcance.Trim();
@@ -125,7 +124,6 @@ namespace PodoFlow.Api.Servicios.Implementaciones
                 throw new InvalidOperationException(
                     $"No se puede pasar de {evaluacion.EvEstad} a {nuevoEstado}.");
 
-            // Una EIPD no se aprueba sin conclusión ni riesgo residual.
             if (nuevoEstado == Aprobada)
             {
                 if (string.IsNullOrWhiteSpace(evaluacion.EvConclu))
@@ -147,8 +145,6 @@ namespace PodoFlow.Api.Servicios.Implementaciones
         {
             return valor.Trim().ToUpperInvariant();
         }
-
-        // Texto opcional: vacío o solo espacios se guarda como NULL.
         private static string? Limpiar(string? valor)
         {
             return string.IsNullOrWhiteSpace(valor) ? null : valor.Trim();

@@ -15,7 +15,6 @@ namespace PodoFlow.Api.Controladores
             _servicio = servicio;
         }
 
-        // GET api/Documento?tipo=RAT&incluirInactivos=false&pagina=1&tamano=10
         [HttpGet]
         public async Task<ActionResult<List<DocumentoRespuestaDto>>> ObtenerTodos(
             [FromQuery] string? tipo = null,
@@ -36,7 +35,6 @@ namespace PodoFlow.Api.Controladores
             }
         }
 
-        // Devuelve el registro esté activo o no.
         [HttpGet("{id:long}")]
         public async Task<ActionResult<DocumentoRespuestaDto>> ObtenerPorId(long id)
         {
@@ -101,7 +99,6 @@ namespace PodoFlow.Api.Controladores
             return NoContent();
         }
 
-        // do_estatus = 1.
         [HttpPatch("{id:long}/reactivar")]
         public async Task<IActionResult> Reactivar(long id)
         {

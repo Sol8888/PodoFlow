@@ -58,7 +58,10 @@ builder.Services.AddScoped<IOpcionComunicacionRepositorio, OpcionComunicacionRep
 builder.Services.AddScoped<IOpcionComunicacionServicio, OpcionComunicacionServicio>();
 builder.Services.AddScoped<INotificacionRepositorio, NotificacionRepositorio>();
 builder.Services.AddScoped<INotificacionServicio, NotificacionServicio>();
-
+builder.Services.AddScoped<ISeudonimoRepositorio, SeudonimoRepositorio>();
+builder.Services.AddScoped<ISeudonimoServicio, SeudonimoServicio>();
+builder.Services.AddScoped<IEjecucionRepositorio, EjecucionRepositorio>();
+builder.Services.AddScoped<IEjecucionServicio, EjecucionServicio>();
 
 builder.Services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
 builder.Services.AddScoped<IUsuarioServicio, UsuarioServicio>();

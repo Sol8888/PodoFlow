@@ -15,7 +15,6 @@ namespace PodoFlow.Api.Controladores
             _servicio = servicio;
         }
 
-        // GET api/OpcionComunicacion?pacienteId=1&finalidadId=3&canal=CORREO&incluirInactivos=false&pagina=1&tamano=10
         [HttpGet]
         public async Task<ActionResult<List<OpcionComunicacionRespuestaDto>>> ObtenerTodos(
             [FromQuery] long? pacienteId = null,

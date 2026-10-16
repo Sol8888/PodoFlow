@@ -232,8 +232,6 @@ namespace PodoFlow.Api.Servicios.Implementaciones
                 throw new ArgumentException($"No existe un usuario activo con id {usuarioId}.");
         }
 
-        // Lee al paciente una sola vez y delega la regla según el tipo de solicitante.
-        // Devuelve la identificación limpia, que es la que se guarda.
         private async Task<string> ValidarSolicitanteAsync(
             long pacienteId, string tipoSolicitante, string nombre,
             string identificacion, string? tipoIdentificacion)

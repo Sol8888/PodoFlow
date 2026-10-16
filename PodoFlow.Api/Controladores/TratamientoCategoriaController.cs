@@ -4,8 +4,6 @@ using PodoFlow.Api.Servicios.Interfaces;
 
 namespace PodoFlow.Api.Controladores
 {
-    // Tabla intermedia: el registro se identifica por las dos llaves en la ruta.
-    // No hay PUT porque no hay nada que editar.
     [ApiController]
     [Route("api/[controller]")]
     public class TratamientoCategoriaController : ControllerBase

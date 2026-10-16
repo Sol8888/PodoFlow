@@ -15,7 +15,6 @@ namespace PodoFlow.Api.Controladores
             _servicio = servicio;
         }
 
-        // GET api/Plantilla?canal=CORREO&tipo=RECORDATORIO_CITA&incluirInactivos=false&pagina=1&tamano=10
         [HttpGet]
         public async Task<ActionResult<List<PlantillaRespuestaDto>>> ObtenerTodos(
             [FromQuery] string? canal = null,
@@ -37,7 +36,6 @@ namespace PodoFlow.Api.Controladores
             }
         }
 
-        // Devuelve el registro esté activo o no.
         [HttpGet("{id:int}")]
         public async Task<ActionResult<PlantillaRespuestaDto>> ObtenerPorId(int id)
         {

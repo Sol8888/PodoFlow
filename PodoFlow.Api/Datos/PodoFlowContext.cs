@@ -33,6 +33,10 @@ public class PodoFlowContext : DbContext
     public DbSet<AccionIncidente> AccionesIncidente { get; set; }
     public DbSet<Plantilla> Plantillas { get; set; }
     public DbSet<OpcionComunicacion> OpcionesComunicacion { get; set; }
+    public DbSet<Seudonimo> Seudonimos { get; set; }
+    public DbSet<Ejecucion> Ejecuciones { get; set; }
+    public DbSet<DatoAnalitico> DatosAnaliticos { get; set; }
+    public DbSet<Recomendacion> Recomendaciones { get; set; }
 
 
 
@@ -1766,6 +1770,75 @@ public class PodoFlowContext : DbContext
             entity.Property(e => e.EnCodError).HasColumnName("en_cod_error").HasMaxLength(100);
             entity.Property(e => e.EnDetalError).HasColumnName("en_detal_error").HasMaxLength(2000);
             entity.HasOne<Notificacion>().WithMany().HasForeignKey(e => e.NoId).OnDelete(DeleteBehavior.Restrict);
+        });
+        modelBuilder.Entity<Seudonimo>(entity =>
+        {
+            entity.ToTable("SEUDONIMO", "ana");
+            entity.HasKey(e => e.SeId);
+            entity.HasIndex(e => e.PaId).IsUnique();
+            entity.Property(e => e.SeId).HasColumnName("se_id").ValueGeneratedNever();
+            entity.Property(e => e.PaId).HasColumnName("pa_id").IsRequired();
+            entity.Property(e => e.SeFechaCrea).HasColumnName("se_fecha_crea").HasColumnType("datetime2(0)");
+            entity.Property(e => e.SeEstatus).HasColumnName("se_estatus").IsRequired();
+        });
+        modelBuilder.Entity<Ejecucion>(entity =>
+        {
+            entity.ToTable("EJECUCION", "ana", t =>
+            {
+                t.HasCheckConstraint("CK_EJECUCION_cant", "ej_cant_reg >= 0");
+                t.HasCheckConstraint("CK_EJECUCION_estad", "ej_estad IN ('PENDIENTE','PROCESANDO','COMPLETADA','ERROR')");
+            });
+            entity.HasKey(e => e.EjId);
+            entity.Property(e => e.EjId).HasColumnName("ej_id");
+            entity.Property(e => e.UsId).HasColumnName("us_id").IsRequired();
+            entity.Property(e => e.EnId).HasColumnName("en_id");
+            entity.Property(e => e.FiId).HasColumnName("fi_id").IsRequired();
+            entity.Property(e => e.EjFechaHora).HasColumnName("ej_fecha_hora").HasColumnType("datetime2(0)");
+            entity.Property(e => e.EjEstad).HasColumnName("ej_estad").HasMaxLength(20).IsRequired();
+            entity.Property(e => e.EjCantReg).HasColumnName("ej_cant_reg").IsRequired();
+            entity.Property(e => e.EjHuellEntr).HasColumnName("ej_huell_entr").HasMaxLength(128);
+            entity.Property(e => e.EjHuellSali).HasColumnName("ej_huell_sali").HasMaxLength(128);
+            entity.Property(e => e.EjObser).HasColumnName("ej_obser").HasMaxLength(1500);
+            entity.HasOne<Encargado>().WithMany().HasForeignKey(e => e.EnId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne<Finalidad>().WithMany().HasForeignKey(e => e.FiId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<DatoAnalitico>(entity =>
+        {
+            entity.ToTable("DATO_ANALITICO", "ana", t =>
+            {
+                t.HasCheckConstraint("CK_DATO_ANALITICO_frec", "da_frec_aten >= 0");
+                t.HasCheckConstraint("CK_DATO_ANALITICO_dias", "da_dias_inact IS NULL OR da_dias_inact >= 0");
+            });
+            entity.HasKey(e => e.DaId);
+            entity.Property(e => e.DaId).HasColumnName("da_id");
+            entity.Property(e => e.EjId).HasColumnName("ej_id").IsRequired();
+            entity.Property(e => e.SeId).HasColumnName("se_id").IsRequired();
+            entity.Property(e => e.DaFrecAten).HasColumnName("da_frec_aten").IsRequired();
+            entity.Property(e => e.DaCategServ).HasColumnName("da_categ_serv").HasMaxLength(100);
+            entity.Property(e => e.DaFechaUlti).HasColumnName("da_fecha_ulti").HasColumnType("date");
+            entity.Property(e => e.DaDiasInact).HasColumnName("da_dias_inact");
+            entity.HasOne<Ejecucion>().WithMany().HasForeignKey(e => e.EjId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne<Seudonimo>().WithMany().HasForeignKey(e => e.SeId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<Recomendacion>(entity =>
+        {
+            entity.ToTable("RECOMENDACION", "ana", t =>
+            {
+                t.HasCheckConstraint("CK_RECOMENDACION_pacie", "re_pacie_estim >= 0");
+                t.HasCheckConstraint("CK_RECOMENDACION_priva", "re_nivel_priva IN ('AGREGADO','SEUDONIMIZADO')");
+            });
+            entity.HasKey(e => e.ReId);
+            entity.Property(e => e.ReId).HasColumnName("re_id");
+            entity.Property(e => e.EjId).HasColumnName("ej_id").IsRequired();
+            entity.Property(e => e.ReSegme).HasColumnName("re_segme").HasMaxLength(150).IsRequired();
+            entity.Property(e => e.ReHallaz).HasColumnName("re_hallaz").HasMaxLength(2000).IsRequired();
+            entity.Property(e => e.ReSugere).HasColumnName("re_sugere").HasMaxLength(2000).IsRequired();
+            entity.Property(e => e.RePacieEstim).HasColumnName("re_pacie_estim").IsRequired();
+            entity.Property(e => e.ReNivelPriva).HasColumnName("re_nivel_priva").HasMaxLength(30).IsRequired();
+            entity.Property(e => e.ReFechaGene).HasColumnName("re_fecha_gene").HasColumnType("datetime2(0)");
+            entity.HasOne<Ejecucion>().WithMany().HasForeignKey(e => e.EjId).OnDelete(DeleteBehavior.Restrict);
         });
     }
 

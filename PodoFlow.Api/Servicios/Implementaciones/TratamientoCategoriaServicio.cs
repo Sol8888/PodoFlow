@@ -5,9 +5,6 @@ using PodoFlow.Api.Servicios.Interfaces;
 
 namespace PodoFlow.Api.Servicios.Implementaciones
 {
-    // Caso A en tabla intermedia. La PK (tr_id, ca_id) funciona como el UNIQUE:
-    // una misma pareja no se puede insertar dos veces, así que se reactiva.
-    // Convención: null/false → 404 · ArgumentException → 400 · InvalidOperationException → 409.
     public class TratamientoCategoriaServicio : ITratamientoCategoriaServicio
     {
         private readonly ITratamientoCategoriaRepositorio _repositorio;

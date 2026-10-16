@@ -5,8 +5,6 @@ using PodoFlow.Api.Servicios.Interfaces;
 
 namespace PodoFlow.Api.Controladores
 {
-    // Caso B: no hay DELETE; la "baja" es pasar a CANCELADA con PATCH {id}/estado (solo si no se envió).
-    // ENVIO (Caso C) se lista y se inserta desde {id}/envios.
     [ApiController]
     [Route("api/[controller]")]
     public class NotificacionController : ControllerBase

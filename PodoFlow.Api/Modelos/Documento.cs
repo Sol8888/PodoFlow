@@ -1,6 +1,5 @@
 namespace PodoFlow.Api.Modelos
 {
-    // Documentos de cumplimiento LOPDP (RAT, EIPD, matrices, evidencias de control, avisos…).
     public class Documento
     {
         public long DoId { get; set; }

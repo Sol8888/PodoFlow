@@ -4,7 +4,6 @@ using PodoFlow.Api.Servicios.Interfaces;
 
 namespace PodoFlow.Api.Controladores
 {
-    // Caso B: no hay DELETE; la "baja" es pasar a CERRADA con PATCH {id}/estado.
     [ApiController]
     [Route("api/[controller]")]
     public class EvaluacionImpactoController : ControllerBase
@@ -16,7 +15,6 @@ namespace PodoFlow.Api.Controladores
             _servicio = servicio;
         }
 
-        // GET api/EvaluacionImpacto?estado=APROBADA&pagina=1&tamano=10
         [HttpGet]
         public async Task<ActionResult<List<EvaluacionImpactoRespuestaDto>>> ObtenerTodos(
             [FromQuery] string? estado = null,
@@ -84,7 +82,6 @@ namespace PodoFlow.Api.Controladores
             }
         }
 
-        // PATCH api/EvaluacionImpacto/5/estado → aprobar, revisar o cerrar
         [HttpPatch("{id:long}/estado")]
         public async Task<ActionResult<EvaluacionImpactoRespuestaDto>> CambiarEstado(long id, EvaluacionImpactoCambiarEstadoDto dto)
         {

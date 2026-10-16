@@ -5,9 +5,6 @@ using PodoFlow.Api.Servicios.Interfaces;
 
 namespace PodoFlow.Api.Servicios.Implementaciones
 {
-    // Caso A. La tabla no tiene UNIQUE, pero el servicio evita duplicados de tipo + nombre + versión,
-    // con el mismo criterio que Encargado.
-    // Convención: null/false → 404 · ArgumentException → 400 · InvalidOperationException → 409.
     public class DocumentoServicio : IDocumentoServicio
     {
         // Mismos valores que CK_DOCUMENTO_tipo.
@@ -85,7 +82,6 @@ namespace PodoFlow.Api.Servicios.Implementaciones
 
             await ValidarDuplicadoAsync(tipo, nombre, version, id);
 
-            // Nunca se tocan DoId, UsId, DoRutaArch, DoHuella, DoFechaCarg ni DoEstatus.
             documento.DoTipo = tipo;
             documento.DoNombre = nombre;
             documento.DoVersi = version;
@@ -102,7 +98,6 @@ namespace PodoFlow.Api.Servicios.Implementaciones
             if (documento == null)
                 return false;
 
-            // Si ya estaba dado de baja no hay nada que hacer.
             if (!documento.DoEstatus)
                 return true;
 
@@ -138,8 +133,6 @@ namespace PodoFlow.Api.Servicios.Implementaciones
 
             return true;
         }
-
-        // Mismo tipo y nombre con otra versión sí es válido (ej. RAT v1.0 y RAT v2.0).
         private async Task ValidarDuplicadoAsync(string tipo, string nombre, string? version, long? excluirId)
         {
             var duplicado = await _repositorio.ObtenerDuplicadoAsync(tipo, nombre, version, excluirId);
@@ -168,8 +161,6 @@ namespace PodoFlow.Api.Servicios.Implementaciones
 
             return normalizado;
         }
-
-        // Texto opcional: vacío o solo espacios se guarda como NULL.
         private static string? Limpiar(string? valor)
         {
             return string.IsNullOrWhiteSpace(valor) ? null : valor.Trim();

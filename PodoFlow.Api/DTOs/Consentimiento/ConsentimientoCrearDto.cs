@@ -13,7 +13,6 @@ namespace PodoFlow.Api.DTOs.Consentimiento
         [Required]
         public int AvisoId { get; set; }
 
-        // Solo ACEPTADO o RECHAZADO.
         [Required, MaxLength(15)]
         public string Estado { get; set; } = string.Empty;
 

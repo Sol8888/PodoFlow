@@ -2,8 +2,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace PodoFlow.Api.DTOs.Notificacion
 {
-    // Reprogramar o cambiar de plantilla mientras esté PENDIENTE o en ERROR.
-    // No cambia el paciente, la opción, la cita ni el canal: eso sería otra notificación.
     public class NotificacionActualizarDto
     {
         [Range(1, int.MaxValue)]

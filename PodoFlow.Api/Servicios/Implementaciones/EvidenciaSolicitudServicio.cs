@@ -70,8 +70,6 @@ namespace PodoFlow.Api.Servicios.Implementaciones
                 EvFechaCarg = ahora
             };
 
-            // Cargar un documento es una gestión de la solicitud, así que queda en su bitácora.
-            // ac_estad_ante y ac_estad_nuev admiten NULL justamente para acciones sin cambio de estado.
             var accion = new AccionSolicitud
             {
                 SoId = dto.SolicitudId,

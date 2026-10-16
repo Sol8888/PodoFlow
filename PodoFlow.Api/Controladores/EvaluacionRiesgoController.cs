@@ -4,7 +4,6 @@ using PodoFlow.Api.Servicios.Interfaces;
 
 namespace PodoFlow.Api.Controladores
 {
-    // Caso C (bitácora): solo GET y POST. No hay PUT ni DELETE a propósito.
     [ApiController]
     [Route("api/[controller]")]
     public class EvaluacionRiesgoController : ControllerBase
@@ -16,8 +15,6 @@ namespace PodoFlow.Api.Controladores
             _servicio = servicio;
         }
 
-        // GET api/EvaluacionRiesgo?evaluacionId=1&pagina=1&tamano=10
-        // GET api/EvaluacionRiesgo?riesgoId=3  → evaluaciones que analizaron ese riesgo
         [HttpGet]
         public async Task<ActionResult<List<EvaluacionRiesgoRespuestaDto>>> ObtenerTodos(
             [FromQuery] long? evaluacionId = null,
