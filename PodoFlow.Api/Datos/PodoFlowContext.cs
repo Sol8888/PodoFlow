@@ -12,8 +12,33 @@ public class PodoFlowContext : DbContext
     }
 
     public DbSet<Servicio> Servicios { get; set; }
-
+    public DbSet<Finalidad> Finalidades { get; set; }
+    public DbSet<Aviso> Avisos { get; set; }
+    public DbSet<Consentimiento> Consentimientos { get; set; }
+    public DbSet<EventoConsentimiento> EventosConsentimiento { get; set; } 
     public DbSet<Usuario> Usuarios { get; set; }
+    public DbSet<Solicitud> Solicitudes { get; set; }
+    public DbSet<AccionSolicitud> AccionesSolicitud { get; set; }
+    public DbSet<EvidenciaSolicitud> EvidenciasSolicitud { get; set; }
+    public DbSet<CategoriaDato> CategoriasDato { get; set; }
+    public DbSet<Encargado> Encargados { get; set; }
+    public DbSet<TratamientoDatos> TratamientosDatos { get; set; }
+    public DbSet<TratamientoCategoria> TratamientosCategorias { get; set; }
+    public DbSet<TratamientoEncargado> TratamientosEncargados { get; set; }
+    public DbSet<Riesgo> Riesgos { get; set; }
+    public DbSet<EvaluacionImpacto> EvaluacionesImpacto { get; set; }
+    public DbSet<EvaluacionRiesgo> EvaluacionesRiesgos { get; set; }
+    public DbSet<Documento> Documentos { get; set; }
+    public DbSet<Incidente> Incidentes { get; set; }
+    public DbSet<AccionIncidente> AccionesIncidente { get; set; }
+    public DbSet<Plantilla> Plantillas { get; set; }
+    public DbSet<OpcionComunicacion> OpcionesComunicacion { get; set; }
+    public DbSet<Seudonimo> Seudonimos { get; set; }
+    public DbSet<Ejecucion> Ejecuciones { get; set; }
+    public DbSet<DatoAnalitico> DatosAnaliticos { get; set; }
+    public DbSet<Recomendacion> Recomendaciones { get; set; }
+
+
 
     public DbSet<Rol> Roles { get; set; }
 
@@ -44,6 +69,9 @@ public class PodoFlowContext : DbContext
     public DbSet<Historia> Historias { get; set; }
 
     public DbSet<Antecedente> Antecedentes { get; set; }
+    public DbSet<Exportacion> Exportaciones { get; set; }
+    public DbSet<Notificacion> Notificaciones { get; set; }
+    public DbSet<Envio> Envios { get; set; }
 
     public DbSet<Atencion> Atenciones { get; set; }
 
@@ -109,6 +137,183 @@ public class PodoFlowContext : DbContext
                 .IsRowVersion();
         });
 
+        modelBuilder.Entity<Finalidad>(entity =>
+        {
+            entity.ToTable("FINALIDAD", "pri");
+
+            entity.HasKey(e => e.FiId);
+
+            entity.HasIndex(e => e.FiCodigo)
+                .IsUnique();
+
+            entity.Property(e => e.FiId)
+                .HasColumnName("fi_id");
+
+            entity.Property(e => e.FiCodigo)
+                .HasColumnName("fi_codigo")
+                .HasMaxLength(50)
+                .IsRequired();
+
+            entity.Property(e => e.FiNombre)
+                .HasColumnName("fi_nombre")
+                .HasMaxLength(150)
+                .IsRequired();
+
+            entity.Property(e => e.FiDescri)
+                .HasColumnName("fi_descri")
+                .HasMaxLength(1000);
+
+            entity.Property(e => e.FiRequiCons)
+                .HasColumnName("fi_requi_cons")
+                .IsRequired();
+
+            entity.Property(e => e.FiEstatus)
+                .HasColumnName("fi_estatus")
+                .HasDefaultValue(true); 
+        });
+
+        modelBuilder.Entity<Aviso>(entity =>
+        {
+            entity.ToTable("AVISO", "pri", t =>
+                t.HasCheckConstraint("CK_AVISO_fechas",
+                    "av_fecha_hast IS NULL OR av_fecha_hast >= av_fecha_desd"));
+
+            entity.HasKey(e => e.AvId);
+
+            entity.HasIndex(e => e.AvVersi)
+                .IsUnique();
+
+            entity.Property(e => e.AvId)
+                .HasColumnName("av_id");
+
+            entity.Property(e => e.AvVersi)
+                .HasColumnName("av_versi")
+                .HasMaxLength(30)
+                .IsRequired();
+
+            entity.Property(e => e.AvFechaDesd)
+                .HasColumnName("av_fecha_desd")
+                .HasColumnType("date")
+                .IsRequired();
+
+            entity.Property(e => e.AvFechaHast)
+                .HasColumnName("av_fecha_hast")
+                .HasColumnType("date");
+
+            entity.Property(e => e.AvRutaArch)
+                .HasColumnName("av_ruta_arch")
+                .HasMaxLength(1000);
+
+            entity.Property(e => e.AvHuella)
+                .HasColumnName("av_huella")
+                .HasMaxLength(128);
+
+            entity.Property(e => e.AvEstatus)
+                .HasColumnName("av_estatus")
+                .IsRequired();
+        });
+
+        modelBuilder.Entity<Consentimiento>(entity =>
+        {
+            entity.ToTable("CONSENTIMIENTO", "pri", t =>
+         t.HasCheckConstraint("CK_CONSENTIMIENTO_estad",
+             "co_estad IN ('ACEPTADO','RECHAZADO','REVOCADO')"));
+
+            entity.HasKey(e => e.CoId);
+
+            entity.HasIndex(e => new { e.PaId, e.FiId })
+                .IsUnique();
+
+            entity.Property(e => e.CoId)
+                .HasColumnName("co_id");
+
+            entity.Property(e => e.PaId)
+                .HasColumnName("pa_id")
+                .IsRequired();
+
+            entity.Property(e => e.FiId)
+                .HasColumnName("fi_id")
+                .IsRequired();
+
+            entity.Property(e => e.AvId)
+                .HasColumnName("av_id")
+                .IsRequired();
+
+            entity.Property(e => e.CoEstad)
+                .HasColumnName("co_estad")
+                .HasMaxLength(15)
+                .IsRequired();
+
+            entity.Property(e => e.CoMedio)
+                .HasColumnName("co_medio")
+                .HasMaxLength(50)
+                .IsRequired();
+
+            entity.Property(e => e.CoFechaObte)
+                .HasColumnName("co_fecha_obte")
+                .HasColumnType("datetime2(0)");
+
+            entity.Property(e => e.CoFechaRevo)
+                .HasColumnName("co_fecha_revo")
+                .HasColumnType("datetime2(0)");
+
+            entity.Property(e => e.CoObser)
+                .HasColumnName("co_obser")
+                .HasMaxLength(1000);
+
+            entity.Property(e => e.CoVersion)
+                .HasColumnName("co_version")
+                .IsRowVersion();
+
+            entity.HasOne<Finalidad>()
+                .WithMany()
+                .HasForeignKey(e => e.FiId);
+
+            entity.HasOne<Aviso>()
+                .WithMany()
+                .HasForeignKey(e => e.AvId);
+        });
+        modelBuilder.Entity<EventoConsentimiento>(entity =>
+        {
+            entity.ToTable("EVENTO_CONSENTIMIENTO", "pri");
+
+            entity.HasKey(e => e.EvId);
+
+            entity.Property(e => e.EvId)
+                .HasColumnName("ev_id");
+
+            entity.Property(e => e.CoId)
+                .HasColumnName("co_id");
+
+            entity.Property(e => e.UsId)
+                .HasColumnName("us_id");
+
+            entity.Property(e => e.EvEstad)
+                .HasColumnName("ev_estad")
+                .HasMaxLength(15)
+                .IsRequired();
+
+            entity.Property(e => e.EvFechaHora)
+                .HasColumnName("ev_fecha_hora")
+                .HasColumnType("datetime2(0)");
+
+            entity.Property(e => e.EvMedio)
+                .HasColumnName("ev_medio")
+                .HasMaxLength(50)
+                .IsRequired();
+
+            entity.Property(e => e.EvRutaEvid)
+                .HasColumnName("ev_ruta_evid")
+                .HasMaxLength(1000);
+
+            entity.Property(e => e.EvObser)
+                .HasColumnName("ev_obser")
+                .HasMaxLength(1000);
+
+            entity.HasOne(e => e.Consentimiento)
+                .WithMany()
+                .HasForeignKey(e => e.CoId);
+        });
 
         modelBuilder.Entity<Usuario>(entity =>
         {
@@ -154,6 +359,74 @@ public class PodoFlowContext : DbContext
 
             entity.Property(e => e.UsVersion)
                 .HasColumnName("us_version")
+                .IsRowVersion();
+        });
+
+        modelBuilder.Entity<Solicitud>(entity =>
+        {
+            entity.ToTable("SOLICITUD", "pri");
+
+            entity.HasKey(e => e.SoId);
+
+            entity.HasIndex(e => new { e.PaId, e.SoFechaRece });
+
+            entity.Property(e => e.SoId)
+                .HasColumnName("so_id");
+
+            entity.Property(e => e.PaId)
+                .HasColumnName("pa_id")
+                .IsRequired();
+
+            entity.Property(e => e.UsId)
+                .HasColumnName("us_id");
+
+            entity.Property(e => e.SoTipoDere)
+                .HasColumnName("so_tipo_dere")
+                .HasMaxLength(25)
+                .IsRequired();
+
+            entity.Property(e => e.SoTipoSoli)
+                .HasColumnName("so_tipo_soli")
+                .HasMaxLength(20)
+                .IsRequired();
+
+            entity.Property(e => e.SoNombrSoli)
+                .HasColumnName("so_nombr_soli")
+                .HasMaxLength(200)
+                .IsRequired();
+
+            entity.Property(e => e.SoIdentSoli)
+                .HasColumnName("so_ident_soli")
+                .HasMaxLength(50)
+                .IsRequired();
+
+            entity.Property(e => e.SoFechaRece)
+                .HasColumnName("so_fecha_rece")
+                .HasColumnType("datetime2(0)");
+
+            entity.Property(e => e.SoEstad)
+                .HasColumnName("so_estad")
+                .HasMaxLength(20)
+                .IsRequired();
+
+            entity.Property(e => e.SoMedioResp)
+                .HasColumnName("so_medio_resp")
+                .HasMaxLength(50);
+
+            entity.Property(e => e.SoDetal)
+                .HasColumnName("so_detal")
+                .HasMaxLength(3000);
+
+            entity.Property(e => e.SoRespue)
+                .HasColumnName("so_respue")
+                .HasMaxLength(3000);
+
+            entity.Property(e => e.SoFechaCier)
+                .HasColumnName("so_fecha_cier")
+                .HasColumnType("datetime2(0)");
+
+            entity.Property(e => e.SoVersion)
+                .HasColumnName("so_version")
                 .IsRowVersion();
         });
 
@@ -1363,6 +1636,712 @@ public class PodoFlowContext : DbContext
                 .OnDelete(DeleteBehavior.Restrict);
         });
 
+        modelBuilder.Entity<AccionSolicitud>(entity =>
+        {
+            entity.ToTable("ACCION_SOLICITUD", "pri");
+
+            entity.HasKey(e => e.AcId);
+
+            entity.Property(e => e.AcId)
+                .HasColumnName("ac_id");
+
+            entity.Property(e => e.SoId)
+                .HasColumnName("so_id");
+
+            entity.Property(e => e.UsId)
+                .HasColumnName("us_id")
+                .IsRequired();
+
+            entity.Property(e => e.AcFechaHora)
+                .HasColumnName("ac_fecha_hora")
+                .HasColumnType("datetime2(0)");
+
+            entity.Property(e => e.AcEstadAnte)
+                .HasColumnName("ac_estad_ante")
+                .HasMaxLength(20);
+
+            entity.Property(e => e.AcEstadNuev)
+                .HasColumnName("ac_estad_nuev")
+                .HasMaxLength(20);
+
+            entity.Property(e => e.AcAccion)
+                .HasColumnName("ac_accion")
+                .HasMaxLength(1000)
+                .IsRequired();
+
+            entity.Property(e => e.AcObser)
+                .HasColumnName("ac_obser")
+                .HasMaxLength(2000);
+
+            entity.HasOne(e => e.Solicitud)
+                .WithMany()
+                .HasForeignKey(e => e.SoId);
+        });
+        modelBuilder.Entity<EvidenciaSolicitud>(entity =>
+        {
+            entity.ToTable("EVIDENCIA_SOLICITUD", "pri");
+
+            entity.HasKey(e => e.EvId);
+
+            entity.Property(e => e.EvId)
+                .HasColumnName("ev_id");
+
+            entity.Property(e => e.SoId)
+                .HasColumnName("so_id")
+                .IsRequired();
+
+            entity.Property(e => e.UsId)
+                .HasColumnName("us_id")
+                .IsRequired();
+
+            entity.Property(e => e.EvTipo)
+                .HasColumnName("ev_tipo")
+                .HasMaxLength(80)
+                .IsRequired();
+
+            entity.Property(e => e.EvRutaArch)
+                .HasColumnName("ev_ruta_arch")
+                .HasMaxLength(1000)
+                .IsRequired();
+
+            entity.Property(e => e.EvHuella)
+                .HasColumnName("ev_huella")
+                .HasMaxLength(128);
+
+            entity.Property(e => e.EvFechaCarg)
+                .HasColumnName("ev_fecha_carg")
+                .HasColumnType("datetime2(0)");
+
+            entity.HasOne<Solicitud>()
+                .WithMany()
+                .HasForeignKey(e => e.SoId);
+        });
+
+        modelBuilder.Entity<Exportacion>(entity =>
+        {
+            entity.ToTable("EXPORTACION", "pri", t =>
+            {
+                t.HasCheckConstraint("CK_EXPORTACION_format", "ex_forma IN ('JSON','CSV','PDF','ZIP')");
+                t.HasCheckConstraint("CK_EXPORTACION_estad", "ex_estad IN ('GENERADA','ENTREGADA','ANULADA')");
+            });
+
+            entity.HasKey(e => e.ExId);
+
+            entity.Property(e => e.ExId)
+                .HasColumnName("ex_id");
+
+            entity.Property(e => e.SoId)
+                .HasColumnName("so_id")
+                .IsRequired();
+
+            entity.Property(e => e.UsId)
+                .HasColumnName("us_id")
+                .IsRequired();
+
+            entity.Property(e => e.ExForma)
+                .HasColumnName("ex_forma")
+                .HasMaxLength(20)
+                .IsRequired();
+
+            entity.Property(e => e.ExRutaArch)
+                .HasColumnName("ex_ruta_arch")
+                .HasMaxLength(1000)
+                .IsRequired();
+
+            entity.Property(e => e.ExHuella)
+                .HasColumnName("ex_huella")
+                .HasMaxLength(128);
+
+            entity.Property(e => e.ExFechaGene)
+                .HasColumnName("ex_fecha_gene")
+                .HasColumnType("datetime2(0)");
+
+            entity.Property(e => e.ExFechaEntr)
+                .HasColumnName("ex_fecha_entr")
+                .HasColumnType("datetime2(0)");
+
+            entity.Property(e => e.ExEstad)
+                .HasColumnName("ex_estad")
+                .HasMaxLength(20)
+                .IsRequired();
+
+            entity.HasOne<Solicitud>()
+                .WithMany()
+                .HasForeignKey(e => e.SoId);
+        });
+
+        modelBuilder.Entity<CategoriaDato>(entity =>
+        {
+            entity.ToTable("CATEGORIA_DATO", "pri");
+
+            entity.HasKey(e => e.CaId);
+
+            entity.HasIndex(e => e.CaNombre)
+                .IsUnique();
+
+            entity.Property(e => e.CaId)
+                .HasColumnName("ca_id");
+
+            entity.Property(e => e.CaNombre)
+                .HasColumnName("ca_nombre")
+                .HasMaxLength(150)
+                .IsRequired();
+
+            entity.Property(e => e.CaDescri)
+                .HasColumnName("ca_descri")
+                .HasMaxLength(1000);
+
+            entity.Property(e => e.CaSensi)
+                .HasColumnName("ca_sensi")
+                .IsRequired();
+
+            entity.Property(e => e.CaEstatus)
+                .HasColumnName("ca_estatus")
+                .IsRequired();
+        });
+        modelBuilder.Entity<Encargado>(entity =>
+        {
+            entity.ToTable("ENCARGADO", "pri");
+
+            entity.HasKey(e => e.EnId);
+
+            entity.Property(e => e.EnId)
+                .HasColumnName("en_id");
+
+            entity.Property(e => e.EnNombre)
+                .HasColumnName("en_nombre")
+                .HasMaxLength(200)
+                .IsRequired();
+
+            entity.Property(e => e.EnServi)
+                .HasColumnName("en_servi")
+                .HasMaxLength(200)
+                .IsRequired();
+
+            entity.Property(e => e.EnRolTrata)
+                .HasColumnName("en_rol_trata")
+                .HasMaxLength(100);
+
+            entity.Property(e => e.EnDescri)
+                .HasColumnName("en_descri")
+                .HasMaxLength(1500);
+
+            entity.Property(e => e.EnRiesgo)
+                .HasColumnName("en_riesgo")
+                .HasMaxLength(1000);
+
+            entity.Property(e => e.EnMediContr)
+                .HasColumnName("en_medi_contr")
+                .HasMaxLength(2000);
+
+            entity.Property(e => e.EnMediTecni)
+                .HasColumnName("en_medi_tecni")
+                .HasMaxLength(2000);
+
+            entity.Property(e => e.EnEstatus)
+                .HasColumnName("en_estatus")
+                .IsRequired();
+        });
+        modelBuilder.Entity<TratamientoDatos>(entity =>
+        {
+            entity.ToTable("TRATAMIENTO_DATOS", "pri");
+
+            entity.HasKey(e => e.TrId);
+
+            entity.HasIndex(e => e.TrCodigo)
+                .IsUnique();
+
+            entity.Property(e => e.TrId)
+                .HasColumnName("tr_id");
+
+            entity.Property(e => e.FiId)
+                .HasColumnName("fi_id")
+                .IsRequired();
+
+            entity.Property(e => e.UsId)
+                .HasColumnName("us_id");
+
+            entity.Property(e => e.TrCodigo)
+                .HasColumnName("tr_codigo")
+                .HasMaxLength(50)
+                .IsRequired();
+
+            entity.Property(e => e.TrNombre)
+                .HasColumnName("tr_nombre")
+                .HasMaxLength(200)
+                .IsRequired();
+
+            entity.Property(e => e.TrModulo)
+                .HasColumnName("tr_modulo")
+                .HasMaxLength(80)
+                .IsRequired();
+
+            entity.Property(e => e.TrDescri)
+                .HasColumnName("tr_descri")
+                .HasMaxLength(2000);
+
+            entity.Property(e => e.TrCategTitu)
+                .HasColumnName("tr_categ_titu")
+                .HasMaxLength(500);
+
+            entity.Property(e => e.TrBaseLegit)
+                .HasColumnName("tr_base_legit")
+                .HasMaxLength(1000);
+
+            entity.Property(e => e.TrPlazoConse)
+                .HasColumnName("tr_plazo_conse")
+                .HasMaxLength(500);
+
+            entity.Property(e => e.TrMediSegur)
+                .HasColumnName("tr_medi_segur")
+                .HasMaxLength(2000);
+
+            entity.Property(e => e.TrFechaRevi)
+                .HasColumnName("tr_fecha_revi")
+                .HasColumnType("date");
+
+            entity.Property(e => e.TrEstatus)
+                .HasColumnName("tr_estatus")
+                .IsRequired();
+
+            entity.HasOne<Finalidad>()
+                .WithMany()
+                .HasForeignKey(e => e.FiId);
+        });
+        modelBuilder.Entity<TratamientoCategoria>(entity =>
+        {
+            entity.ToTable("TR_CA", "pri");
+
+            // Clave primaria compuesta.
+            entity.HasKey(e => new { e.TrId, e.CaId });
+
+            entity.Property(e => e.TrId)
+                .HasColumnName("tr_id")
+                .ValueGeneratedNever();
+
+            entity.Property(e => e.CaId)
+                .HasColumnName("ca_id")
+                .ValueGeneratedNever();
+
+            entity.Property(e => e.TcFechaAsig)
+                .HasColumnName("tc_fecha_asig")
+                .HasColumnType("datetime2(0)");
+
+            entity.Property(e => e.TcEstatus)
+                .HasColumnName("tc_estatus")
+                .IsRequired();
+
+            entity.HasOne<TratamientoDatos>()
+                .WithMany()
+                .HasForeignKey(e => e.TrId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne<CategoriaDato>()
+                .WithMany()
+                .HasForeignKey(e => e.CaId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+        modelBuilder.Entity<TratamientoEncargado>(entity =>
+        {
+            entity.ToTable("TR_EN", "pri");
+
+            entity.HasKey(e => new { e.TrId, e.EnId });
+
+            entity.Property(e => e.TrId)
+                .HasColumnName("tr_id")
+                .ValueGeneratedNever();
+
+            entity.Property(e => e.EnId)
+                .HasColumnName("en_id")
+                .ValueGeneratedNever();
+
+            entity.Property(e => e.TeFechaAsig)
+                .HasColumnName("te_fecha_asig")
+                .HasColumnType("datetime2(0)");
+
+            entity.Property(e => e.TeEstatus)
+                .HasColumnName("te_estatus")
+                .IsRequired();
+
+            entity.HasOne<TratamientoDatos>()
+                .WithMany()
+                .HasForeignKey(e => e.TrId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne<Encargado>()
+                .WithMany()
+                .HasForeignKey(e => e.EnId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+        modelBuilder.Entity<Riesgo>(entity =>
+        {
+            entity.ToTable("RIESGO", "pri", t =>
+            {
+                t.HasCheckConstraint("CK_RIESGO_proba", "ri_proba BETWEEN 1 AND 5");
+                t.HasCheckConstraint("CK_RIESGO_impac", "ri_impac BETWEEN 1 AND 5");
+                t.HasCheckConstraint("CK_RIESGO_nivel", "ri_nivel BETWEEN 1 AND 25");
+                t.HasCheckConstraint("CK_RIESGO_resid", "ri_riesg_resid IS NULL OR ri_riesg_resid BETWEEN 1 AND 25");
+                t.HasCheckConstraint("CK_RIESGO_estad", "ri_estad IN ('ABIERTO','MITIGADO','ACEPTADO','CERRADO')");
+            });
+
+            entity.HasKey(e => e.RiId);
+
+            entity.Property(e => e.RiId)
+                .HasColumnName("ri_id");
+
+            entity.Property(e => e.TrId)
+                .HasColumnName("tr_id")
+                .IsRequired();
+
+            entity.Property(e => e.RiDescri)
+                .HasColumnName("ri_descri")
+                .HasMaxLength(2000)
+                .IsRequired();
+
+            entity.Property(e => e.RiProba)
+                .HasColumnName("ri_proba")
+                .IsRequired();
+
+            entity.Property(e => e.RiImpac)
+                .HasColumnName("ri_impac")
+                .IsRequired();
+
+            entity.Property(e => e.RiNivel)
+                .HasColumnName("ri_nivel")
+                .IsRequired();
+
+            entity.Property(e => e.RiMediMitig)
+                .HasColumnName("ri_medi_mitig")
+                .HasMaxLength(2000);
+
+            entity.Property(e => e.RiRiesgResid)
+                .HasColumnName("ri_riesg_resid");
+
+            entity.Property(e => e.RiEstad)
+                .HasColumnName("ri_estad")
+                .HasMaxLength(20)
+                .IsRequired();
+
+            entity.Property(e => e.RiFechaRevi)
+                .HasColumnName("ri_fecha_revi")
+                .HasColumnType("date");
+
+            entity.HasOne<TratamientoDatos>()
+                .WithMany()
+                .HasForeignKey(e => e.TrId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<EvaluacionImpacto>(entity =>
+        {
+            entity.ToTable("EVALUACION_IMPACTO", "pri", t =>
+            {
+                t.HasCheckConstraint("CK_EVALUACION_nivel", "ev_nivel_resid IS NULL OR ev_nivel_resid BETWEEN 1 AND 25");
+                t.HasCheckConstraint("CK_EVALUACION_estad", "ev_estad IN ('BORRADOR','APROBADA','REVISADA','CERRADA')");
+            });
+
+            entity.HasKey(e => e.EvId);
+
+            entity.Property(e => e.EvId)
+                .HasColumnName("ev_id");
+
+            entity.Property(e => e.UsId)
+                .HasColumnName("us_id")
+                .IsRequired();
+
+            entity.Property(e => e.EvVersi)
+                .HasColumnName("ev_versi")
+                .HasMaxLength(30)
+                .IsRequired();
+
+            entity.Property(e => e.EvFecha)
+                .HasColumnName("ev_fecha")
+                .HasColumnType("date")
+                .IsRequired();
+
+            entity.Property(e => e.EvAlcan)
+                .HasColumnName("ev_alcan")
+                .HasMaxLength(2000)
+                .IsRequired();
+
+            entity.Property(e => e.EvDescri)
+                .HasColumnName("ev_descri")
+                .HasMaxLength(3000);
+
+            entity.Property(e => e.EvConclu)
+                .HasColumnName("ev_conclu")
+                .HasMaxLength(3000);
+
+            entity.Property(e => e.EvNivelResid)
+                .HasColumnName("ev_nivel_resid");
+
+            entity.Property(e => e.EvEstad)
+                .HasColumnName("ev_estad")
+                .HasMaxLength(20)
+                .IsRequired();
+
+            entity.Property(e => e.EvFechaModi)
+                .HasColumnName("ev_fecha_modi")
+                .HasColumnType("datetime2(0)");
+        });
+        modelBuilder.Entity<EvaluacionRiesgo>(entity =>
+        {
+            entity.ToTable("EV_RI", "pri");
+
+            // Clave primaria compuesta.
+            entity.HasKey(e => new { e.EvId, e.RiId });
+
+            entity.Property(e => e.EvId)
+                .HasColumnName("ev_id")
+                .ValueGeneratedNever();
+
+            entity.Property(e => e.RiId)
+                .HasColumnName("ri_id")
+                .ValueGeneratedNever();
+
+            entity.Property(e => e.ErFechaAsig)
+                .HasColumnName("er_fecha_asig")
+                .HasColumnType("datetime2(0)");
+
+            entity.Property(e => e.ErObser)
+                .HasColumnName("er_obser")
+                .HasMaxLength(1000);
+
+            entity.HasOne<EvaluacionImpacto>()
+                .WithMany()
+                .HasForeignKey(e => e.EvId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne<Riesgo>()
+                .WithMany()
+                .HasForeignKey(e => e.RiId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+        modelBuilder.Entity<Documento>(entity =>
+        {
+            entity.ToTable("DOCUMENTO", "pri", t =>
+                t.HasCheckConstraint("CK_DOCUMENTO_tipo",
+                    "do_tipo IN ('RAT','EIPD','MATRIZ_RIESGO','MATRIZ_ENCARGADO','EVIDENCIA_CONTROL','AVISO_PRIVACIDAD','OTRO')"));
+
+            entity.HasKey(e => e.DoId);
+
+            entity.Property(e => e.DoId)
+                .HasColumnName("do_id");
+
+            entity.Property(e => e.UsId)
+                .HasColumnName("us_id")
+                .IsRequired();
+
+            entity.Property(e => e.DoTipo)
+                .HasColumnName("do_tipo")
+                .HasMaxLength(50)
+                .IsRequired();
+
+            entity.Property(e => e.DoVersi)
+                .HasColumnName("do_versi")
+                .HasMaxLength(30);
+
+            entity.Property(e => e.DoNombre)
+                .HasColumnName("do_nombre")
+                .HasMaxLength(255)
+                .IsRequired();
+
+            entity.Property(e => e.DoRutaArch)
+                .HasColumnName("do_ruta_arch")
+                .HasMaxLength(1000)
+                .IsRequired();
+
+            entity.Property(e => e.DoHuella)
+                .HasColumnName("do_huella")
+                .HasMaxLength(128);
+
+            entity.Property(e => e.DoFechaCarg)
+                .HasColumnName("do_fecha_carg")
+                .HasColumnType("datetime2(0)");
+
+            entity.Property(e => e.DoEstatus)
+                .HasColumnName("do_estatus")
+                .IsRequired();
+        });
+        modelBuilder.Entity<Incidente>(entity =>
+        {
+            entity.ToTable("INCIDENTE", "pri", t =>
+                t.HasCheckConstraint("CK_INCIDENTE_estad",
+                    "in_estad IN ('ABIERTO','ANALISIS','CONTENIDO','RECUPERADO','CERRADO')"));
+            entity.HasKey(e => e.InId);
+            entity.Property(e => e.InId).HasColumnName("in_id");
+            entity.Property(e => e.UsId).HasColumnName("us_id").IsRequired();
+            entity.Property(e => e.InFechaDete).HasColumnName("in_fecha_dete").HasColumnType("datetime2(0)").IsRequired();
+            entity.Property(e => e.InTipo).HasColumnName("in_tipo").HasMaxLength(100).IsRequired();
+            entity.Property(e => e.InModulo).HasColumnName("in_modulo").HasMaxLength(80).IsRequired();
+            entity.Property(e => e.InDescri).HasColumnName("in_descri").HasMaxLength(3000).IsRequired();
+            entity.Property(e => e.InDatosAfec).HasColumnName("in_datos_afec").HasMaxLength(2000);
+            entity.Property(e => e.InImpacPreli).HasColumnName("in_impac_preli").HasMaxLength(1500);
+            entity.Property(e => e.InEstad).HasColumnName("in_estad").HasMaxLength(20).IsRequired();
+            entity.Property(e => e.InFechaCier).HasColumnName("in_fecha_cier").HasColumnType("datetime2(0)");
+            entity.Property(e => e.InVersion).HasColumnName("in_version").IsRowVersion();
+        });
+
+        modelBuilder.Entity<AccionIncidente>(entity =>
+        {
+            entity.ToTable("ACCION_INCIDENTE", "pri");
+            entity.HasKey(e => e.AcId);
+            entity.Property(e => e.AcId).HasColumnName("ac_id");
+            entity.Property(e => e.InId).HasColumnName("in_id");
+            entity.Property(e => e.UsId).HasColumnName("us_id").IsRequired();
+            entity.Property(e => e.AcFechaHora).HasColumnName("ac_fecha_hora").HasColumnType("datetime2(0)");
+            entity.Property(e => e.AcTipo).HasColumnName("ac_tipo").HasMaxLength(50).IsRequired();
+            entity.Property(e => e.AcAccion).HasColumnName("ac_accion").HasMaxLength(2000).IsRequired();
+            entity.Property(e => e.AcObser).HasColumnName("ac_obser").HasMaxLength(1500);
+            entity.HasOne(e => e.Incidente).WithMany().HasForeignKey(e => e.InId);
+        });
+        modelBuilder.Entity<Plantilla>(entity =>
+        {
+            entity.ToTable("PLANTILLA", "com", t =>
+                t.HasCheckConstraint("CK_PLANTILLA_canal", "pl_canal IN ('CORREO','WHATSAPP')"));
+            entity.HasKey(e => e.PlId);
+            entity.Property(e => e.PlId).HasColumnName("pl_id");
+            entity.Property(e => e.PlNombre).HasColumnName("pl_nombre").HasMaxLength(150).IsRequired();
+            entity.Property(e => e.PlCanal).HasColumnName("pl_canal").HasMaxLength(20).IsRequired();
+            entity.Property(e => e.PlTipo).HasColumnName("pl_tipo").HasMaxLength(50).IsRequired();
+            entity.Property(e => e.PlAsunto).HasColumnName("pl_asunto").HasMaxLength(250);
+            entity.Property(e => e.PlConte).HasColumnName("pl_conte").HasColumnType("nvarchar(max)").IsRequired();
+            entity.Property(e => e.PlVersi).HasColumnName("pl_versi").HasMaxLength(20).IsRequired();
+            entity.Property(e => e.PlFechaCrea).HasColumnName("pl_fecha_crea").HasColumnType("datetime2(0)");
+            entity.Property(e => e.PlEstatus).HasColumnName("pl_estatus").IsRequired();
+        });
+
+        modelBuilder.Entity<OpcionComunicacion>(entity =>
+        {
+            entity.ToTable("OPCION_COMUNICACION", "com", t =>
+                t.HasCheckConstraint("CK_OPCION_canal", "op_canal IN ('CORREO','WHATSAPP')"));
+            entity.HasKey(e => e.OpId);
+            entity.HasIndex(e => new { e.PaId, e.OpCanal, e.FiId }).IsUnique();
+            entity.Property(e => e.OpId).HasColumnName("op_id");
+            entity.Property(e => e.PaId).HasColumnName("pa_id").IsRequired();
+            entity.Property(e => e.FiId).HasColumnName("fi_id").IsRequired();
+            entity.Property(e => e.CoId).HasColumnName("co_id");
+            entity.Property(e => e.OpCanal).HasColumnName("op_canal").HasMaxLength(20).IsRequired();
+            entity.Property(e => e.OpPermi).HasColumnName("op_permi").IsRequired();
+            entity.Property(e => e.OpFechaActu).HasColumnName("op_fecha_actu").HasColumnType("datetime2(0)");
+            entity.Property(e => e.OpEstatus).HasColumnName("op_estatus").IsRequired();
+            entity.HasOne<Finalidad>().WithMany().HasForeignKey(e => e.FiId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne<Consentimiento>().WithMany().HasForeignKey(e => e.CoId).OnDelete(DeleteBehavior.Restrict);
+        });
+        modelBuilder.Entity<Notificacion>(entity =>
+        {
+            entity.ToTable("NOTIFICACION", "com", t =>
+            {
+                t.HasCheckConstraint("CK_NOTIFICACION_canal", "no_canal IN ('CORREO','WHATSAPP')");
+                t.HasCheckConstraint("CK_NOTIFICACION_estad",
+                    "no_estad IN ('PENDIENTE','PROCESANDO','ENVIADA','ERROR','CANCELADA')");
+            });
+            entity.HasKey(e => e.NoId);
+            entity.HasIndex(e => new { e.NoEstad, e.NoFechaProg });
+            entity.Property(e => e.NoId).HasColumnName("no_id");
+            entity.Property(e => e.PaId).HasColumnName("pa_id").IsRequired();
+            entity.Property(e => e.CiId).HasColumnName("ci_id");
+            entity.Property(e => e.PlId).HasColumnName("pl_id").IsRequired();
+            entity.Property(e => e.OpId).HasColumnName("op_id");
+            entity.Property(e => e.UsId).HasColumnName("us_id");
+            entity.Property(e => e.NoTipo).HasColumnName("no_tipo").HasMaxLength(50).IsRequired();
+            entity.Property(e => e.NoCanal).HasColumnName("no_canal").HasMaxLength(20).IsRequired();
+            entity.Property(e => e.NoFechaProg).HasColumnName("no_fecha_prog").HasColumnType("datetime2(0)").IsRequired();
+            entity.Property(e => e.NoEstad).HasColumnName("no_estad").HasMaxLength(20).IsRequired();
+            entity.Property(e => e.NoFechaCrea).HasColumnName("no_fecha_crea").HasColumnType("datetime2(0)");
+            entity.Property(e => e.NoVersion).HasColumnName("no_version").IsRowVersion();
+            entity.HasOne<Plantilla>().WithMany().HasForeignKey(e => e.PlId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne<OpcionComunicacion>().WithMany().HasForeignKey(e => e.OpId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<Envio>(entity =>
+        {
+            entity.ToTable("ENVIO", "com", t =>
+            {
+                t.HasCheckConstraint("CK_ENVIO_intento", "en_num_inten > 0");
+                t.HasCheckConstraint("CK_ENVIO_result", "en_resul IN ('ENVIADO','ERROR')");
+            });
+            entity.HasKey(e => e.EnId);
+            entity.HasIndex(e => new { e.NoId, e.EnNumInten }).IsUnique();
+            entity.Property(e => e.EnId).HasColumnName("en_id");
+            entity.Property(e => e.NoId).HasColumnName("no_id").IsRequired();
+            entity.Property(e => e.EnNumInten).HasColumnName("en_num_inten").IsRequired();
+            entity.Property(e => e.EnFechaHora).HasColumnName("en_fecha_hora").HasColumnType("datetime2(0)");
+            entity.Property(e => e.EnResul).HasColumnName("en_resul").HasMaxLength(20).IsRequired();
+            entity.Property(e => e.EnIdProve).HasColumnName("en_id_prove").HasMaxLength(300);
+            entity.Property(e => e.EnCodError).HasColumnName("en_cod_error").HasMaxLength(100);
+            entity.Property(e => e.EnDetalError).HasColumnName("en_detal_error").HasMaxLength(2000);
+            entity.HasOne<Notificacion>().WithMany().HasForeignKey(e => e.NoId).OnDelete(DeleteBehavior.Restrict);
+        });
+        modelBuilder.Entity<Seudonimo>(entity =>
+        {
+            entity.ToTable("SEUDONIMO", "ana");
+            entity.HasKey(e => e.SeId);
+            entity.HasIndex(e => e.PaId).IsUnique();
+            entity.Property(e => e.SeId).HasColumnName("se_id").ValueGeneratedNever();
+            entity.Property(e => e.PaId).HasColumnName("pa_id").IsRequired();
+            entity.Property(e => e.SeFechaCrea).HasColumnName("se_fecha_crea").HasColumnType("datetime2(0)");
+            entity.Property(e => e.SeEstatus).HasColumnName("se_estatus").IsRequired();
+        });
+        modelBuilder.Entity<Ejecucion>(entity =>
+        {
+            entity.ToTable("EJECUCION", "ana", t =>
+            {
+                t.HasCheckConstraint("CK_EJECUCION_cant", "ej_cant_reg >= 0");
+                t.HasCheckConstraint("CK_EJECUCION_estad", "ej_estad IN ('PENDIENTE','PROCESANDO','COMPLETADA','ERROR')");
+            });
+            entity.HasKey(e => e.EjId);
+            entity.Property(e => e.EjId).HasColumnName("ej_id");
+            entity.Property(e => e.UsId).HasColumnName("us_id").IsRequired();
+            entity.Property(e => e.EnId).HasColumnName("en_id");
+            entity.Property(e => e.FiId).HasColumnName("fi_id").IsRequired();
+            entity.Property(e => e.EjFechaHora).HasColumnName("ej_fecha_hora").HasColumnType("datetime2(0)");
+            entity.Property(e => e.EjEstad).HasColumnName("ej_estad").HasMaxLength(20).IsRequired();
+            entity.Property(e => e.EjCantReg).HasColumnName("ej_cant_reg").IsRequired();
+            entity.Property(e => e.EjHuellEntr).HasColumnName("ej_huell_entr").HasMaxLength(128);
+            entity.Property(e => e.EjHuellSali).HasColumnName("ej_huell_sali").HasMaxLength(128);
+            entity.Property(e => e.EjObser).HasColumnName("ej_obser").HasMaxLength(1500);
+            entity.HasOne<Encargado>().WithMany().HasForeignKey(e => e.EnId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne<Finalidad>().WithMany().HasForeignKey(e => e.FiId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<DatoAnalitico>(entity =>
+        {
+            entity.ToTable("DATO_ANALITICO", "ana", t =>
+            {
+                t.HasCheckConstraint("CK_DATO_ANALITICO_frec", "da_frec_aten >= 0");
+                t.HasCheckConstraint("CK_DATO_ANALITICO_dias", "da_dias_inact IS NULL OR da_dias_inact >= 0");
+            });
+            entity.HasKey(e => e.DaId);
+            entity.Property(e => e.DaId).HasColumnName("da_id");
+            entity.Property(e => e.EjId).HasColumnName("ej_id").IsRequired();
+            entity.Property(e => e.SeId).HasColumnName("se_id").IsRequired();
+            entity.Property(e => e.DaFrecAten).HasColumnName("da_frec_aten").IsRequired();
+            entity.Property(e => e.DaCategServ).HasColumnName("da_categ_serv").HasMaxLength(100);
+            entity.Property(e => e.DaFechaUlti).HasColumnName("da_fecha_ulti").HasColumnType("date");
+            entity.Property(e => e.DaDiasInact).HasColumnName("da_dias_inact");
+            entity.HasOne<Ejecucion>().WithMany().HasForeignKey(e => e.EjId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne<Seudonimo>().WithMany().HasForeignKey(e => e.SeId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<Recomendacion>(entity =>
+        {
+            entity.ToTable("RECOMENDACION", "ana", t =>
+            {
+                t.HasCheckConstraint("CK_RECOMENDACION_pacie", "re_pacie_estim >= 0");
+                t.HasCheckConstraint("CK_RECOMENDACION_priva", "re_nivel_priva IN ('AGREGADO','SEUDONIMIZADO')");
+            });
+            entity.HasKey(e => e.ReId);
+            entity.Property(e => e.ReId).HasColumnName("re_id");
+            entity.Property(e => e.EjId).HasColumnName("ej_id").IsRequired();
+            entity.Property(e => e.ReSegme).HasColumnName("re_segme").HasMaxLength(150).IsRequired();
+            entity.Property(e => e.ReHallaz).HasColumnName("re_hallaz").HasMaxLength(2000).IsRequired();
+            entity.Property(e => e.ReSugere).HasColumnName("re_sugere").HasMaxLength(2000).IsRequired();
+            entity.Property(e => e.RePacieEstim).HasColumnName("re_pacie_estim").IsRequired();
+            entity.Property(e => e.ReNivelPriva).HasColumnName("re_nivel_priva").HasMaxLength(30).IsRequired();
+            entity.Property(e => e.ReFechaGene).HasColumnName("re_fecha_gene").HasColumnType("datetime2(0)");
+            entity.HasOne<Ejecucion>().WithMany().HasForeignKey(e => e.EjId).OnDelete(DeleteBehavior.Restrict);
+        });
 
         modelBuilder.Entity<Cobro>(entity =>
         {
@@ -1431,4 +2410,6 @@ public class PodoFlowContext : DbContext
         });
 
     }
+
+
 }

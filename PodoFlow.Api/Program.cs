@@ -24,9 +24,53 @@ builder.Services.AddDbContext<PodoFlowContext>(options =>
 // Mujer Aqui van los servicios de repositorio y servicio (Si no pones aqui no funciona)
 builder.Services.AddScoped<IServicioRepositorio, ServicioRepositorio>();
 builder.Services.AddScoped<IServicioServicio, ServicioServicio>();
+builder.Services.AddScoped<IFinalidadRepositorio, FinalidadRepositorio>();
+builder.Services.AddScoped<IFinalidadServicio, FinalidadServicio>();
+builder.Services.AddScoped<IAvisoRepositorio, AvisoRepositorio>();
+builder.Services.AddScoped<IAvisoServicio, AvisoServicio>();
+builder.Services.AddScoped<IConsentimientoRepositorio, ConsentimientoRepositorio>();
+builder.Services.AddScoped<IConsentimientoServicio, ConsentimientoServicio>();
+builder.Services.AddScoped<IExportacionRepositorio, ExportacionRepositorio>();
+builder.Services.AddScoped<IExportacionServicio, ExportacionServicio>();
+builder.Services.AddScoped<ICategoriaDatoRepositorio, CategoriaDatoRepositorio>();
+builder.Services.AddScoped<ICategoriaDatoServicio, CategoriaDatoServicio>();
+builder.Services.AddScoped<IEncargadoRepositorio, EncargadoRepositorio>();
+builder.Services.AddScoped<IEncargadoServicio, EncargadoServicio>();
+builder.Services.AddScoped<ITratamientoDatosRepositorio, TratamientoDatosRepositorio>();
+builder.Services.AddScoped<ITratamientoDatosServicio, TratamientoDatosServicio>();
+builder.Services.AddScoped<ITratamientoCategoriaRepositorio, TratamientoCategoriaRepositorio>();
+builder.Services.AddScoped<ITratamientoCategoriaServicio, TratamientoCategoriaServicio>();
+builder.Services.AddScoped<ITratamientoEncargadoRepositorio, TratamientoEncargadoRepositorio>();
+builder.Services.AddScoped<ITratamientoEncargadoServicio, TratamientoEncargadoServicio>();
+builder.Services.AddScoped<IRiesgoRepositorio, RiesgoRepositorio>();
+builder.Services.AddScoped<IRiesgoServicio, RiesgoServicio>();
+builder.Services.AddScoped<IEvaluacionImpactoRepositorio, EvaluacionImpactoRepositorio>();
+builder.Services.AddScoped<IEvaluacionImpactoServicio, EvaluacionImpactoServicio>();
+builder.Services.AddScoped<IEvaluacionRiesgoRepositorio, EvaluacionRiesgoRepositorio>();
+builder.Services.AddScoped<IEvaluacionRiesgoServicio, EvaluacionRiesgoServicio>();
+builder.Services.AddScoped<IDocumentoRepositorio, DocumentoRepositorio>();
+builder.Services.AddScoped<IDocumentoServicio, DocumentoServicio>();
+builder.Services.AddScoped<IIncidenteRepositorio, IncidenteRepositorio>();
+builder.Services.AddScoped<IIncidenteServicio, IncidenteServicio>();
+builder.Services.AddScoped<IPlantillaRepositorio, PlantillaRepositorio>();
+builder.Services.AddScoped<IPlantillaServicio, PlantillaServicio>();
+builder.Services.AddScoped<IOpcionComunicacionRepositorio, OpcionComunicacionRepositorio>();
+builder.Services.AddScoped<IOpcionComunicacionServicio, OpcionComunicacionServicio>();
+builder.Services.AddScoped<INotificacionRepositorio, NotificacionRepositorio>();
+builder.Services.AddScoped<INotificacionServicio, NotificacionServicio>();
+builder.Services.AddScoped<ISeudonimoRepositorio, SeudonimoRepositorio>();
+builder.Services.AddScoped<ISeudonimoServicio, SeudonimoServicio>();
+builder.Services.AddScoped<IEjecucionRepositorio, EjecucionRepositorio>();
+builder.Services.AddScoped<IEjecucionServicio, EjecucionServicio>();
 
 builder.Services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
 builder.Services.AddScoped<IUsuarioServicio, UsuarioServicio>();
+builder.Services.AddScoped<ISolicitudRepositorio, SolicitudRepositorio>();
+builder.Services.AddScoped<ISolicitudServicio, SolicitudServicio>();
+builder.Services.AddScoped<IEvidenciaSolicitudRepositorio, EvidenciaSolicitudRepositorio>();
+builder.Services.AddScoped<IEvidenciaSolicitudServicio, EvidenciaSolicitudServicio>();
+
+
 
 builder.Services.AddScoped<IRolRepositorio, RolRepositorio>();
 builder.Services.AddScoped<IRolServicio, RolServicio>();
