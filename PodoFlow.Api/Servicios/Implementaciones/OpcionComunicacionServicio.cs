@@ -5,15 +5,10 @@ using PodoFlow.Api.Servicios.Interfaces;
 
 namespace PodoFlow.Api.Servicios.Implementaciones
 {
-    // Caso A con UNIQUE (paciente, canal, finalidad): si ya existe dada de baja, se reactiva y actualiza.
-    // Si la finalidad requiere consentimiento y el paciente da permiso, co_id debe apuntar a su
-    // consentimiento ACEPTADO para esa finalidad.
-    // Convención: null/false → 404 · ArgumentException → 400 · InvalidOperationException → 409.
     public class OpcionComunicacionServicio : IOpcionComunicacionServicio
     {
         private const string Aceptado = "ACEPTADO";
 
-        // Mismos valores que CK_OPCION_canal.
         private static readonly HashSet<string> Canales = ["CORREO", "WHATSAPP"];
 
         private readonly IOpcionComunicacionRepositorio _repositorio;
@@ -103,8 +98,6 @@ namespace PodoFlow.Api.Servicios.Implementaciones
 
             var permitido = dto.Permitido!.Value;
 
-            // Quitar el permiso siempre se puede (es lo que protege al paciente).
-            // Darlo exige paciente y finalidad activos y, si corresponde, consentimiento aceptado.
             if (permitido)
             {
                 var finalidad = await ValidarPacienteYFinalidadAsync(opcion.PaId, opcion.FiId);
@@ -116,7 +109,6 @@ namespace PodoFlow.Api.Servicios.Implementaciones
                 opcion.CoId = null;
             }
 
-            // Nunca se tocan OpId, PaId, FiId, OpCanal ni OpEstatus.
             opcion.OpPermi = permitido;
             opcion.OpFechaActu = DateTime.UtcNow;
 
@@ -132,7 +124,6 @@ namespace PodoFlow.Api.Servicios.Implementaciones
             if (opcion == null)
                 return false;
 
-            // Si ya estaba dada de baja no hay nada que hacer.
             if (!opcion.OpEstatus)
                 return true;
 
@@ -151,11 +142,8 @@ namespace PodoFlow.Api.Servicios.Implementaciones
             if (opcion == null)
                 return false;
 
-            // Si ya estaba activa no hay nada que hacer.
             if (opcion.OpEstatus)
                 return true;
-
-            // Mientras estuvo de baja pudo cambiar el paciente, la finalidad o el consentimiento.
             var finalidad = await ValidarPacienteYFinalidadAsync(opcion.PaId, opcion.FiId);
 
             opcion.CoId = await ResolverConsentimientoAsync(opcion.PaId, finalidad, opcion.OpPermi);

@@ -5,10 +5,6 @@ using PodoFlow.Api.Servicios.Interfaces;
 
 namespace PodoFlow.Api.Servicios.Implementaciones
 {
-    // Caso B: la "baja" es CERRAR.
-    // Una EIPD aprobada es un documento firme: ya no se edita. Si hay que cambiarla,
-    // se crea una versión nueva (ev_versi), que es lo que indica el documento para EV_RI.
-    // Convención: null/false → 404 · ArgumentException → 400 · InvalidOperationException → 409.
     public class EvaluacionImpactoServicio : IEvaluacionImpactoServicio
     {
         private const string Borrador = "BORRADOR";
@@ -16,10 +12,9 @@ namespace PodoFlow.Api.Servicios.Implementaciones
         private const string Revisada = "REVISADA";
         private const string Cerrada = "CERRADA";
 
-        // Estado actual → estados a los que puede pasar. CERRADA es final.
         private static readonly Dictionary<string, string[]> TransicionesPermitidas = new()
         {
-            [Borrador] = [Aprobada, Cerrada],   // cerrar un borrador = descartarlo
+            [Borrador] = [Aprobada, Cerrada],   
             [Aprobada] = [Revisada, Cerrada],
             [Revisada] = [Cerrada],
             [Cerrada] = []

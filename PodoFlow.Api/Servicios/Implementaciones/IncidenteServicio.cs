@@ -12,9 +12,6 @@ namespace PodoFlow.Api.Servicios.Implementaciones
         private const string Contenido = "CONTENIDO";
         private const string Recuperado = "RECUPERADO";
         private const string Cerrado = "CERRADO";
-
-        // Tipos de acción que pone el sistema. No se aceptan en el registro manual
-        // para que la bitácora no muestre cambios de estado que no ocurrieron.
         private const string TipoRegistro = "REGISTRO";
         private const string TipoCambioEstado = "CAMBIO_ESTADO";
 

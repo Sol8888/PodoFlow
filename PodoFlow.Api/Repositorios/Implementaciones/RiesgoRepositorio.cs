@@ -14,7 +14,6 @@ namespace PodoFlow.Api.Repositorios.Implementaciones
             _context = context;
         }
 
-        // Del nivel más alto al más bajo: lo primero que hay que atender.
         public async Task<List<Riesgo>> ObtenerTodosAsync(int? tratamientoId, string? estado, int pagina, int tamano)
         {
             var consulta = _context.Riesgos.AsNoTracking();

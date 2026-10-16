@@ -36,8 +36,7 @@ namespace PodoFlow.Api.Repositorios.Implementaciones
                 .Take(tamano)
                 .ToListAsync();
         }
-
-        // Por la clave compuesta. Sin filtro de estatus (para poder reactivar).
+     
         public async Task<TratamientoEncargado?> ObtenerAsync(int tratamientoId, int encargadoId)
         {
             return await _context.TratamientosEncargados

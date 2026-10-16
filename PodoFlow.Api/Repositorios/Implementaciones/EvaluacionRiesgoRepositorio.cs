@@ -5,7 +5,6 @@ using PodoFlow.Api.Repositorios.Interfaces;
 
 namespace PodoFlow.Api.Repositorios.Implementaciones
 {
-    // Caso C: solo insertar y listar. No hay actualizar ni eliminar.
     public class EvaluacionRiesgoRepositorio : IEvaluacionRiesgoRepositorio
     {
         private readonly PodoFlowContext _context;
@@ -15,7 +14,6 @@ namespace PodoFlow.Api.Repositorios.Implementaciones
             _context = context;
         }
 
-        // Filtros opcionales: los riesgos de una evaluación, o las evaluaciones que analizaron un riesgo.
         public async Task<List<EvaluacionRiesgo>> ObtenerTodosAsync(long? evaluacionId, long? riesgoId, int pagina, int tamano)
         {
             var consulta = _context.EvaluacionesRiesgos.AsNoTracking();
@@ -57,8 +55,6 @@ namespace PodoFlow.Api.Repositorios.Implementaciones
 
             return asignacion;
         }
-
-        // Todas en un solo SaveChanges: o se copian todas o ninguna.
         public async Task CrearVariosAsync(List<EvaluacionRiesgo> asignaciones)
         {
             _context.EvaluacionesRiesgos.AddRange(asignaciones);

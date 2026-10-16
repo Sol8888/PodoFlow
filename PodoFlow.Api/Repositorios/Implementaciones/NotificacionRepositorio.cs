@@ -14,7 +14,6 @@ namespace PodoFlow.Api.Repositorios.Implementaciones
             _context = context;
         }
 
-        // Caso B: no hay estatus. Filtros opcionales por paciente y estado, de la más reciente a la más antigua.
         public async Task<List<Notificacion>> ObtenerTodosAsync(long? pacienteId, string? estado, int pagina, int tamano)
         {
             var consulta = _context.Notificaciones.AsNoTracking();
@@ -33,7 +32,6 @@ namespace PodoFlow.Api.Repositorios.Implementaciones
                 .ToListAsync();
         }
 
-        // Usa el índice IX_NOTIFICACION_programadas (no_estad, no_fecha_prog).
         public async Task<List<Notificacion>> ObtenerPorEnviarAsync(DateTime hasta, int tamano)
         {
             return await _context.Notificaciones
@@ -59,8 +57,6 @@ namespace PodoFlow.Api.Repositorios.Implementaciones
                 .OrderBy(x => x.EnNumInten)
                 .ToListAsync();
         }
-
-        // cit.CITA es del bloque de la Persona 1: solo se lee.
         public async Task<DateTime?> ObtenerFechaCitaVigenteAsync(long citaId, long pacienteId)
         {
             var fechas = await _context.Database
@@ -71,8 +67,6 @@ namespace PodoFlow.Api.Repositorios.Implementaciones
 
             return fechas.Count == 0 ? null : fechas[0];
         }
-
-        // seg.USUARIO es del bloque de la Persona 1: solo se lee.
         public async Task<bool> ExisteUsuarioActivoAsync(long usuarioId)
         {
             return await _context.Database
@@ -96,9 +90,7 @@ namespace PodoFlow.Api.Repositorios.Implementaciones
             await _context.SaveChangesAsync();
         }
 
-        // La notificación se cargó con tracking en esta misma petición: su versión original es la leída
-        // de la base, así que si otro proceso la cambió entretanto, EF lanza DbUpdateConcurrencyException.
-        // UX_ENVIO_notif_intento protege además contra dos intentos con el mismo número.
+      
         public async Task<Envio> RegistrarEnvioAsync(Notificacion notificacion, Envio envio)
         {
             var ultimo = await _context.Envios
@@ -115,7 +107,7 @@ namespace PodoFlow.Api.Repositorios.Implementaciones
             return envio;
         }
 
-        // Si otro usuario modificó la notificación, el UPDATE no afecta filas y EF lanza DbUpdateConcurrencyException.
+        // Si otro usuario modificó la notificación, el UPDATE no afecta filas
         private void AplicarVersionLeida(Notificacion notificacion, byte[] versionLeida)
         {
             _context.Entry(notificacion)

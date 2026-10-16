@@ -36,7 +36,6 @@ namespace PodoFlow.Api.Repositorios.Implementaciones
                 .FirstOrDefaultAsync(x => x.EvId == id);
         }
 
-        // seg.USUARIO es del bloque de la Persona 1: solo se lee.
         public async Task<bool> ExisteUsuarioActivoAsync(long usuarioId)
         {
             return await _context.Database

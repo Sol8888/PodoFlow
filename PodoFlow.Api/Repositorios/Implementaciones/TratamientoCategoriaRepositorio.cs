@@ -14,7 +14,6 @@ namespace PodoFlow.Api.Repositorios.Implementaciones
             _context = context;
         }
 
-        // Filtros opcionales: las categorías de un tratamiento, o los tratamientos que usan una categoría.
         public async Task<List<TratamientoCategoria>> ObtenerTodosAsync(
             int? tratamientoId, int? categoriaId, bool incluirInactivos, int pagina, int tamano)
         {
@@ -37,7 +36,6 @@ namespace PodoFlow.Api.Repositorios.Implementaciones
                 .ToListAsync();
         }
 
-        // Por la clave compuesta. Sin filtro de estatus (para poder reactivar).
         public async Task<TratamientoCategoria?> ObtenerAsync(int tratamientoId, int categoriaId)
         {
             return await _context.TratamientosCategorias

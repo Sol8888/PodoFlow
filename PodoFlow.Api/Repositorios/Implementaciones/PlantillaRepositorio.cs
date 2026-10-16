@@ -14,7 +14,6 @@ namespace PodoFlow.Api.Repositorios.Implementaciones
             _context = context;
         }
 
-        // Por nombre; dentro del mismo nombre, la versión más reciente primero.
         public async Task<List<Plantilla>> ObtenerTodosAsync(
             string? canal, string? tipo, bool incluirInactivos, int pagina, int tamano)
         {
@@ -38,14 +37,11 @@ namespace PodoFlow.Api.Repositorios.Implementaciones
                 .ToListAsync();
         }
 
-        // Sin filtro de estatus: el detalle se muestra aunque esté dada de baja.
         public async Task<Plantilla?> ObtenerPorIdAsync(int id)
         {
             return await _context.Plantillas
                 .FirstOrDefaultAsync(x => x.PlId == id);
         }
-
-        // La comparación la hace SQL Server, que por defecto no distingue mayúsculas.
         public async Task<Plantilla?> ObtenerDuplicadoAsync(string nombre, string canal, string version, int? excluirId)
         {
             return await _context.Plantillas
@@ -56,7 +52,6 @@ namespace PodoFlow.Api.Repositorios.Implementaciones
                 .FirstOrDefaultAsync();
         }
 
-        // com.NOTIFICACION es de mi bloque, pero todavía no tiene modelo: se lee con SQL.
         // Cuando exista el DbSet de Notificacion se puede cambiar por LINQ.
         public async Task<int> ContarNotificacionesAsync(int plantillaId, bool soloPendientes)
         {

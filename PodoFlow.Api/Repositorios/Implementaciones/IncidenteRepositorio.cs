@@ -14,7 +14,6 @@ namespace PodoFlow.Api.Repositorios.Implementaciones
             _context = context;
         }
 
-        // Caso B: no hay estatus, así que no aplica incluirInactivos. Filtro opcional por estado y paginación.
         public async Task<List<Incidente>> ObtenerTodosAsync(string? estado, int pagina, int tamano)
         {
             var consulta = _context.Incidentes.AsNoTracking();
@@ -44,16 +43,12 @@ namespace PodoFlow.Api.Repositorios.Implementaciones
                 .OrderBy(x => x.AcId)
                 .ToListAsync();
         }
-
-        // seg.USUARIO es del bloque de la Persona 1: solo se lee.
         public async Task<bool> ExisteUsuarioActivoAsync(long usuarioId)
         {
             return await _context.Database
                 .SqlQuery<long>($"SELECT us_id AS Value FROM seg.USUARIO WHERE us_id = {usuarioId} AND us_estatus = 1")
                 .AnyAsync();
         }
-
-        // Incidente y su primera acción se guardan juntos: o se graban los dos o ninguno.
         public async Task<Incidente> CrearAsync(Incidente incidente, AccionIncidente accion)
         {
             _context.Incidentes.Add(incidente);
@@ -81,8 +76,6 @@ namespace PodoFlow.Api.Repositorios.Implementaciones
 
             await _context.SaveChangesAsync();
         }
-
-        // Acción manual: no toca la fila del incidente, por eso no necesita versión.
         public async Task<AccionIncidente> CrearAccionAsync(AccionIncidente accion)
         {
             _context.AccionesIncidente.Add(accion);
@@ -91,8 +84,6 @@ namespace PodoFlow.Api.Repositorios.Implementaciones
 
             return accion;
         }
-
-        // Si otro usuario modificó el incidente, el UPDATE no afecta filas y EF lanza DbUpdateConcurrencyException.
         private void AplicarVersionLeida(Incidente incidente, byte[] versionLeida)
         {
             _context.Entry(incidente)

@@ -5,21 +5,16 @@ using PodoFlow.Api.Servicios.Interfaces;
 
 namespace PodoFlow.Api.Servicios.Implementaciones
 {
-    // Caso A. La tabla no tiene UNIQUE, pero el servicio evita duplicados de nombre + canal + versión,
-    // con el mismo criterio que Documento.
-    // Convención: null/false → 404 · ArgumentException → 400 · InvalidOperationException → 409.
     public class PlantillaServicio : IPlantillaServicio
     {
         private const string Correo = "CORREO";
         private const string WhatsApp = "WHATSAPP";
 
-        // Mismo valor que DF_PLANTILLA_versi.
         private const string VersionInicial = "1.0";
 
         // Límite de WhatsApp para el cuerpo de un mensaje de texto.
         private const int MaximoWhatsApp = 4096;
 
-        // Mismos valores que CK_PLANTILLA_canal.
         private static readonly HashSet<string> Canales = [Correo, WhatsApp];
 
         private readonly IPlantillaRepositorio _repositorio;
@@ -77,7 +72,6 @@ namespace PodoFlow.Api.Servicios.Implementaciones
             if (plantilla == null)
                 return false;
 
-            // Si ya se usó, editarla cambiaría lo que consta como enviado a los pacientes.
             var usos = await _repositorio.ContarNotificacionesAsync(id, soloPendientes: false);
 
             if (usos > 0)
@@ -89,7 +83,6 @@ namespace PodoFlow.Api.Servicios.Implementaciones
 
             await ValidarDuplicadoAsync(datos.Nombre, datos.Canal, datos.Version, id);
 
-            // Nunca se tocan PlId, PlFechaCrea ni PlEstatus.
             AplicarDatos(plantilla, datos);
 
             await _repositorio.GuardarCambiosAsync();
@@ -104,11 +97,9 @@ namespace PodoFlow.Api.Servicios.Implementaciones
             if (plantilla == null)
                 return false;
 
-            // Si ya estaba dada de baja no hay nada que hacer.
             if (!plantilla.PlEstatus)
                 return true;
 
-            // No se deja sin plantilla activa a mensajes que todavía van a salir.
             var pendientes = await _repositorio.ContarNotificacionesAsync(id, soloPendientes: true);
 
             if (pendientes > 0)
@@ -130,7 +121,6 @@ namespace PodoFlow.Api.Servicios.Implementaciones
             if (plantilla == null)
                 return false;
 
-            // Si ya estaba activa no hay nada que hacer.
             if (plantilla.PlEstatus)
                 return true;
 
@@ -148,8 +138,6 @@ namespace PodoFlow.Api.Servicios.Implementaciones
 
             return true;
         }
-
-        // Normaliza y valida lo que comparten crear y actualizar.
         private static DatosPlantilla PrepararDatos(
             string nombre, string canal, string tipo, string? asunto, string contenido, string? version)
         {
@@ -165,7 +153,6 @@ namespace PodoFlow.Api.Servicios.Implementaciones
 
             var asuntoLimpio = Limpiar(asunto);
 
-            // Un correo sin asunto suele terminar en spam; WhatsApp no tiene asunto.
             if (canalNormalizado == Correo && asuntoLimpio == null)
                 throw new ArgumentException("Las plantillas de CORREO necesitan asunto.");
 
@@ -198,8 +185,6 @@ namespace PodoFlow.Api.Servicios.Implementaciones
             plantilla.PlVersi = datos.Version;
         }
 
-        // Mismo nombre y canal con otra versión sí es válido (ej. "Recordatorio" 1.0 y 2.0),
-        // y también el mismo nombre en los dos canales.
         private async Task ValidarDuplicadoAsync(string nombre, string canal, string version, int? excluirId)
         {
             var duplicado = await _repositorio.ObtenerDuplicadoAsync(nombre, canal, version, excluirId);
@@ -233,7 +218,6 @@ namespace PodoFlow.Api.Servicios.Implementaciones
             return valor.Trim().ToUpperInvariant();
         }
 
-        // Texto opcional: vacío o solo espacios se guarda como NULL.
         private static string? Limpiar(string? valor)
         {
             return string.IsNullOrWhiteSpace(valor) ? null : valor.Trim();

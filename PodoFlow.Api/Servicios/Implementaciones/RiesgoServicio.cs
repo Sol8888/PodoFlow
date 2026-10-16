@@ -5,8 +5,7 @@ using PodoFlow.Api.Servicios.Interfaces;
 
 namespace PodoFlow.Api.Servicios.Implementaciones
 {
-    // Caso B: la "baja" es CERRAR. Matriz de riesgo clásica: nivel = probabilidad × impacto.
-    // Convención: null/false → 404 · ArgumentException → 400 · InvalidOperationException → 409.
+    
     public class RiesgoServicio : IRiesgoServicio
     {
         private const string Abierto = "ABIERTO";
@@ -14,12 +13,12 @@ namespace PodoFlow.Api.Servicios.Implementaciones
         private const string Aceptado = "ACEPTADO";
         private const string Cerrado = "CERRADO";
 
-        // Estado actual → estados a los que puede pasar. CERRADO es final.
+      
         private static readonly Dictionary<string, string[]> TransicionesPermitidas = new()
         {
             [Abierto] = [Mitigado, Aceptado, Cerrado],
-            [Mitigado] = [Abierto, Aceptado, Cerrado],   // se reabre si la medida no funcionó
-            [Aceptado] = [Abierto, Cerrado],             // se reabre si se reevalúa
+            [Mitigado] = [Abierto, Aceptado, Cerrado],  
+            [Aceptado] = [Abierto, Cerrado],            
             [Cerrado] = []
         };
 

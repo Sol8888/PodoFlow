@@ -1,7 +1,5 @@
 namespace PodoFlow.Api.Modelos
 {
-    // Mensaje programado para un paciente. La API lo registra y controla;
-    // el envío real lo hace un proceso externo, que deja cada intento en ENVIO.
     public class Notificacion
     {
         public long NoId { get; set; }

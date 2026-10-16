@@ -5,9 +5,6 @@ using PodoFlow.Api.Servicios.Interfaces;
 
 namespace PodoFlow.Api.Servicios.Implementaciones
 {
-    // Caso A en tabla intermedia. La PK (tr_id, en_id) funciona como el UNIQUE:
-    // una misma pareja no se puede insertar dos veces, así que se reactiva.
-    // Convención: null/false → 404 · ArgumentException → 400 · InvalidOperationException → 409.
     public class TratamientoEncargadoServicio : ITratamientoEncargadoServicio
     {
         private readonly ITratamientoEncargadoRepositorio _repositorio;
@@ -53,7 +50,6 @@ namespace PodoFlow.Api.Servicios.Implementaciones
                     throw new InvalidOperationException(
                         "El encargado ya está asignado a este tratamiento.");
 
-                // Estaba dada de baja: se reactiva. Es una asignación nueva, así que la fecha se actualiza.
                 existente.TeEstatus = true;
                 existente.TeFechaAsig = DateTime.UtcNow;
 
@@ -82,7 +78,6 @@ namespace PodoFlow.Api.Servicios.Implementaciones
             if (asignacion == null)
                 return false;
 
-            // Si ya estaba dada de baja no hay nada que hacer.
             if (!asignacion.TeEstatus)
                 return true;
 
@@ -100,7 +95,6 @@ namespace PodoFlow.Api.Servicios.Implementaciones
             if (asignacion == null)
                 return false;
 
-            // Si ya estaba activa no hay nada que hacer.
             if (asignacion.TeEstatus)
                 return true;
 

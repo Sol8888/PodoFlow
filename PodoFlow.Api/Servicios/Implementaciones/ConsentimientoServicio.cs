@@ -13,9 +13,9 @@ namespace PodoFlow.Api.Servicios.Implementaciones
 
         private static readonly Dictionary<string, string[]> TransicionesPermitidas = new()
         {
-            [Aceptado] = [Revocado],             // solo se retira
-            [Rechazado] = [Aceptado],            // puede cambiar de opinión
-            [Revocado] = [Aceptado]              // puede volver a otorgarlo
+            [Aceptado] = [Revocado],            
+            [Rechazado] = [Aceptado],           
+            [Revocado] = [Aceptado]             
         };
 
         private readonly IConsentimientoRepositorio _repositorio;

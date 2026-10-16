@@ -184,13 +184,13 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("PrivacidadGestionar", policy =>
     {
         policy.RequireAuthenticatedUser();
-        policy.RequireClaim("permiso", "PRIVACIDAD_GESTIONAR");
+        policy.RequireClaim("permiso", "PRIVACIDAD_GEST");
     });
 
     options.AddPolicy("ComunicacionGestionar", policy =>
     {
         policy.RequireAuthenticatedUser();
-        policy.RequireClaim("permiso", "COMUNICACION_GESTIONAR");
+        policy.RequireClaim("permiso", "COMUNICACION_GEST");
     });
 
     options.AddPolicy("AnaliticaVer", policy =>

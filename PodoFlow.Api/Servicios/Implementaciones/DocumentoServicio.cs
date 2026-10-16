@@ -7,7 +7,6 @@ namespace PodoFlow.Api.Servicios.Implementaciones
 {
     public class DocumentoServicio : IDocumentoServicio
     {
-        // Mismos valores que CK_DOCUMENTO_tipo.
         private static readonly HashSet<string> Tipos =
         [
             "RAT", "EIPD", "MATRIZ_RIESGO", "MATRIZ_ENCARGADO",
