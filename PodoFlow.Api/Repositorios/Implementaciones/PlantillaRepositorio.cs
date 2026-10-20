@@ -52,7 +52,6 @@ namespace PodoFlow.Api.Repositorios.Implementaciones
                 .FirstOrDefaultAsync();
         }
 
-        // Cuando exista el DbSet de Notificacion se puede cambiar por LINQ.
         public async Task<int> ContarNotificacionesAsync(int plantillaId, bool soloPendientes)
         {
             var consulta = _context.Notificaciones.Where(x => x.PlId == plantillaId);

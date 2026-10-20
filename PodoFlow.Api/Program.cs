@@ -1,12 +1,15 @@
-using Microsoft.EntityFrameworkCore;
-using PodoFlow.Api.Datos;
-using PodoFlow.Api.Repositorios.Interfaces;
-using PodoFlow.Api.Repositorios.Implementaciones;
-using PodoFlow.Api.Servicios.Interfaces;
-using PodoFlow.Api.Servicios.Implementaciones;
 using Microsoft.AspNetCore.Authentication;
-using PodoFlow.Api.Seguridad;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using PodoFlow.Api.Datos;
+using PodoFlow.Api.Integraciones.Implementaciones;
+using PodoFlow.Api.Integraciones.Interfaces;
+using PodoFlow.Api.Procesos;
+using PodoFlow.Api.Repositorios.Implementaciones;
+using PodoFlow.Api.Repositorios.Interfaces;
+using PodoFlow.Api.Seguridad;
+using PodoFlow.Api.Servicios.Implementaciones;
+using PodoFlow.Api.Servicios.Interfaces;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -138,6 +141,15 @@ builder.Services.AddScoped<IPrestacionServicio, PrestacionServicio>();
 builder.Services.AddScoped<ICobroRepositorio, CobroRepositorio>();
 builder.Services.AddScoped<ICobroServicio, CobroServicio>();
 
+// Esto de aqui es estrictamente para la parte de notificaciones
+
+// Puse dos proveedores de correo para poder hacer pruebas mas completas usando resend. 
+// Esta de tal forma que podemos regresar a sendgrid cuando sea.
+
+builder.Services.AddHttpClient<IProveedorCorreo, SendGridProveedorCorreo>();
+builder.Services.AddHttpClient<IProveedorWhatsApp, MetaProveedorWhatsApp>();
+builder.Services.AddScoped<IEnvioNotificacionServicio, EnvioNotificacionServicio>();
+builder.Services.AddHostedService<EnvioNotificacionesWorker>();
 
 // Esto de aqui esta porque necesito hacer mock de la seguridad para probar algunas cosas :) la carpeta de seguridad esta conectada a esto y es por hacer mock a la Autenticacion
 if (builder.Environment.IsDevelopment())
