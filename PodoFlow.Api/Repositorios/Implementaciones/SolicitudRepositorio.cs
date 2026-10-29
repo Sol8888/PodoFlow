@@ -51,34 +51,38 @@ namespace PodoFlow.Api.Repositorios.Implementaciones
 
         public async Task<bool> ExistePacienteActivoAsync(long pacienteId)
         {
-            return await _context.Database
-                .SqlQuery<long>($"SELECT pa_id AS Value FROM pac.PACIENTE WHERE pa_id = {pacienteId} AND pa_estatus = 1")
-                .AnyAsync();
+            return await _context.Pacientes
+                .AnyAsync(x => x.PaId == pacienteId && x.PaEstatus);
         }
 
         public async Task<bool> ExisteUsuarioActivoAsync(long usuarioId)
         {
-            return await _context.Database
-                .SqlQuery<long>($"SELECT us_id AS Value FROM seg.USUARIO WHERE us_id = {usuarioId} AND us_estatus = 1")
-                .AnyAsync();
+            return await _context.Usuarios
+                .AnyAsync(x => x.UsId == usuarioId && x.UsEstatus);
         }
-        // Esto tal vez sea mejor en un SP
+
+        public async Task<bool> ExisteExportacionEntregadaAsync(long solicitudId)
+        {
+            return await _context.Exportaciones
+                .AnyAsync(x => x.SoId == solicitudId && x.ExEstad == "ENTREGADA");
+        }
         public async Task<(string TipoIdentificacion, string Identificacion, string Nombre)?> ObtenerIdentidadPacienteAsync(long pacienteId)
         {
-            var fila = await _context.Database
-                .SqlQuery<IdentidadPacienteFila>($"""
-                    SELECT pa_tipo_ident                      AS TipoIdentificacion,
-                           pa_ident                           AS Identificacion,
-                           CONCAT(pa_nombres, ' ', pa_apelli) AS Nombre
-                    FROM pac.PACIENTE
-                    WHERE pa_id = {pacienteId}
-                    """)
+            var fila = await _context.Pacientes
+                .AsNoTracking()
+                .Where(x => x.PaId == pacienteId)
+                .Select(x => new
+                {
+                    x.PaTipoIdent,
+                    x.PaIdent,
+                    Nombre = x.PaNombres + " " + x.PaApelli
+                })
                 .FirstOrDefaultAsync();
 
             if (fila == null)
                 return null;
 
-            return (fila.TipoIdentificacion, fila.Identificacion, fila.Nombre);
+            return (fila.PaTipoIdent, fila.PaIdent, fila.Nombre);
         }
         public async Task<Solicitud> CrearAsync(Solicitud solicitud, AccionSolicitud? accion)
         {
@@ -115,14 +119,6 @@ namespace PodoFlow.Api.Repositorios.Implementaciones
             _context.Entry(solicitud)
                 .Property(x => x.SoVersion)
                 .OriginalValue = versionLeida;
-        }
-        private sealed class IdentidadPacienteFila
-        {
-            public string TipoIdentificacion { get; set; } = string.Empty;
-
-            public string Identificacion { get; set; } = string.Empty;
-
-            public string Nombre { get; set; } = string.Empty;
         }
     }
 

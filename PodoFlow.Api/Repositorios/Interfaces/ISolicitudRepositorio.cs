@@ -16,6 +16,8 @@ namespace PodoFlow.Api.Repositorios.Interfaces
 
         Task<bool> ExisteUsuarioActivoAsync(long usuarioId);
 
+        Task<bool> ExisteExportacionEntregadaAsync(long solicitudId);
+
         Task<(string TipoIdentificacion, string Identificacion, string Nombre)?> ObtenerIdentidadPacienteAsync(long pacienteId);
 
         Task<Solicitud> CrearAsync(Solicitud solicitud, AccionSolicitud? accion);

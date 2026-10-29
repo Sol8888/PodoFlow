@@ -24,6 +24,7 @@ namespace PodoFlow.Api.Servicios.Implementaciones
         ];
 
         private static readonly HashSet<string> TiposSolicitante = [Titular, Representante];
+        private static readonly HashSet<string> DerechosConExportacion = ["ACCESO", "PORTABILIDAD"];
         private static readonly HashSet<string> TiposIdentificacion = [Cedula, Pasaporte];
         private static readonly Dictionary<string, string[]> TransicionesPermitidas = new()
         {
@@ -35,11 +36,18 @@ namespace PodoFlow.Api.Servicios.Implementaciones
             [Rechazada] = []
         };
 
-        private readonly ISolicitudRepositorio _repositorio;
+        private const int PlazoDiasPorDefecto = 15;
+        private static readonly HashSet<string> EstadosConPlazo = [Recibida, Validando, EnProceso];
 
-        public SolicitudServicio(ISolicitudRepositorio repositorio)
+        private readonly ISolicitudRepositorio _repositorio;
+        private readonly int _plazoDias;
+
+        public SolicitudServicio(ISolicitudRepositorio repositorio, IConfiguration configuration)
         {
             _repositorio = repositorio;
+
+            var plazo = configuration.GetValue("Solicitudes:PlazoDias", PlazoDiasPorDefecto);
+            _plazoDias = plazo > 0 ? plazo : PlazoDiasPorDefecto;
         }
 
         public async Task<List<SolicitudRespuestaDto>> ObtenerTodosAsync(int pagina, int tamano)
@@ -182,6 +190,12 @@ namespace PodoFlow.Api.Servicios.Implementaciones
                     $"No se puede pasar de {estadoAnterior} a {nuevoEstado}.");
 
             await ValidarUsuarioAsync(dto.UsuarioId);
+
+            if (nuevoEstado == Respondida
+                && DerechosConExportacion.Contains(solicitud.SoTipoDere)
+                && !await _repositorio.ExisteExportacionEntregadaAsync(solicitud.SoId))
+                throw new InvalidOperationException(
+                    $"Una solicitud de {solicitud.SoTipoDere} se responde entregando los datos al titular. Genere la exportación y márquela como ENTREGADA antes de responder.");
 
             var ahora = DateTime.UtcNow;
 
@@ -345,9 +359,13 @@ namespace PodoFlow.Api.Servicios.Implementaciones
             return valor.Trim().ToUpperInvariant();
         }
 
-        private static SolicitudRespuestaDto MapearRespuesta(
+        private SolicitudRespuestaDto MapearRespuesta(
             Solicitud solicitud)
         {
+            var fechaLimite = DateTime.SpecifyKind(solicitud.SoFechaRece, DateTimeKind.Utc).AddDays(_plazoDias);
+            var abierta = EstadosConPlazo.Contains(solicitud.SoEstad);
+            var ahora = DateTime.UtcNow;
+
             return new SolicitudRespuestaDto
             {
                 Id = solicitud.SoId,
@@ -363,6 +381,9 @@ namespace PodoFlow.Api.Servicios.Implementaciones
                 Detalle = solicitud.SoDetal,
                 Respuesta = solicitud.SoRespue,
                 FechaCierre = solicitud.SoFechaCier,
+                FechaLimite = fechaLimite,
+                DiasRestantes = abierta ? (int)Math.Ceiling((fechaLimite - ahora).TotalDays) : null,
+                Vencida = abierta && ahora > fechaLimite,
                 Version = solicitud.SoVersion
             };
         }

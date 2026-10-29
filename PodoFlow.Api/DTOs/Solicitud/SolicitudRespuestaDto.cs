@@ -28,6 +28,12 @@
 
         public DateTime? FechaCierre { get; set; }
 
+        public DateTime FechaLimite { get; set; }
+
+        public int? DiasRestantes { get; set; }
+
+        public bool Vencida { get; set; }
+
         public byte[] Version { get; set; } = [];
     }
 }

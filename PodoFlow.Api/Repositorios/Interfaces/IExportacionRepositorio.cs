@@ -10,8 +10,14 @@ namespace PodoFlow.Api.Repositorios.Interfaces
 
         Task<Exportacion?> ObtenerPorIdAsync(long id);
 
+        Task<bool> ExisteEvidenciaAsync(long solicitudId);
+
+        Task<List<Dictionary<string, object?>>> ObtenerDatosTitularAsync(string conjunto, long pacienteId);
+
         Task<Exportacion> CrearAsync(Exportacion exportacion, AccionSolicitud accion);
 
         Task CambiarEstadoAsync(AccionSolicitud accion);
+
+        Task RegistrarAccionAsync(AccionSolicitud accion);
     }
 }

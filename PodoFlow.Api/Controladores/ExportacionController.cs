@@ -50,6 +50,28 @@ namespace PodoFlow.Api.Controladores
             return Ok(exportacion);
         }
 
+        [HttpGet("{id:long}/descargar")]
+        public async Task<IActionResult> Descargar(long id, [FromQuery] long usuarioId)
+        {
+            try
+            {
+                var archivo = await _servicio.DescargarAsync(id, usuarioId);
+
+                if (archivo == null)
+                    return NotFound();
+
+                return File(archivo.Value.Contenido, archivo.Value.TipoContenido, archivo.Value.NombreArchivo);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { mensaje = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(new { mensaje = ex.Message });
+            }
+        }
+
         [HttpPost]
         public async Task<ActionResult<ExportacionRespuestaDto>> Crear(ExportacionCrearDto dto)
         {

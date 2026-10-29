@@ -12,6 +12,8 @@ namespace PodoFlow.Api.Servicios.Interfaces
 
         Task<ExportacionRespuestaDto> CrearAsync(ExportacionCrearDto dto);
 
+        Task<(byte[] Contenido, string NombreArchivo, string TipoContenido)?> DescargarAsync(long id, long usuarioId);
+
         Task<ExportacionRespuestaDto?> CambiarEstadoAsync(long id, ExportacionCambiarEstadoDto dto);
     }
 }

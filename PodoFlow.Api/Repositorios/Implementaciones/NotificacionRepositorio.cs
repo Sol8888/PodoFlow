@@ -59,19 +59,18 @@ namespace PodoFlow.Api.Repositorios.Implementaciones
         }
         public async Task<DateTime?> ObtenerFechaCitaVigenteAsync(long citaId, long pacienteId)
         {
-            var fechas = await _context.Database
-                .SqlQuery<DateTime>($@"SELECT ci_fecha_ini AS Value FROM cit.CITA
-                    WHERE ci_id = {citaId} AND pa_id = {pacienteId}
-                      AND ci_estad IN ('SOLICITADA','CONFIRMADA','REPROGRAMADA')")
-                .ToListAsync();
+            var estadosVigentes = new[] { "SOLICITADA", "CONFIRMADA", "REPROGRAMADA" };
 
-            return fechas.Count == 0 ? null : fechas[0];
+            return await _context.Citas
+                .AsNoTracking()
+                .Where(x => x.CiId == citaId && x.PaId == pacienteId && estadosVigentes.Contains(x.CiEstad))
+                .Select(x => (DateTime?)x.CiFechaIni)
+                .FirstOrDefaultAsync();
         }
         public async Task<bool> ExisteUsuarioActivoAsync(long usuarioId)
         {
-            return await _context.Database
-                .SqlQuery<long>($"SELECT us_id AS Value FROM seg.USUARIO WHERE us_id = {usuarioId} AND us_estatus = 1")
-                .AnyAsync();
+            return await _context.Usuarios
+                .AnyAsync(x => x.UsId == usuarioId && x.UsEstatus);
         }
 
         public async Task<Notificacion> CrearAsync(Notificacion notificacion)

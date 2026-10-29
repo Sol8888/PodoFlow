@@ -42,9 +42,8 @@ namespace PodoFlow.Api.Repositorios.Implementaciones
 
         public async Task<bool> ExistePacienteActivoAsync(long pacienteId)
         {
-            return await _context.Database
-                .SqlQuery<long>($"SELECT pa_id AS Value FROM pac.PACIENTE WHERE pa_id = {pacienteId} AND pa_estatus = 1")
-                .AnyAsync();
+            return await _context.Pacientes
+                .AnyAsync(x => x.PaId == pacienteId && x.PaEstatus);
         }
 
         public async Task<string?> ObtenerEstadoConsentimientoAsync(long pacienteId, int finalidadId)
@@ -58,23 +57,22 @@ namespace PodoFlow.Api.Repositorios.Implementaciones
 
         public async Task<List<long>> ObtenerPacientesSinSeudonimoAsync(int finalidadId)
         {
-            return await _context.Database
-                .SqlQuery<long>($@"SELECT c.pa_id AS Value
-                    FROM pri.CONSENTIMIENTO c
-                    JOIN pac.PACIENTE p ON p.pa_id = c.pa_id
-                    WHERE c.fi_id = {finalidadId} AND c.co_estad = 'ACEPTADO' AND p.pa_estatus = 1
-                      AND NOT EXISTS (SELECT 1 FROM ana.SEUDONIMO s WHERE s.pa_id = c.pa_id)")
+            return await _context.Consentimientos
+                .AsNoTracking()
+                .Where(c => c.FiId == finalidadId && c.CoEstad == "ACEPTADO")
+                .Where(c => _context.Pacientes.Any(p => p.PaId == c.PaId && p.PaEstatus))
+                .Where(c => !_context.Seudonimos.Any(s => s.PaId == c.PaId))
+                .Select(c => c.PaId)
                 .ToListAsync();
         }
 
         public async Task<int> ContarPacientesConSeudonimoActivoAsync(int finalidadId)
         {
-            return await _context.Database
-                .SqlQuery<long>($@"SELECT c.pa_id AS Value
-                    FROM pri.CONSENTIMIENTO c
-                    JOIN pac.PACIENTE p ON p.pa_id = c.pa_id
-                    JOIN ana.SEUDONIMO s ON s.pa_id = c.pa_id AND s.se_estatus = 1
-                    WHERE c.fi_id = {finalidadId} AND c.co_estad = 'ACEPTADO' AND p.pa_estatus = 1")
+            return await _context.Consentimientos
+                .AsNoTracking()
+                .Where(c => c.FiId == finalidadId && c.CoEstad == "ACEPTADO")
+                .Where(c => _context.Pacientes.Any(p => p.PaId == c.PaId && p.PaEstatus))
+                .Join(_context.Seudonimos.Where(s => s.SeEstatus), c => c.PaId, s => s.PaId, (c, s) => c.PaId)
                 .CountAsync();
         }
 

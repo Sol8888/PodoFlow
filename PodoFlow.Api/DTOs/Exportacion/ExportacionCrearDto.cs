@@ -4,20 +4,16 @@ namespace PodoFlow.Api.DTOs.Exportacion
 {
     public class ExportacionCrearDto
     {
-        [Required]
+        [Range(1, long.MaxValue)]
         public long SolicitudId { get; set; }
 
-        [Required]
+        [Range(1, long.MaxValue)]
         public long UsuarioId { get; set; }
 
         [Required, MaxLength(20)]
         public string Formato { get; set; } = string.Empty;
 
-        [Required, MaxLength(1000)]
-        public string RutaArchivo { get; set; } = string.Empty;
-
-        [MaxLength(128)]
-        public string? Huella { get; set; }
+        public List<string>? Secciones { get; set; }
 
         [MaxLength(2000)]
         public string? Observacion { get; set; }

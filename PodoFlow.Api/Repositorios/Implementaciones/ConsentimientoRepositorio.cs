@@ -45,16 +45,14 @@ namespace PodoFlow.Api.Repositorios.Implementaciones
         }
         public async Task<bool> ExistePacienteActivoAsync(long pacienteId)
         {
-            return await _context.Database
-                .SqlQuery<long>($"SELECT pa_id AS Value FROM pac.PACIENTE WHERE pa_id = {pacienteId} AND pa_estatus = 1")
-                .AnyAsync();
+            return await _context.Pacientes
+                .AnyAsync(x => x.PaId == pacienteId && x.PaEstatus);
         }
 
         public async Task<bool> ExisteUsuarioActivoAsync(long usuarioId)
         {
-            return await _context.Database
-                .SqlQuery<long>($"SELECT us_id AS Value FROM seg.USUARIO WHERE us_id = {usuarioId} AND us_estatus = 1")
-                .AnyAsync();
+            return await _context.Usuarios
+                .AnyAsync(x => x.UsId == usuarioId && x.UsEstatus);
         }
 
 

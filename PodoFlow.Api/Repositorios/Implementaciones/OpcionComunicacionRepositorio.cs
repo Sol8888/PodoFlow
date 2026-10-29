@@ -61,12 +61,10 @@ namespace PodoFlow.Api.Repositorios.Implementaciones
                 .FirstOrDefaultAsync(x => x.PaId == pacienteId && x.FiId == finalidadId);
         }
 
-        // pac.PACIENTE es del bloque de la Persona 1: solo se lee.
         public async Task<bool> ExistePacienteActivoAsync(long pacienteId)
         {
-            return await _context.Database
-                .SqlQuery<long>($"SELECT pa_id AS Value FROM pac.PACIENTE WHERE pa_id = {pacienteId} AND pa_estatus = 1")
-                .AnyAsync();
+            return await _context.Pacientes
+                .AnyAsync(x => x.PaId == pacienteId && x.PaEstatus);
         }
 
         public async Task<OpcionComunicacion> CrearAsync(OpcionComunicacion opcion)

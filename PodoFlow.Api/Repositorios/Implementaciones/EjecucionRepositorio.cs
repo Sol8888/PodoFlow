@@ -85,9 +85,8 @@ namespace PodoFlow.Api.Repositorios.Implementaciones
 
         public async Task<bool> ExisteUsuarioActivoAsync(long usuarioId)
         {
-            return await _context.Database
-                .SqlQuery<long>($"SELECT us_id AS Value FROM seg.USUARIO WHERE us_id = {usuarioId} AND us_estatus = 1")
-                .AnyAsync();
+            return await _context.Usuarios
+                .AnyAsync(x => x.UsId == usuarioId && x.UsEstatus);
         }
 
         public async Task<Ejecucion> CrearAsync(Ejecucion ejecucion)
