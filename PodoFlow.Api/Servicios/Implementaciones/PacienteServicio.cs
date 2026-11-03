@@ -155,25 +155,189 @@ public class PacienteServicio : IPacienteServicio
         return true;
     }
 
+
     private static void Validar(PacienteCrearDto dto)
     {
-        if (string.IsNullOrWhiteSpace(dto.TipoIdentificacion) ||
-            !TiposValidos.Contains(
-                dto.TipoIdentificacion.Trim().ToUpperInvariant()))
-            throw new ArgumentException(
-                "Tipo válido: CEDULA, PASAPORTE, RUC u OTRO.");
+        ArgumentNullException.ThrowIfNull(dto);
 
-        if (string.IsNullOrWhiteSpace(dto.Identificacion) ||
-            string.IsNullOrWhiteSpace(dto.Nombres) ||
-            string.IsNullOrWhiteSpace(dto.Apellidos))
+        // ============================================
+        // TIPO DE IDENTIFICACIÓN
+        // ============================================
+
+        string tipo = dto.TipoIdentificacion?
+            .Trim()
+            .ToUpperInvariant() ?? "";
+
+        if (!TiposValidos.Contains(tipo))
+        {
             throw new ArgumentException(
-                "Identificación, nombres y apellidos son obligatorios.");
+                "Tipo de identificación inválido. " +
+                "Valores permitidos: CEDULA, PASAPORTE, RUC u OTRO.");
+        }
+
+        // ============================================
+        // IDENTIFICACIÓN OBLIGATORIA
+        // ============================================
+
+        string identificacion = dto.Identificacion?.Trim() ?? "";
+
+        if (string.IsNullOrWhiteSpace(identificacion))
+        {
+            throw new ArgumentException(
+                "La identificación del paciente es obligatoria.");
+        }
+
+        if (identificacion.Length > 30)
+        {
+            throw new ArgumentException(
+                "La identificación no puede superar los 30 caracteres.");
+        }
+
+        // ============================================
+        // VALIDACIÓN DE CÉDULA ECUATORIANA
+        // ============================================
+
+        if (tipo == "CEDULA")
+        {
+            if (identificacion.Length != 10 ||
+                !identificacion.All(char.IsAsciiDigit))
+            {
+                throw new ArgumentException(
+                    "La cédula debe contener exactamente " +
+                    "10 dígitos numéricos.");
+            }
+
+            if (!CedulaEcuatorianaValida(identificacion))
+            {
+                throw new ArgumentException(
+                    "La cédula ecuatoriana ingresada no es válida. " +
+                    "Verifica el número de identificación.");
+            }
+        }
+
+        // ============================================
+        // VALIDACIÓN BÁSICA DE RUC
+        // ============================================
+
+        if (tipo == "RUC")
+        {
+            if (identificacion.Length != 13 ||
+                !identificacion.All(char.IsAsciiDigit))
+            {
+                throw new ArgumentException(
+                    "El RUC debe contener exactamente " +
+                    "13 dígitos numéricos.");
+            }
+        }
+
+        // ============================================
+        // NOMBRES Y APELLIDOS
+        // ============================================
+
+        if (string.IsNullOrWhiteSpace(dto.Nombres))
+        {
+            throw new ArgumentException(
+                "Los nombres del paciente son obligatorios.");
+        }
+
+        if (string.IsNullOrWhiteSpace(dto.Apellidos))
+        {
+            throw new ArgumentException(
+                "Los apellidos del paciente son obligatorios.");
+        }
+
+        if (dto.Nombres.Trim().Length > 100 ||
+            dto.Apellidos.Trim().Length > 100)
+        {
+            throw new ArgumentException(
+                "Los nombres y apellidos no pueden superar " +
+                "los 100 caracteres respectivamente.");
+        }
+
+        // ============================================
+        // FECHA DE NACIMIENTO
+        // ============================================
 
         if (dto.FechaNacimiento.HasValue &&
             dto.FechaNacimiento.Value.Date > DateTime.UtcNow.Date)
+        {
             throw new ArgumentException(
                 "La fecha de nacimiento no puede ser futura.");
+        }
     }
+
+    private static bool CedulaEcuatorianaValida(string cedula)
+    {
+        // ============================================
+        // FORMATO
+        // ============================================
+
+        if (cedula.Length != 10 ||
+            !cedula.All(char.IsAsciiDigit))
+        {
+            return false;
+        }
+
+        // ============================================
+        // PROVINCIA
+        // ============================================
+
+        int provincia = int.Parse(cedula[..2]);
+
+        if (provincia < 1 || provincia > 24)
+        {
+            return false;
+        }
+
+        // ============================================
+        // TERCER DÍGITO
+        // ============================================
+
+        int tercerDigito = cedula[2] - '0';
+
+        if (tercerDigito >= 6)
+        {
+            return false;
+        }
+
+        // ============================================
+        // COEFICIENTES
+        // ============================================
+
+        int[] coeficientes =
+        {
+        2, 1, 2, 1, 2, 1, 2, 1, 2
+    };
+
+        int suma = 0;
+
+        for (int i = 0; i < 9; i++)
+        {
+            int digito = cedula[i] - '0';
+
+            int producto = digito * coeficientes[i];
+
+            if (producto >= 10)
+            {
+                producto -= 9;
+            }
+
+            suma += producto;
+        }
+
+        // ============================================
+        // DÍGITO VERIFICADOR
+        // ============================================
+
+        int verificadorCalculado =
+            (10 - (suma % 10)) % 10;
+
+        int verificadorIngresado =
+            cedula[9] - '0';
+
+        return verificadorCalculado == verificadorIngresado;
+    }
+
 
     private static void CopiarDatos(
         Paciente paciente, PacienteCrearDto dto)
