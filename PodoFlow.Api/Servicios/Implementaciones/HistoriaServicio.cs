@@ -294,4 +294,21 @@ public class HistoriaServicio : IHistoriaServicio
             Version = Convert.ToBase64String(h.HiVersion)
         };
     }
+
+    public async Task<HistoriaRespuestaDto?> ObtenerPorPacienteAsync(
+        long pacienteId)
+    {
+        if (pacienteId <= 0)
+        {
+            throw new ArgumentException(
+                "El identificador del paciente no es válido.");
+        }
+
+        var historia = await _repo.ObtenerPorPacienteAsync(pacienteId);
+
+        return historia is null
+            ? null
+            : Mapear(historia);
+    }
+
 }

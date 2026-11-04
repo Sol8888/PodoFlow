@@ -18,4 +18,7 @@ public interface IHistoriaServicio
 
     Task<bool> CambiarEstadoAsync(
         long id, HistoriaCambiarEstadoDto dto);
+
+    Task<HistoriaRespuestaDto?> ObtenerPorPacienteAsync(long pacienteId);
+
 }
