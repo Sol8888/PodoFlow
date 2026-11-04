@@ -139,4 +139,27 @@ public class HistoriaController : ControllerBase
                 "No se pudo cambiar el estado de la historia.");
         }
     }
+
+    [HttpGet("paciente/{pacienteId:long}")]
+    public async Task<IActionResult> ObtenerPorPaciente(long pacienteId)
+    {
+        try
+        {
+            var historia =
+                await _servicio.ObtenerPorPacienteAsync(pacienteId);
+
+            if (historia is null)
+            {
+                return NotFound(
+                    "El paciente todavía no tiene una historia clínica.");
+            }
+
+            return Ok(historia);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
 }
