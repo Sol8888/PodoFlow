@@ -50,57 +50,24 @@ public class AdjuntoController : ControllerBase
         return Ok(adjunto);
     }
 
-    [HttpPost]
-    public async Task<IActionResult> Crear(
-        [FromBody] AdjuntoCrearDto dto)
-    {
-        try
-        {
-            var adjunto = await _servicio.CrearAsync(dto);
 
-            return CreatedAtAction(
-                nameof(ObtenerPorId),
-                new { id = adjunto.Id },
-                adjunto);
-        }
-        catch (ArgumentException ex)
-        {
-            return BadRequest(ex.Message);
-        }
-        catch (InvalidOperationException ex)
-        {
-            return Conflict(ex.Message);
-        }
-        catch (DbUpdateException)
-        {
-            return Conflict("No se pudo registrar el adjunto.");
-        }
+    [HttpPost]
+    public IActionResult Crear()
+    {
+        return StatusCode(
+            StatusCodes.Status410Gone,
+            "Para registrar un adjunto utiliza " +
+            "POST /api/adjuntos/archivos/atencion/{atencionId}.");
     }
 
     [HttpPut("{id:long}")]
-    public async Task<IActionResult> Actualizar(
-        long id,
-        [FromBody] AdjuntoActualizarDto dto)
+    public IActionResult Actualizar(long id)
     {
-        try
-        {
-            var actualizado = await _servicio.ActualizarAsync(id, dto);
-
-            return actualizado ? NoContent() : NotFound();
-        }
-        catch (ArgumentException ex)
-        {
-            return BadRequest(ex.Message);
-        }
-        catch (InvalidOperationException ex)
-        {
-            return Conflict(ex.Message);
-        }
-        catch (DbUpdateException)
-        {
-            return Conflict("No se pudo actualizar el adjunto.");
-        }
+        return StatusCode(
+            StatusCodes.Status410Gone,
+            "La actualización directa de metadatos está deshabilitada.");
     }
+
 
     [HttpDelete("{id:long}")]
     public async Task<IActionResult> Eliminar(long id)

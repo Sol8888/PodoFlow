@@ -8,6 +8,8 @@ using PodoFlow.Api.Procesos;
 using PodoFlow.Api.Repositorios.Implementaciones;
 using PodoFlow.Api.Repositorios.Interfaces;
 using PodoFlow.Api.Seguridad;
+using Microsoft.OpenApi.Models;
+using PodoFlow.Api.Servicios.Almacenamiento;
 using PodoFlow.Api.Servicios.Implementaciones;
 using PodoFlow.Api.Servicios.Interfaces;
 
@@ -140,6 +142,8 @@ builder.Services.AddScoped<IPrestacionServicio, PrestacionServicio>();
 
 builder.Services.AddScoped<ICobroRepositorio, CobroRepositorio>();
 builder.Services.AddScoped<ICobroServicio, CobroServicio>();
+
+builder.Services.AddSingleton<AlmacenamientoAdjuntos>();
 
 // Esto de aqui es estrictamente para la parte de notificaciones
 
