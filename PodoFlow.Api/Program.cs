@@ -7,7 +7,7 @@ using PodoFlow.Api.Servicios.Implementaciones;
 using Microsoft.AspNetCore.Authentication;
 using PodoFlow.Api.Seguridad;
 using Microsoft.OpenApi.Models;
-
+using PodoFlow.Api.Servicios.Almacenamiento;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -93,6 +93,8 @@ builder.Services.AddScoped<IPrestacionServicio, PrestacionServicio>();
 
 builder.Services.AddScoped<ICobroRepositorio, CobroRepositorio>();
 builder.Services.AddScoped<ICobroServicio, CobroServicio>();
+
+builder.Services.AddSingleton<AlmacenamientoAdjuntos>();
 
 
 // Esto de aqui esta porque necesito hacer mock de la seguridad para probar algunas cosas :) la carpeta de seguridad esta conectada a esto y es por hacer mock a la Autenticacion
