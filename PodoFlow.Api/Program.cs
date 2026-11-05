@@ -1,13 +1,18 @@
-using Microsoft.EntityFrameworkCore;
-using PodoFlow.Api.Datos;
-using PodoFlow.Api.Repositorios.Interfaces;
-using PodoFlow.Api.Repositorios.Implementaciones;
-using PodoFlow.Api.Servicios.Interfaces;
-using PodoFlow.Api.Servicios.Implementaciones;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
+using PodoFlow.Api.Datos;
+using PodoFlow.Api.Integraciones.Implementaciones;
+using PodoFlow.Api.Integraciones.Interfaces;
+using PodoFlow.Api.Procesos;
+using PodoFlow.Api.Repositorios.Implementaciones;
+using PodoFlow.Api.Repositorios.Interfaces;
 using PodoFlow.Api.Seguridad;
 using Microsoft.OpenApi.Models;
 using PodoFlow.Api.Servicios.Almacenamiento;
+using PodoFlow.Api.Servicios.Implementaciones;
+using PodoFlow.Api.Servicios.Interfaces;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,9 +29,53 @@ builder.Services.AddDbContext<PodoFlowContext>(options =>
 // Mujer Aqui van los servicios de repositorio y servicio (Si no pones aqui no funciona)
 builder.Services.AddScoped<IServicioRepositorio, ServicioRepositorio>();
 builder.Services.AddScoped<IServicioServicio, ServicioServicio>();
+builder.Services.AddScoped<IFinalidadRepositorio, FinalidadRepositorio>();
+builder.Services.AddScoped<IFinalidadServicio, FinalidadServicio>();
+builder.Services.AddScoped<IAvisoRepositorio, AvisoRepositorio>();
+builder.Services.AddScoped<IAvisoServicio, AvisoServicio>();
+builder.Services.AddScoped<IConsentimientoRepositorio, ConsentimientoRepositorio>();
+builder.Services.AddScoped<IConsentimientoServicio, ConsentimientoServicio>();
+builder.Services.AddScoped<IExportacionRepositorio, ExportacionRepositorio>();
+builder.Services.AddScoped<IExportacionServicio, ExportacionServicio>();
+builder.Services.AddScoped<ICategoriaDatoRepositorio, CategoriaDatoRepositorio>();
+builder.Services.AddScoped<ICategoriaDatoServicio, CategoriaDatoServicio>();
+builder.Services.AddScoped<IEncargadoRepositorio, EncargadoRepositorio>();
+builder.Services.AddScoped<IEncargadoServicio, EncargadoServicio>();
+builder.Services.AddScoped<ITratamientoDatosRepositorio, TratamientoDatosRepositorio>();
+builder.Services.AddScoped<ITratamientoDatosServicio, TratamientoDatosServicio>();
+builder.Services.AddScoped<ITratamientoCategoriaRepositorio, TratamientoCategoriaRepositorio>();
+builder.Services.AddScoped<ITratamientoCategoriaServicio, TratamientoCategoriaServicio>();
+builder.Services.AddScoped<ITratamientoEncargadoRepositorio, TratamientoEncargadoRepositorio>();
+builder.Services.AddScoped<ITratamientoEncargadoServicio, TratamientoEncargadoServicio>();
+builder.Services.AddScoped<IRiesgoRepositorio, RiesgoRepositorio>();
+builder.Services.AddScoped<IRiesgoServicio, RiesgoServicio>();
+builder.Services.AddScoped<IEvaluacionImpactoRepositorio, EvaluacionImpactoRepositorio>();
+builder.Services.AddScoped<IEvaluacionImpactoServicio, EvaluacionImpactoServicio>();
+builder.Services.AddScoped<IEvaluacionRiesgoRepositorio, EvaluacionRiesgoRepositorio>();
+builder.Services.AddScoped<IEvaluacionRiesgoServicio, EvaluacionRiesgoServicio>();
+builder.Services.AddScoped<IDocumentoRepositorio, DocumentoRepositorio>();
+builder.Services.AddScoped<IDocumentoServicio, DocumentoServicio>();
+builder.Services.AddScoped<IIncidenteRepositorio, IncidenteRepositorio>();
+builder.Services.AddScoped<IIncidenteServicio, IncidenteServicio>();
+builder.Services.AddScoped<IPlantillaRepositorio, PlantillaRepositorio>();
+builder.Services.AddScoped<IPlantillaServicio, PlantillaServicio>();
+builder.Services.AddScoped<IOpcionComunicacionRepositorio, OpcionComunicacionRepositorio>();
+builder.Services.AddScoped<IOpcionComunicacionServicio, OpcionComunicacionServicio>();
+builder.Services.AddScoped<INotificacionRepositorio, NotificacionRepositorio>();
+builder.Services.AddScoped<INotificacionServicio, NotificacionServicio>();
+builder.Services.AddScoped<ISeudonimoRepositorio, SeudonimoRepositorio>();
+builder.Services.AddScoped<ISeudonimoServicio, SeudonimoServicio>();
+builder.Services.AddScoped<IEjecucionRepositorio, EjecucionRepositorio>();
+builder.Services.AddScoped<IEjecucionServicio, EjecucionServicio>();
 
 builder.Services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
 builder.Services.AddScoped<IUsuarioServicio, UsuarioServicio>();
+builder.Services.AddScoped<ISolicitudRepositorio, SolicitudRepositorio>();
+builder.Services.AddScoped<ISolicitudServicio, SolicitudServicio>();
+builder.Services.AddScoped<IEvidenciaSolicitudRepositorio, EvidenciaSolicitudRepositorio>();
+builder.Services.AddScoped<IEvidenciaSolicitudServicio, EvidenciaSolicitudServicio>();
+
+
 
 builder.Services.AddScoped<IRolRepositorio, RolRepositorio>();
 builder.Services.AddScoped<IRolServicio, RolServicio>();
@@ -96,6 +145,15 @@ builder.Services.AddScoped<ICobroServicio, CobroServicio>();
 
 builder.Services.AddSingleton<AlmacenamientoAdjuntos>();
 
+// Esto de aqui es estrictamente para la parte de notificaciones
+
+// Puse dos proveedores de correo para poder hacer pruebas mas completas usando resend. 
+// Esta de tal forma que podemos regresar a sendgrid cuando sea.
+
+builder.Services.AddHttpClient<IProveedorCorreo, SendGridProveedorCorreo>();
+builder.Services.AddHttpClient<IProveedorWhatsApp, MetaProveedorWhatsApp>();
+builder.Services.AddScoped<IEnvioNotificacionServicio, EnvioNotificacionServicio>();
+builder.Services.AddHostedService<EnvioNotificacionesWorker>();
 
 // Esto de aqui esta porque necesito hacer mock de la seguridad para probar algunas cosas :) la carpeta de seguridad esta conectada a esto y es por hacer mock a la Autenticacion
 if (builder.Environment.IsDevelopment())
@@ -134,6 +192,27 @@ builder.Services.AddAuthorization(options =>
     {
         policy.RequireAuthenticatedUser();
         policy.RequireClaim("permiso", "FINANZAS_GESTIONAR");
+    });
+
+    // Estas politicas son para lo de seguridad, comunicacion y lo de IA
+
+
+    options.AddPolicy("PrivacidadGestionar", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireClaim("permiso", "PRIVACIDAD_GEST");
+    });
+
+    options.AddPolicy("ComunicacionGestionar", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireClaim("permiso", "COMUNICACION_GEST");
+    });
+
+    options.AddPolicy("AnaliticaVer", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireClaim("permiso", "ANALITICA_VER");
     });
 
 });

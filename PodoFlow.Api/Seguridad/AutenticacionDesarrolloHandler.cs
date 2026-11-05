@@ -63,6 +63,9 @@ public class AutenticacionDesarrolloHandler
             new Claim("permiso", "HISTORIA_GESTIONAR"),
             new Claim("permiso", "AUDITORIA_VER"),
             new Claim("permiso", "FINANZAS_GESTIONAR"),
+            new Claim("permiso", "PRIVACIDAD_GEST"),
+            new Claim("permiso", "COMUNICACION_GEST"),
+            new Claim("permiso", "ANALITICA_VER"),
 
         };
 
