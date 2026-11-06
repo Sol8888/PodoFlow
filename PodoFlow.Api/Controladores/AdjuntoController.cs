@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PodoFlow.Api.DTOs.Adjunto;
+using PodoFlow.Api.Servicios.Almacenamiento;
 using PodoFlow.Api.Servicios.Interfaces;
 
 namespace PodoFlow.Api.Controladores;
@@ -50,13 +51,28 @@ public class AdjuntoController : ControllerBase
         return Ok(adjunto);
     }
 
+
     [HttpPost]
-    public async Task<IActionResult> Crear(
-        [FromBody] AdjuntoCrearDto dto)
+    public IActionResult Crear()
+    {
+        return StatusCode(
+            StatusCodes.Status410Gone,
+            "Para registrar un adjunto utiliza " +
+            "POST /api/adjuntos/archivos/atencion/{atencionId}.");
+    }
+
+    [HttpPost("archivos/atencion/{atencionId:long}")]
+    [Consumes("multipart/form-data")]
+    [RequestSizeLimit(AlmacenamientoAdjuntos.MaximoBytes + 1024 * 1024)]
+    [RequestFormLimits(MultipartBodyLengthLimit = AlmacenamientoAdjuntos.MaximoBytes + 1024 * 1024)]
+    public async Task<IActionResult> Subir(
+        long atencionId,
+        [FromForm] AdjuntoSubirDto dto,
+        CancellationToken ct)
     {
         try
         {
-            var adjunto = await _servicio.CrearAsync(dto);
+            var adjunto = await _servicio.SubirAsync(atencionId, dto, ct);
 
             return CreatedAtAction(
                 nameof(ObtenerPorId),
@@ -65,42 +81,48 @@ public class AdjuntoController : ControllerBase
         }
         catch (ArgumentException ex)
         {
-            return BadRequest(ex.Message);
+            return BadRequest(new { mensaje = ex.Message });
         }
         catch (InvalidOperationException ex)
         {
-            return Conflict(ex.Message);
+            return Conflict(new { mensaje = ex.Message });
         }
         catch (DbUpdateException)
         {
-            return Conflict("No se pudo registrar el adjunto.");
+            return Conflict(new { mensaje = "No se pudo registrar el adjunto." });
+        }
+    }
+
+    [HttpGet("{id:long}/archivo")]
+    public async Task<IActionResult> Descargar(long id, CancellationToken ct)
+    {
+        try
+        {
+            var archivo = await _servicio.AbrirArchivoAsync(id, ct);
+
+            if (archivo == null)
+                return NotFound(new { mensaje = "No se encontró el archivo." });
+
+            return File(archivo.Contenido, archivo.TipoMime, archivo.Nombre);
+        }
+        catch (InvalidDataException ex)
+        {
+            return Conflict(new { mensaje = ex.Message });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Conflict(new { mensaje = ex.Message });
         }
     }
 
     [HttpPut("{id:long}")]
-    public async Task<IActionResult> Actualizar(
-        long id,
-        [FromBody] AdjuntoActualizarDto dto)
+    public IActionResult Actualizar(long id)
     {
-        try
-        {
-            var actualizado = await _servicio.ActualizarAsync(id, dto);
-
-            return actualizado ? NoContent() : NotFound();
-        }
-        catch (ArgumentException ex)
-        {
-            return BadRequest(ex.Message);
-        }
-        catch (InvalidOperationException ex)
-        {
-            return Conflict(ex.Message);
-        }
-        catch (DbUpdateException)
-        {
-            return Conflict("No se pudo actualizar el adjunto.");
-        }
+        return StatusCode(
+            StatusCodes.Status410Gone,
+            "La actualización directa de metadatos está deshabilitada.");
     }
+
 
     [HttpDelete("{id:long}")]
     public async Task<IActionResult> Eliminar(long id)

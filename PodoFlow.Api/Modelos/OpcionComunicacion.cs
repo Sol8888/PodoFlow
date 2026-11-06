@@ -1,6 +1,5 @@
 namespace PodoFlow.Api.Modelos
 {
-    // Preferencia del paciente: si acepta o no recibir mensajes de una finalidad por un canal.
     public class OpcionComunicacion
     {
         public long OpId { get; set; }

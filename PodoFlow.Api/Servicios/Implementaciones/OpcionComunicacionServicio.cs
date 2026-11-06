@@ -60,7 +60,6 @@ namespace PodoFlow.Api.Servicios.Implementaciones
                         $"El paciente ya tiene una opción para {finalidad.FiCodigo} por {canal} (id {existente.OpId}). " +
                         $"Use PUT api/OpcionComunicacion/{existente.OpId} para cambiar el permiso.");
 
-                // Estaba dada de baja: se reactiva y actualiza en lugar de insertar (la clave sigue ocupada).
                 existente.OpPermi = permitido;
                 existente.CoId = consentimientoId;
                 existente.OpFechaActu = DateTime.UtcNow;
@@ -168,12 +167,8 @@ namespace PodoFlow.Api.Servicios.Implementaciones
             return finalidad;
         }
 
-        // Devuelve el co_id que respalda el permiso, o null si no hace falta.
-        // Si la finalidad requiere consentimiento (fi_requi_cons) y el paciente da permiso,
-        // tiene que existir su consentimiento ACEPTADO para esa finalidad.
         private async Task<long?> ResolverConsentimientoAsync(long pacienteId, Finalidad finalidad, bool permitido)
         {
-            // Sin permiso no se enviará nada, así que no hay consentimiento que enlazar.
             if (!permitido)
                 return null;
 

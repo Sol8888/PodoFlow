@@ -114,11 +114,9 @@ namespace PodoFlow.Api.Servicios.Implementaciones
             if (documento == null)
                 return false;
 
-            // Si ya estaba activo no hay nada que hacer.
             if (documento.DoEstatus)
                 return true;
 
-            // Al reactivarlo no puede quedar duplicado con otro que ya esté activo.
             var duplicado = await _repositorio.ObtenerDuplicadoAsync(
                 documento.DoTipo, documento.DoNombre, documento.DoVersi, id);
 

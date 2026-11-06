@@ -149,7 +149,6 @@ namespace PodoFlow.Api.Servicios.Implementaciones
                 throw new InvalidOperationException(
                     $"No se puede pasar de {estadoAnterior} a {nuevoEstado}.");
 
-            // El cierre tiene que quedar justificado en la bitácora (resumen o motivo del descarte).
             if (nuevoEstado == Cerrado && string.IsNullOrWhiteSpace(dto.Observacion))
                 throw new ArgumentException(
                     "Para CERRAR el incidente hay que indicar en la observación el resumen del cierre o el motivo del descarte.");

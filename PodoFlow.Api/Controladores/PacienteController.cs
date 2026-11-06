@@ -1,4 +1,5 @@
 ﻿
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PodoFlow.Api.DTOs.Paciente;
@@ -7,6 +8,7 @@ using PodoFlow.Api.Servicios.Interfaces;
 namespace PodoFlow.Api.Controladores;
 
 [ApiController]
+[Authorize(Policy = "PacientesVer")]
 [Route("api/pacientes")]
 public class PacienteController : ControllerBase
 {
@@ -38,6 +40,7 @@ public class PacienteController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Policy = "PacientesCrear")]
     public async Task<IActionResult> Crear(PacienteCrearDto dto)
     {
         try
@@ -63,6 +66,7 @@ public class PacienteController : ControllerBase
     }
 
     [HttpPut("{id:long}")]
+    [Authorize(Policy = "PacientesEditar")]
     public async Task<IActionResult> Actualizar(
         long id, PacienteActualizarDto dto)
     {
@@ -90,6 +94,7 @@ public class PacienteController : ControllerBase
     }
 
     [HttpDelete("{id:long}")]
+    [Authorize(Policy = "PacientesEditar")]
     public async Task<IActionResult> Eliminar(
         long id, [FromQuery] string motivo)
     {
@@ -109,6 +114,7 @@ public class PacienteController : ControllerBase
     }
 
     [HttpPatch("{id:long}/reactivar")]
+    [Authorize(Policy = "PacientesEditar")]
     public async Task<IActionResult> Reactivar(long id)
     {
         try

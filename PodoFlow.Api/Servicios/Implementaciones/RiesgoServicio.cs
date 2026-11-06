@@ -104,7 +104,6 @@ namespace PodoFlow.Api.Servicios.Implementaciones
 
             ValidarResidual(dto.RiesgoResidual, nivel);
 
-            // Nunca se tocan RiId, TrId ni RiEstad.
             riesgo.RiDescri = dto.Descripcion.Trim();
             riesgo.RiProba = dto.Probabilidad;
             riesgo.RiImpac = dto.Impacto;
@@ -145,7 +144,6 @@ namespace PodoFlow.Api.Servicios.Implementaciones
                 riesgo.RiRiesgResid = dto.RiesgoResidual;
             }
 
-            // Un riesgo mitigado tiene que decir cómo se mitigó y cuánto riesgo queda.
             if (nuevoEstado == Mitigado)
             {
                 if (string.IsNullOrWhiteSpace(riesgo.RiMediMitig))
@@ -162,13 +160,11 @@ namespace PodoFlow.Api.Servicios.Implementaciones
             return MapearRespuesta(riesgo);
         }
 
-        // 1–5 × 1–5 = 1–25, mismo rango que CK_RIESGO_nivel. Se calcula para que nunca quede inconsistente.
         private static byte CalcularNivel(byte probabilidad, byte impacto)
         {
             return (byte)(probabilidad * impacto);
         }
 
-        // Las medidas reducen el riesgo, no lo aumentan.
         private static void ValidarResidual(byte? residual, byte nivel)
         {
             if (residual.HasValue && residual.Value > nivel)
@@ -181,7 +177,6 @@ namespace PodoFlow.Api.Servicios.Implementaciones
             return valor.Trim().ToUpperInvariant();
         }
 
-        // Texto opcional: vacío o solo espacios se guarda como NULL.
         private static string? Limpiar(string? valor)
         {
             return string.IsNullOrWhiteSpace(valor) ? null : valor.Trim();

@@ -21,7 +21,6 @@ namespace PodoFlow.Api.Controladores
             _servicio = servicio;
         }
 
-        // GET api/Incidente?estado=ABIERTO&pagina=1&tamano=10
         [HttpGet]
         public async Task<ActionResult<List<IncidenteRespuestaDto>>> ObtenerTodos(
             [FromQuery] string? estado = null,
@@ -52,7 +51,6 @@ namespace PodoFlow.Api.Controladores
             return Ok(incidente);
         }
 
-        // Bitácora de gestión (ACCION_INCIDENTE), de la más antigua a la más reciente.
         [HttpGet("{id:long}/acciones")]
         public async Task<ActionResult<List<AccionIncidenteRespuestaDto>>> ObtenerAcciones(long id)
         {
@@ -79,7 +77,6 @@ namespace PodoFlow.Api.Controladores
             }
         }
 
-        // POST api/Incidente/5/acciones → registrar una acción que no cambia el estado
         [HttpPost("{id:long}/acciones")]
         public async Task<ActionResult<AccionIncidenteRespuestaDto>> RegistrarAccion(long id, AccionIncidenteCrearDto dto)
         {
@@ -120,7 +117,6 @@ namespace PodoFlow.Api.Controladores
             }
             catch (DbUpdateConcurrencyException)
             {
-                // Va antes que InvalidOperationException porque hereda de ella.
                 return Conflict(new { mensaje = MensajeConcurrencia });
             }
             catch (InvalidOperationException ex)
@@ -129,7 +125,6 @@ namespace PodoFlow.Api.Controladores
             }
         }
 
-        // PATCH api/Incidente/5/estado → analizar, contener, recuperar o cerrar
         [HttpPatch("{id:long}/estado")]
         public async Task<ActionResult<IncidenteRespuestaDto>> CambiarEstado(long id, IncidenteCambiarEstadoDto dto)
         {

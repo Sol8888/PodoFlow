@@ -12,10 +12,11 @@ namespace PodoFlow.Api.Servicios.Implementaciones
 
         private const string VersionInicial = "1.0";
 
-        // Límite de WhatsApp para el cuerpo de un mensaje de texto.
         private const int MaximoWhatsApp = 4096;
 
         private static readonly HashSet<string> Canales = [Correo, WhatsApp];
+
+        private static readonly HashSet<string> TiposWhatsApp = ["RECORDATORIO_CITA", "CONFIRMACION_CITA", "AVISO_ADMINISTRATIVO"];
 
         private readonly IPlantillaRepositorio _repositorio;
 
@@ -124,7 +125,6 @@ namespace PodoFlow.Api.Servicios.Implementaciones
             if (plantilla.PlEstatus)
                 return true;
 
-            // Al reactivarla no puede quedar duplicada con otra que ya esté activa.
             var duplicado = await _repositorio.ObtenerDuplicadoAsync(
                 plantilla.PlNombre, plantilla.PlCanal, plantilla.PlVersi, id);
 
@@ -159,6 +159,10 @@ namespace PodoFlow.Api.Servicios.Implementaciones
             if (canalNormalizado == WhatsApp)
             {
                 asuntoLimpio = null;
+
+                if (!TiposWhatsApp.Contains(tipoNormalizado))
+                    throw new ArgumentException(
+                        $"Por WHATSAPP solo se envían mensajes operativos: {string.Join(", ", TiposWhatsApp)}.");
 
                 if (contenidoLimpio.Length > MaximoWhatsApp)
                     throw new ArgumentException(
@@ -240,7 +244,6 @@ namespace PodoFlow.Api.Servicios.Implementaciones
             };
         }
 
-        // Datos ya normalizados y validados, listos para copiarlos a la entidad.
         private sealed record DatosPlantilla(
             string Nombre, string Canal, string Tipo, string? Asunto, string Contenido, string Version);
     }

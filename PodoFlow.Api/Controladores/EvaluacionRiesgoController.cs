@@ -61,7 +61,6 @@ namespace PodoFlow.Api.Controladores
             }
         }
 
-        // POST api/EvaluacionRiesgo/copiar → pasa los riesgos de una versión a la siguiente
         [HttpPost("copiar")]
         public async Task<ActionResult<List<EvaluacionRiesgoRespuestaDto>>> Copiar(EvaluacionRiesgoCopiarDto dto)
         {

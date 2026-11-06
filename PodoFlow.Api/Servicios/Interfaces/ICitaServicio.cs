@@ -21,4 +21,7 @@ public interface ICitaServicio
 
     Task<bool> CambiarEstadoAsync(
         long id, CitaCambiarEstadoDto dto);
+
+    Task<List<CitaDisponibilidadDto>> ObtenerDisponibilidadAsync(
+        int servicioId, DateOnly fecha, long? usuarioId);
 }

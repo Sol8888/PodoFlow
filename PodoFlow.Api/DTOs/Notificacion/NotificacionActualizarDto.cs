@@ -13,7 +13,6 @@ namespace PodoFlow.Api.DTOs.Notificacion
         [Required]
         public DateTime? FechaProgramada { get; set; }
 
-        // no_version leída (base64 en Swagger).
         [Required]
         public byte[] Version { get; set; } = [];
     }

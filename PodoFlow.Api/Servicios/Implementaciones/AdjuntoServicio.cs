@@ -3,6 +3,7 @@ using PodoFlow.Api.Datos;
 using PodoFlow.Api.DTOs.Adjunto;
 using PodoFlow.Api.Modelos;
 using PodoFlow.Api.Repositorios.Interfaces;
+using PodoFlow.Api.Servicios.Almacenamiento;
 using PodoFlow.Api.Servicios.Interfaces;
 
 namespace PodoFlow.Api.Servicios.Implementaciones;
@@ -12,15 +13,114 @@ public class AdjuntoServicio : IAdjuntoServicio
     private readonly IAdjuntoRepositorio _repo;
     private readonly IEventoAuditoriaServicio _auditoria;
     private readonly PodoFlowContext _context;
+    private readonly IServiceProvider _servicios;
 
     public AdjuntoServicio(
         IAdjuntoRepositorio repo,
         IEventoAuditoriaServicio auditoria,
-        PodoFlowContext context)
+        PodoFlowContext context,
+        IServiceProvider servicios)
     {
         _repo = repo;
         _auditoria = auditoria;
         _context = context;
+        _servicios = servicios;
+    }
+
+    private AlmacenamientoAdjuntos Almacenamiento =>
+        _servicios.GetRequiredService<AlmacenamientoAdjuntos>();
+
+    public async Task<AdjuntoRespuestaDto> SubirAsync(
+        long atencionId, AdjuntoSubirDto dto, CancellationToken ct)
+    {
+        if (atencionId <= 0)
+            throw new ArgumentException("Atención inválida.");
+
+        if (dto.Archivo == null || dto.Archivo.Length == 0)
+            throw new ArgumentException("Selecciona un archivo.");
+
+        var nombre = string.IsNullOrWhiteSpace(dto.Nombre)
+            ? Path.GetFileName(dto.Archivo.FileName.Replace('\\', '/'))
+            : dto.Nombre.Trim();
+
+        if (string.IsNullOrWhiteSpace(nombre) || nombre.Length > 255)
+            throw new ArgumentException(
+                "Nombre obligatorio, máximo 255 caracteres.");
+
+        if (dto.UsuarioId <= 0 ||
+            !await _repo.UsuarioActivoAsync(dto.UsuarioId))
+            throw new ArgumentException(
+                "El usuario no existe o está inactivo.");
+
+        await ValidarAtencionAbiertaAsync(atencionId);
+
+        var almacenamiento = Almacenamiento;
+        var guardado = await almacenamiento.GuardarAsync(dto.Archivo, ct);
+
+        try
+        {
+            return await CrearAsync(new AdjuntoCrearDto
+            {
+                AtencionId = atencionId,
+                UsuarioId = dto.UsuarioId,
+                Nombre = nombre,
+                RutaArchivo = guardado.Clave,
+                TipoMime = guardado.TipoMime,
+                Huella = guardado.Huella,
+                TamanoBytes = guardado.TamanoBytes
+            });
+        }
+        catch
+        {
+            almacenamiento.Eliminar(guardado.Clave);
+            throw;
+        }
+    }
+
+    public async Task<AdjuntoArchivoDto?> AbrirArchivoAsync(
+        long id, CancellationToken ct)
+    {
+        var adjunto = await _repo.ObtenerPorIdAsync(id);
+
+        if (adjunto == null || !adjunto.AdEstatus)
+            return null;
+
+        var contenido = await Almacenamiento.AbrirVerificadoAsync(
+            adjunto.AdRutaArch,
+            adjunto.AdHuella,
+            adjunto.AdTamanByte,
+            ct);
+
+        if (contenido == null)
+            return null;
+
+        var atencion = await _repo.ObtenerAtencionAsync(adjunto.AtId);
+
+        var historia = atencion == null
+            ? null
+            : await _repo.ObtenerHistoriaAsync(atencion.HiId);
+
+        await _auditoria.RegistrarAsync(
+            us_id: null,
+            pa_id: historia?.PaId,
+            ev_modulo: "CLINICA",
+            ev_accion: "DESCARGAR",
+            ev_entid: "ADJUNTO",
+            ev_entid_id: adjunto.AdId.ToString(),
+            ev_resul: "CORRECTO",
+            ev_direc_ip: null,
+            ev_agent_usua: null,
+            ev_metad_json: null
+        );
+
+        var nombre = Path.HasExtension(adjunto.AdNombre)
+            ? adjunto.AdNombre
+            : adjunto.AdNombre + Path.GetExtension(adjunto.AdRutaArch);
+
+        return new AdjuntoArchivoDto(
+            contenido,
+            adjunto.AdTipoMime ?? "application/octet-stream",
+            nombre);
     }
 
     public async Task<List<AdjuntoRespuestaDto>> ObtenerTodosAsync(

@@ -17,8 +17,6 @@ namespace PodoFlow.Api.Controladores
             _servicio = servicio;
         }
 
-        // GET api/TratamientoCategoria?tratamientoId=1&incluirInactivos=false&pagina=1&tamano=10
-        // GET api/TratamientoCategoria?categoriaId=4  → tratamientos que usan esa categoría
         [HttpGet]
         public async Task<ActionResult<List<TratamientoCategoriaRespuestaDto>>> ObtenerTodos(
             [FromQuery] int? tratamientoId = null,
@@ -34,7 +32,6 @@ namespace PodoFlow.Api.Controladores
                 tratamientoId, categoriaId, incluirInactivos, pagina, tamano));
         }
 
-        // Devuelve la asignación esté activa o no.
         [HttpGet("{tratamientoId:int}/{categoriaId:int}")]
         public async Task<ActionResult<TratamientoCategoriaRespuestaDto>> Obtener(int tratamientoId, int categoriaId)
         {
@@ -66,7 +63,6 @@ namespace PodoFlow.Api.Controladores
             }
         }
 
-        // Baja lógica: tc_estatus = 0.
         [HttpDelete("{tratamientoId:int}/{categoriaId:int}")]
         public async Task<IActionResult> Eliminar(int tratamientoId, int categoriaId)
         {
@@ -78,7 +74,6 @@ namespace PodoFlow.Api.Controladores
             return NoContent();
         }
 
-        // tc_estatus = 1.
         [HttpPatch("{tratamientoId:int}/{categoriaId:int}/reactivar")]
         public async Task<IActionResult> Reactivar(int tratamientoId, int categoriaId)
         {

@@ -1,4 +1,5 @@
 ﻿
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PodoFlow.Api.DTOs.RolPermiso;
@@ -7,6 +8,7 @@ using PodoFlow.Api.Servicios.Interfaces;
 namespace PodoFlow.Api.Controladores;
 
 [ApiController]
+[Authorize(Policy = "SeguridadGestionar")]
 [Route("api/roles-permisos")]
 public class RolPermisoController : ControllerBase
 {

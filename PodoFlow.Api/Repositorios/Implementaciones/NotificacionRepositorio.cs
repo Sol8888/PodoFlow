@@ -7,6 +7,8 @@ namespace PodoFlow.Api.Repositorios.Implementaciones
 {
     public class NotificacionRepositorio : INotificacionRepositorio
     {
+        private static readonly string[] EstadosCitaVigente = ["SOLICITADA", "CONFIRMADA", "REPROGRAMADA"];
+
         private readonly PodoFlowContext _context;
 
         public NotificacionRepositorio(PodoFlowContext context)
@@ -59,13 +61,29 @@ namespace PodoFlow.Api.Repositorios.Implementaciones
         }
         public async Task<DateTime?> ObtenerFechaCitaVigenteAsync(long citaId, long pacienteId)
         {
-            var estadosVigentes = new[] { "SOLICITADA", "CONFIRMADA", "REPROGRAMADA" };
-
             return await _context.Citas
                 .AsNoTracking()
-                .Where(x => x.CiId == citaId && x.PaId == pacienteId && estadosVigentes.Contains(x.CiEstad))
+                .Where(x => x.CiId == citaId && x.PaId == pacienteId && EstadosCitaVigente.Contains(x.CiEstad))
                 .Select(x => (DateTime?)x.CiFechaIni)
                 .FirstOrDefaultAsync();
+        }
+
+        public async Task<List<Cita>> ObtenerCitasPorRecordarAsync(DateTime desde, DateTime hasta)
+        {
+            return await _context.Citas
+                .AsNoTracking()
+                .Where(x => EstadosCitaVigente.Contains(x.CiEstad)
+                    && x.CiFechaIni >= desde
+                    && x.CiFechaIni <= hasta
+                    && _context.Pacientes.Any(p => p.PaId == x.PaId && p.PaEstatus))
+                .OrderBy(x => x.CiFechaIni)
+                .ToListAsync();
+        }
+
+        public async Task<bool> ExisteNotificacionDeCitaAsync(long citaId, long opcionId)
+        {
+            return await _context.Notificaciones
+                .AnyAsync(x => x.CiId == citaId && x.OpId == opcionId);
         }
         public async Task<bool> ExisteUsuarioActivoAsync(long usuarioId)
         {
@@ -106,7 +124,6 @@ namespace PodoFlow.Api.Repositorios.Implementaciones
             return envio;
         }
 
-        // Si otro usuario modificó la notificación, el UPDATE no afecta filas
         private void AplicarVersionLeida(Notificacion notificacion, byte[] versionLeida)
         {
             _context.Entry(notificacion)

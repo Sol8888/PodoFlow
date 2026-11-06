@@ -1,6 +1,5 @@
 namespace PodoFlow.Api.Modelos
 {
-    // EIPD: Evaluación de Impacto relativa a la Protección de Datos.
     public class EvaluacionImpacto
     {
         public long EvId { get; set; }

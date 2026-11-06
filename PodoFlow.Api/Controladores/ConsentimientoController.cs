@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using PodoFlow.Api.DTOs.Consentimiento;
 using PodoFlow.Api.Servicios.Interfaces;
@@ -58,6 +59,10 @@ namespace PodoFlow.Api.Controladores
 
                 return CreatedAtAction(nameof(ObtenerPorId), new { id = creado.Id }, creado);
             }
+            catch (DbUpdateException ex) when (ex.InnerException is SqlException { Number: 2601 or 2627 })
+            {
+                return Conflict(new { mensaje = "El paciente ya tiene consentimiento para esa finalidad. Recargue la página." });
+            }
             catch (ArgumentException ex)
             {
                 return BadRequest(new { mensaje = ex.Message });
@@ -86,7 +91,6 @@ namespace PodoFlow.Api.Controladores
             }
         }
 
-        // PATCH api/Consentimiento/5/estado  → aceptar, rechazar o revocar
         [HttpPatch("{id:long}/estado")]
         public async Task<ActionResult<ConsentimientoRespuestaDto>> CambiarEstado(long id, ConsentimientoCambiarEstadoDto dto)
         {

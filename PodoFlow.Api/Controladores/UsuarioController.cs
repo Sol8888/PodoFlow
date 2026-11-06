@@ -1,4 +1,5 @@
 ﻿
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PodoFlow.Api.DTOs.Usuario;
@@ -7,6 +8,7 @@ using PodoFlow.Api.Servicios.Interfaces;
 namespace PodoFlow.Api.Controladores;
 
 [ApiController]
+[Authorize(Policy = "SeguridadGestionar")]
 [Route("api/usuarios")]
 public class UsuarioController : ControllerBase
 {

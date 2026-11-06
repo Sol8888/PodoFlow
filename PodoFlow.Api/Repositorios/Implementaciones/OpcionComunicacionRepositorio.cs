@@ -40,14 +40,12 @@ namespace PodoFlow.Api.Repositorios.Implementaciones
                 .ToListAsync();
         }
 
-        // Sin filtro de estatus: el detalle se muestra aunque esté dada de baja.
         public async Task<OpcionComunicacion?> ObtenerPorIdAsync(long id)
         {
             return await _context.OpcionesComunicacion
                 .FirstOrDefaultAsync(x => x.OpId == id);
         }
 
-        // Con tracking: si está dada de baja, el servicio la reactiva sobre esta misma entidad.
         public async Task<OpcionComunicacion?> ObtenerPorClaveAsync(long pacienteId, string canal, int finalidadId)
         {
             return await _context.OpcionesComunicacion

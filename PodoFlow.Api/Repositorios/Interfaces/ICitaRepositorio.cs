@@ -24,6 +24,11 @@ public interface ICitaRepositorio
         DateTime finUtc,
         long? excluirCitaId = null);
 
+    Task<short?> ObtenerDuracionServicioAsync(int id);
+
+    Task<List<(DateTime InicioUtc, DateTime FinUtc)>>
+        ObtenerFranjasAtencionAsync(long? usuarioId, DateOnly fecha);
+
     Task<Cita> CrearAsync(Cita cita);
     Task GuardarCambiosAsync();
 

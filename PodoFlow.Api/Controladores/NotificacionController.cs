@@ -21,7 +21,6 @@ namespace PodoFlow.Api.Controladores
             _servicio = servicio;
         }
 
-        // GET api/Notificacion?pacienteId=1&estado=PENDIENTE&pagina=1&tamano=10
         [HttpGet]
         public async Task<ActionResult<List<NotificacionRespuestaDto>>> ObtenerTodos(
             [FromQuery] long? pacienteId = null,
@@ -42,7 +41,6 @@ namespace PodoFlow.Api.Controladores
             }
         }
 
-        // GET api/Notificacion/por-enviar?tamano=20 → lo que el proceso de envío debe tomar ahora.
         [HttpGet("por-enviar")]
         public async Task<ActionResult<List<NotificacionRespuestaDto>>> ObtenerPorEnviar(
             [FromQuery] int tamano = 20)
@@ -64,7 +62,6 @@ namespace PodoFlow.Api.Controladores
             return Ok(notificacion);
         }
 
-        // Intentos de entrega (ENVIO), del primero al último.
         [HttpGet("{id:long}/envios")]
         public async Task<ActionResult<List<EnvioRespuestaDto>>> ObtenerEnvios(long id)
         {
@@ -95,7 +92,21 @@ namespace PodoFlow.Api.Controladores
             }
         }
 
-        // POST api/Notificacion/5/envios → el proceso de envío registra el resultado del intento.
+        [HttpPost("recordatorios")]
+        public async Task<IActionResult> ProgramarRecordatorios([FromQuery] int horasAntes = 24)
+        {
+            try
+            {
+                var (programadas, omitidas) = await _servicio.ProgramarRecordatoriosAsync(horasAntes);
+
+                return Ok(new { programadas, omitidas });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { mensaje = ex.Message });
+            }
+        }
+
         [HttpPost("{id:long}/envios")]
         public async Task<ActionResult<EnvioRespuestaDto>> RegistrarEnvio(long id, EnvioCrearDto dto)
         {
@@ -118,7 +129,6 @@ namespace PodoFlow.Api.Controladores
             }
             catch (DbUpdateException)
             {
-                // UX_ENVIO_notif_intento: otro proceso registró el mismo número de intento a la vez.
                 return Conflict(new { mensaje = "Otro proceso registró un intento al mismo tiempo. Vuelva a consultar los envíos." });
             }
             catch (InvalidOperationException ex)
@@ -153,7 +163,6 @@ namespace PodoFlow.Api.Controladores
             }
         }
 
-        // PATCH api/Notificacion/5/estado → tomarla para enviar (PROCESANDO), cancelar o reintentar (PENDIENTE)
         [HttpPatch("{id:long}/estado")]
         public async Task<ActionResult<NotificacionRespuestaDto>> CambiarEstado(long id, NotificacionCambiarEstadoDto dto)
         {

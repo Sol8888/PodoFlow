@@ -272,6 +272,57 @@ public class CitaServicio : ICitaServicio
         return true;
     }
 
+    public async Task<List<CitaDisponibilidadDto>> ObtenerDisponibilidadAsync(
+        int servicioId, DateOnly fecha, long? usuarioId)
+    {
+        if (servicioId <= 0)
+            throw new ArgumentException("Servicio inválido.");
+
+        if (usuarioId.HasValue && usuarioId <= 0)
+            throw new ArgumentException("Usuario inválido.");
+
+        var duracion = await _repo.ObtenerDuracionServicioAsync(servicioId);
+
+        if (duracion is null or <= 0)
+            throw new ArgumentException(
+                "El servicio no existe o está inactivo.");
+
+        if (usuarioId.HasValue &&
+            !await _repo.UsuarioActivoAsync(usuarioId.Value))
+            throw new ArgumentException(
+                "El profesional no existe o está inactivo.");
+
+        var paso = TimeSpan.FromMinutes(duracion.Value);
+        var ahora = DateTime.UtcNow;
+        var huecos = new List<CitaDisponibilidadDto>();
+
+        var franjas = await _repo.ObtenerFranjasAtencionAsync(
+            usuarioId, fecha);
+
+        foreach (var (inicioFranja, finFranja) in franjas)
+        {
+            for (var inicio = inicioFranja;
+                 inicio + paso <= finFranja;
+                 inicio += paso)
+            {
+                var fin = inicio + paso;
+
+                if (inicio <= ahora ||
+                    huecos.Any(x => x.FechaInicio == inicio))
+                    continue;
+
+                if (await _repo.DisponibleAsync(usuarioId, inicio, fin))
+                    huecos.Add(new CitaDisponibilidadDto
+                    {
+                        FechaInicio = inicio,
+                        FechaFin = fin
+                    });
+            }
+        }
+
+        return huecos.OrderBy(x => x.FechaInicio).ToList();
+    }
+
     private async Task ValidarRelacionesAsync(CitaCrearDto dto)
     {
         if (!await _repo.PacienteActivoAsync(dto.PacienteId))

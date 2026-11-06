@@ -17,7 +17,6 @@ namespace PodoFlow.Api.Controladores
             _servicio = servicio;
         }
 
-        // GET api/Seudonimo?incluirInactivos=false&pagina=1&tamano=10
         [HttpGet]
         public async Task<ActionResult<List<SeudonimoRespuestaDto>>> ObtenerTodos(
             [FromQuery] bool incluirInactivos = false,
