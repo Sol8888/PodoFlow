@@ -13,11 +13,19 @@ namespace PodoFlow.Api.Servicios.Implementaciones
         private const string Error = "ERROR";
         private const string Cancelada = "CANCELADA";
 
-        // Resultados de ENVIO (CK_ENVIO_result).
         private const string ResultadoEnviado = "ENVIADO";
         private const string ResultadoError = "ERROR";
 
         private const string Aceptado = "ACEPTADO";
+
+        private const string FinalidadRecordatorios = "RECORDATORIOS";
+        private const string TipoRecordatorio = "RECORDATORIO_CITA";
+        private const int MaximoHorasAntes = 168;
+        private const int OpcionesPorPaciente = 10;
+        private const int PlantillasPorCanal = 100;
+
+        private static readonly TimeSpan AnticipacionMinima = TimeSpan.FromHours(1);
+        private static readonly SemaphoreSlim ProgramacionEnCurso = new(1, 1);
 
         private const string MensajeEstadoInvalido =
             "El estado debe ser PENDIENTE, PROCESANDO, ENVIADA, ERROR o CANCELADA.";
@@ -223,7 +231,6 @@ namespace PodoFlow.Api.Servicios.Implementaciones
             if (notificacion == null)
                 return null;
 
-            // Solo se registran intentos de lo que el proceso de envío tomó.
             if (notificacion.NoEstad != Procesando)
                 throw new InvalidOperationException(
                     $"La notificación está {notificacion.NoEstad}. Solo se registran intentos de notificaciones en PROCESANDO.");
@@ -243,6 +250,86 @@ namespace PodoFlow.Api.Servicios.Implementaciones
             var creado = await _repositorio.RegistrarEnvioAsync(notificacion, envio);
 
             return MapearEnvio(creado);
+        }
+
+        public async Task<(int Programadas, int Omitidas)> ProgramarRecordatoriosAsync(int horasAntes)
+        {
+            if (horasAntes < 1 || horasAntes > MaximoHorasAntes)
+                throw new ArgumentException($"Las horas de anticipación deben estar entre 1 y {MaximoHorasAntes}.");
+
+            await ProgramacionEnCurso.WaitAsync();
+
+            try
+            {
+                var finalidad = await _finalidadRepositorio.ObtenerPorCodigoAsync(FinalidadRecordatorios);
+
+                if (finalidad == null || !finalidad.FiEstatus)
+                    return (0, 0);
+
+                var ahora = DateTime.UtcNow;
+                var citas = await _repositorio.ObtenerCitasPorRecordarAsync(ahora.Add(AnticipacionMinima), ahora.AddHours(horasAntes));
+                var plantillas = new Dictionary<string, Plantilla?>();
+                var programadas = 0;
+                var omitidas = 0;
+
+                foreach (var cita in citas)
+                {
+                    var opciones = await _opcionRepositorio.ObtenerTodosAsync(
+                        cita.PaId, finalidad.FiId, null, false, 1, OpcionesPorPaciente);
+
+                    foreach (var opcion in opciones.Where(o => o.OpPermi))
+                    {
+                        if (await _repositorio.ExisteNotificacionDeCitaAsync(cita.CiId, opcion.OpId))
+                            continue;
+
+                        if (!plantillas.TryGetValue(opcion.OpCanal, out var plantilla))
+                        {
+                            var candidatas = await _plantillaRepositorio.ObtenerTodosAsync(
+                                opcion.OpCanal, TipoRecordatorio, false, 1, PlantillasPorCanal);
+
+                            plantilla = candidatas
+                                .OrderByDescending(p => p.PlFechaCrea)
+                                .ThenByDescending(p => p.PlId)
+                                .FirstOrDefault();
+
+                            plantillas[opcion.OpCanal] = plantilla;
+                        }
+
+                        if (plantilla == null)
+                        {
+                            omitidas++;
+                            continue;
+                        }
+
+                        var fechaCita = DateTime.SpecifyKind(cita.CiFechaIni, DateTimeKind.Utc);
+                        var fechaProgramada = fechaCita.AddHours(-horasAntes);
+
+                        try
+                        {
+                            await CrearAsync(new NotificacionCrearDto
+                            {
+                                OpcionId = opcion.OpId,
+                                PlantillaId = plantilla.PlId,
+                                CitaId = cita.CiId,
+                                Tipo = TipoRecordatorio,
+                                FechaProgramada = fechaProgramada < ahora ? ahora : fechaProgramada
+                            });
+
+                            programadas++;
+                        }
+                        catch (Exception ex) when (ex is ArgumentException or InvalidOperationException)
+                        {
+                            omitidas++;
+                        }
+                    }
+                }
+
+                return (programadas, omitidas);
+            }
+            finally
+            {
+                ProgramacionEnCurso.Release();
+            }
         }
 
         private async Task VerificarAutorizacionAsync(OpcionComunicacion opcion)
@@ -311,7 +398,6 @@ namespace PodoFlow.Api.Servicios.Implementaciones
             if (plantilla == null || !plantilla.PlEstatus)
                 throw new ArgumentException($"No existe una plantilla activa con id {plantillaId}.");
 
-            // Una plantilla de correo no sirve para WhatsApp (asunto, formato y largo distintos).
             if (plantilla.PlCanal != canal)
                 throw new ArgumentException(
                     $"La plantilla {plantillaId} es de {plantilla.PlCanal} y la opción del paciente es por {canal}.");
@@ -358,7 +444,6 @@ namespace PodoFlow.Api.Servicios.Implementaciones
             return valor.Trim().ToUpperInvariant();
         }
 
-        // Texto opcional: vacío o solo espacios se guarda como NULL.
         private static string? Limpiar(string? valor)
         {
             return string.IsNullOrWhiteSpace(valor) ? null : valor.Trim();

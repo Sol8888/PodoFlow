@@ -18,7 +18,6 @@ namespace PodoFlow.Api.Servicios.Implementaciones
             _solicitudRepositorio = solicitudRepositorio;
         }
 
-        // null si la solicitud no existe (→ 404); lista vacía si existe pero no tiene evidencias.
         public async Task<List<EvidenciaSolicitudRespuestaDto>?> ObtenerPorSolicitudAsync(long solicitudId)
         {
             var solicitud = await _solicitudRepositorio.ObtenerPorIdAsync(solicitudId);
@@ -49,7 +48,6 @@ namespace PodoFlow.Api.Servicios.Implementaciones
             if (solicitud == null)
                 throw new ArgumentException($"No existe la solicitud {dto.SolicitudId}.");
 
-            // Una solicitud terminada ya no recibe documentos: su expediente queda cerrado.
             if (solicitud.SoEstad == "CERRADA" || solicitud.SoEstad == "RECHAZADA")
                 throw new InvalidOperationException(
                     $"La solicitud está {solicitud.SoEstad} y ya no admite evidencias.");

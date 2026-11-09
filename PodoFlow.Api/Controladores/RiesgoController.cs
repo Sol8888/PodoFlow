@@ -17,7 +17,6 @@ namespace PodoFlow.Api.Controladores
             _servicio = servicio;
         }
 
-        // GET api/Riesgo?tratamientoId=1&estado=ABIERTO&pagina=1&tamano=10
         [HttpGet]
         public async Task<ActionResult<List<RiesgoRespuestaDto>>> ObtenerTodos(
             [FromQuery] int? tratamientoId = null,
@@ -86,7 +85,6 @@ namespace PodoFlow.Api.Controladores
             }
         }
 
-        // PATCH api/Riesgo/5/estado → mitigar, aceptar, reabrir o cerrar
         [HttpPatch("{id:long}/estado")]
         public async Task<ActionResult<RiesgoRespuestaDto>> CambiarEstado(long id, RiesgoCambiarEstadoDto dto)
         {

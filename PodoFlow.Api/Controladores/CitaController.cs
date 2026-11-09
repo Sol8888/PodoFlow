@@ -8,7 +8,7 @@ using PodoFlow.Api.Servicios.Interfaces;
 namespace PodoFlow.Api.Controladores;
 
 [ApiController]
-[Authorize]
+[Authorize(Policy = "CitasVer")]
 [Route("api/citas")]
 public class CitaController : ControllerBase
 {
@@ -41,6 +41,28 @@ public class CitaController : ControllerBase
         }
     }
 
+    [HttpGet("disponibilidad")]
+    public async Task<IActionResult> ObtenerDisponibilidad(
+        [FromQuery] int servicioId,
+        [FromQuery] DateOnly? fecha,
+        [FromQuery] long? usuarioId = null)
+    {
+        if (fecha == null)
+            return BadRequest(new { mensaje = "La fecha es obligatoria." });
+
+        try
+        {
+            var huecos = await _servicio.ObtenerDisponibilidadAsync(
+                servicioId, fecha.Value, usuarioId);
+
+            return Ok(huecos);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { mensaje = ex.Message });
+        }
+    }
+
     [HttpGet("{id:long}")]
     public async Task<IActionResult> ObtenerPorId(long id)
     {
@@ -52,6 +74,7 @@ public class CitaController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Policy = "CitasCrear")]
     public async Task<IActionResult> Crear(
         [FromBody] CitaCrearDto dto)
     {
@@ -80,6 +103,7 @@ public class CitaController : ControllerBase
     }
 
     [HttpPut("{id:long}")]
+    [Authorize(Policy = "CitasEditar")]
     public async Task<IActionResult> Actualizar(
         long id,
         [FromBody] CitaActualizarDto dto)
@@ -112,10 +136,16 @@ public class CitaController : ControllerBase
     }
 
     [HttpPatch("{id:long}/estado")]
+    [Authorize(Policy = "CitasEditar")]
     public async Task<IActionResult> CambiarEstado(
         long id,
         [FromBody] CitaCambiarEstadoDto dto)
     {
+        if (string.Equals(dto.NuevoEstado?.Trim(), "CANCELADA",
+                StringComparison.OrdinalIgnoreCase) &&
+            !User.HasClaim("permiso", "CITA_CANCELAR"))
+            return Forbid();
+
         try
         {
             var actualizado = await _servicio.CambiarEstadoAsync(
@@ -145,6 +175,7 @@ public class CitaController : ControllerBase
     }
 
     [HttpPatch("{id:long}/cancelar")]
+    [Authorize(Policy = "CitasCancelar")]
     public async Task<IActionResult> Cancelar(
         long id,
         [FromBody] CitaCambiarEstadoDto dto)

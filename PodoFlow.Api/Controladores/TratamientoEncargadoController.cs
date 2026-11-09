@@ -17,8 +17,6 @@ namespace PodoFlow.Api.Controladores
             _servicio = servicio;
         }
 
-        // GET api/TratamientoEncargado?tratamientoId=1&incluirInactivos=false&pagina=1&tamano=10
-        // GET api/TratamientoEncargado?encargadoId=2  → tratamientos en los que participa ese encargado
         [HttpGet]
         public async Task<ActionResult<List<TratamientoEncargadoRespuestaDto>>> ObtenerTodos(
             [FromQuery] int? tratamientoId = null,

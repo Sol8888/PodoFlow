@@ -90,7 +90,6 @@ namespace PodoFlow.Api.Controladores
             }
         }
 
-        // Baja lógica: pl_estatus = 0.
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Eliminar(int id)
         {
@@ -109,7 +108,6 @@ namespace PodoFlow.Api.Controladores
             }
         }
 
-        // pl_estatus = 1.
         [HttpPatch("{id:int}/reactivar")]
         public async Task<IActionResult> Reactivar(int id)
         {

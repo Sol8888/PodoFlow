@@ -70,7 +70,6 @@ namespace PodoFlow.Api.Servicios.Implementaciones
             return MapearRespuesta(creado);
         }
 
-        // Crea de una vez los seudónimos que faltan antes de una ejecución analítica.
         public async Task<SeudonimoGeneracionRespuestaDto> GenerarAsync()
         {
             var finalidad = await ObtenerFinalidadAnaliticaAsync();

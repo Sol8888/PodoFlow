@@ -40,7 +40,6 @@ namespace PodoFlow.Api.Controladores
             }
         }
 
-        // Devuelve el registro esté activo o no.
         [HttpGet("{id:long}")]
         public async Task<ActionResult<OpcionComunicacionRespuestaDto>> ObtenerPorId(long id)
         {
@@ -52,7 +51,6 @@ namespace PodoFlow.Api.Controladores
             return Ok(opcion);
         }
 
-        // Si la opción existía dada de baja, se reactiva y responde 201 con el mismo id.
         [HttpPost]
         public async Task<ActionResult<OpcionComunicacionRespuestaDto>> Crear(OpcionComunicacionCrearDto dto)
         {
@@ -94,7 +92,6 @@ namespace PodoFlow.Api.Controladores
             }
         }
 
-        // Baja lógica: op_estatus = 0.
         [HttpDelete("{id:long}")]
         public async Task<IActionResult> Eliminar(long id)
         {
@@ -106,7 +103,6 @@ namespace PodoFlow.Api.Controladores
             return NoContent();
         }
 
-        // op_estatus = 1.
         [HttpPatch("{id:long}/reactivar")]
         public async Task<IActionResult> Reactivar(long id)
         {

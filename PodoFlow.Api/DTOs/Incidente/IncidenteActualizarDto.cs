@@ -2,8 +2,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace PodoFlow.Api.DTOs.Incidente
 {
-    // Corrige o completa los datos del incidente mientras no esté CERRADO.
-    // No cambia el usuario que lo registró, el estado (va por su endpoint) ni la fecha de cierre.
     public class IncidenteActualizarDto
     {
         [Required]
@@ -24,7 +22,6 @@ namespace PodoFlow.Api.DTOs.Incidente
         [MaxLength(1500)]
         public string? ImpactoPreliminar { get; set; }
 
-        // in_version leída (base64 en Swagger).
         [Required]
         public byte[] Version { get; set; } = [];
     }

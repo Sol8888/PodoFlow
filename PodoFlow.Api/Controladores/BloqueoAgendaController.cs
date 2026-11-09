@@ -1,4 +1,5 @@
 ﻿
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PodoFlow.Api.DTOs.BloqueoAgenda;
@@ -7,6 +8,7 @@ using PodoFlow.Api.Servicios.Interfaces;
 namespace PodoFlow.Api.Controladores;
 
 [ApiController]
+[Authorize(Policy = "CitasVer")]
 [Route("api/bloqueos-agenda")]
 public class BloqueoAgendaController : ControllerBase
 {
@@ -47,6 +49,7 @@ public class BloqueoAgendaController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Policy = "CitasEditar")]
     public async Task<IActionResult> Crear(
         [FromBody] BloqueoAgendaCrearDto dto)
     {
@@ -74,6 +77,7 @@ public class BloqueoAgendaController : ControllerBase
     }
 
     [HttpPut("{id:long}")]
+    [Authorize(Policy = "CitasEditar")]
     public async Task<IActionResult> Actualizar(
         long id,
         [FromBody] BloqueoAgendaActualizarDto dto)
@@ -103,6 +107,7 @@ public class BloqueoAgendaController : ControllerBase
     }
 
     [HttpDelete("{id:long}")]
+    [Authorize(Policy = "CitasEditar")]
     public async Task<IActionResult> Eliminar(long id)
     {
         try
@@ -121,6 +126,7 @@ public class BloqueoAgendaController : ControllerBase
     }
 
     [HttpPatch("{id:long}/reactivar")]
+    [Authorize(Policy = "CitasEditar")]
     public async Task<IActionResult> Reactivar(long id)
     {
         try

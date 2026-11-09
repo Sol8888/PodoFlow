@@ -15,7 +15,6 @@ namespace PodoFlow.Api.Repositorios.Interfaces
 
         Task<List<long>> ObtenerPacientesSinSeudonimoAsync(int finalidadId);
 
-        // Pacientes activos con consentimiento ACEPTADO para la finalidad y con seudónimo activo.
         Task<int> ContarPacientesConSeudonimoActivoAsync(int finalidadId);
 
         Task<Seudonimo> CrearAsync(Seudonimo seudonimo);

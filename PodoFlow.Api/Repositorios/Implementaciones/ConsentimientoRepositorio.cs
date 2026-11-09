@@ -43,12 +43,6 @@ namespace PodoFlow.Api.Repositorios.Implementaciones
             return await _context.Consentimientos
                 .AnyAsync(x => x.PaId == pacienteId && x.FiId == finalidadId);
         }
-        public async Task<bool> ExistePacienteActivoAsync(long pacienteId)
-        {
-            return await _context.Pacientes
-                .AnyAsync(x => x.PaId == pacienteId && x.PaEstatus);
-        }
-
         public async Task<bool> ExisteUsuarioActivoAsync(long usuarioId)
         {
             return await _context.Usuarios

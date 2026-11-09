@@ -16,7 +16,6 @@ namespace PodoFlow.Api.Modelos
 
         public string? AcObser { get; set; }
 
-        // Permite insertar la acción en el mismo SaveChanges que un incidente nuevo.
         public Incidente? Incidente { get; set; }
     }
 }

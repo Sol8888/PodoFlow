@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PodoFlow.Api.DTOs.Servicio;
 using PodoFlow.Api.Servicios.Interfaces;
 
@@ -6,6 +7,7 @@ namespace PodoFlow.Api.Controladores;
 
 
 [ApiController]
+[Authorize(Policy = "CitasVer")]
 [Route("api/servicios")]
 public class ServicioController : ControllerBase
 {
@@ -38,6 +40,7 @@ public class ServicioController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Policy = "CitasEditar")]
     public async Task<ActionResult> Crear(
         ServicioCrearDto dto)
     {
@@ -52,6 +55,7 @@ public class ServicioController : ControllerBase
     }
 
     [HttpPut("{id:int}")]
+    [Authorize(Policy = "CitasEditar")]
     public async Task<ActionResult> Actualizar(
         int id,
         ServicioActualizarDto dto)
@@ -66,6 +70,7 @@ public class ServicioController : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
+    [Authorize(Policy = "CitasEditar")]
     public async Task<ActionResult> Eliminar(int id)
     {
         var eliminado =

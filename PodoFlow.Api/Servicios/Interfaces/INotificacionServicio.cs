@@ -19,5 +19,7 @@ namespace PodoFlow.Api.Servicios.Interfaces
         Task<NotificacionRespuestaDto?> CambiarEstadoAsync(long id, NotificacionCambiarEstadoDto dto);
 
         Task<EnvioRespuestaDto?> RegistrarEnvioAsync(long id, EnvioCrearDto dto);
+
+        Task<(int Programadas, int Omitidas)> ProgramarRecordatoriosAsync(int horasAntes);
     }
 }

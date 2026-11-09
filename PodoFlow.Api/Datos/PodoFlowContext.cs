@@ -1912,7 +1912,6 @@ public class PodoFlowContext : DbContext
         {
             entity.ToTable("TR_CA", "pri");
 
-            // Clave primaria compuesta.
             entity.HasKey(e => new { e.TrId, e.CaId });
 
             entity.Property(e => e.TrId)
@@ -2088,7 +2087,6 @@ public class PodoFlowContext : DbContext
         {
             entity.ToTable("EV_RI", "pri");
 
-            // Clave primaria compuesta.
             entity.HasKey(e => new { e.EvId, e.RiId });
 
             entity.Property(e => e.EvId)

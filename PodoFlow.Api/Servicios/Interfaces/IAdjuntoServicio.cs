@@ -22,5 +22,11 @@ public interface IAdjuntoServicio
     Task<bool> EliminarAsync(long id);
 
     Task<bool> ReactivarAsync(long id);
+
+    Task<AdjuntoRespuestaDto> SubirAsync(
+        long atencionId, AdjuntoSubirDto dto, CancellationToken ct);
+
+    Task<AdjuntoArchivoDto?> AbrirArchivoAsync(
+        long id, CancellationToken ct);
 }
 

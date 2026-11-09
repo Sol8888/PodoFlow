@@ -50,7 +50,6 @@ namespace PodoFlow.Api.Servicios.Implementaciones
                     throw new InvalidOperationException(
                         "La categoría ya está asignada a este tratamiento.");
 
-                // Estaba dada de baja: se reactiva. Es una asignación nueva, así que la fecha se actualiza.
                 existente.TcEstatus = true;
                 existente.TcFechaAsig = DateTime.UtcNow;
 
@@ -79,7 +78,6 @@ namespace PodoFlow.Api.Servicios.Implementaciones
             if (asignacion == null)
                 return false;
 
-            // Si ya estaba dada de baja no hay nada que hacer.
             if (!asignacion.TcEstatus)
                 return true;
 
@@ -97,11 +95,9 @@ namespace PodoFlow.Api.Servicios.Implementaciones
             if (asignacion == null)
                 return false;
 
-            // Si ya estaba activa no hay nada que hacer.
             if (asignacion.TcEstatus)
                 return true;
 
-            // No se reactiva una asignación cuyo tratamiento o categoría ya no estén activos.
             await ValidarReferenciasAsync(tratamientoId, categoriaId);
 
             asignacion.TcEstatus = true;

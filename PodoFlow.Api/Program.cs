@@ -8,7 +8,6 @@ using PodoFlow.Api.Procesos;
 using PodoFlow.Api.Repositorios.Implementaciones;
 using PodoFlow.Api.Repositorios.Interfaces;
 using PodoFlow.Api.Seguridad;
-using Microsoft.OpenApi.Models;
 using PodoFlow.Api.Servicios.Almacenamiento;
 using PodoFlow.Api.Servicios.Implementaciones;
 using PodoFlow.Api.Servicios.Interfaces;
@@ -131,6 +130,9 @@ builder.Services.AddScoped<IEvolucionServicio, EvolucionServicio>();
 builder.Services.AddScoped<IAdjuntoRepositorio, AdjuntoRepositorio>();
 builder.Services.AddScoped<IAdjuntoServicio, AdjuntoServicio>();
 
+builder.Services.AddScoped<IInsumoRepositorio, InsumoRepositorio>();
+builder.Services.AddScoped<IInsumoServicio, InsumoServicio>();
+
 builder.Services.AddScoped<IMovimientoRepositorio, MovimientoRepositorio>();
 builder.Services.AddScoped<IMovimientoServicio, MovimientoServicio>();
 
@@ -145,33 +147,74 @@ builder.Services.AddScoped<ICobroServicio, CobroServicio>();
 
 builder.Services.AddSingleton<AlmacenamientoAdjuntos>();
 
-// Esto de aqui es estrictamente para la parte de notificaciones
-
-// Puse dos proveedores de correo para poder hacer pruebas mas completas usando resend. 
-// Esta de tal forma que podemos regresar a sendgrid cuando sea.
-
 builder.Services.AddHttpClient<IProveedorCorreo, SendGridProveedorCorreo>();
 builder.Services.AddHttpClient<IProveedorWhatsApp, MetaProveedorWhatsApp>();
 builder.Services.AddScoped<IEnvioNotificacionServicio, EnvioNotificacionServicio>();
 builder.Services.AddHostedService<EnvioNotificacionesWorker>();
+builder.Services.AddHostedService<RecordatorioCitasWorker>();
 
 // Esto de aqui esta porque necesito hacer mock de la seguridad para probar algunas cosas :) la carpeta de seguridad esta conectada a esto y es por hacer mock a la Autenticacion
-if (builder.Environment.IsDevelopment())
-{
-    builder.Services
-        .AddAuthentication("Desarrollo")
-        .AddScheme<AuthenticationSchemeOptions,
-            AutenticacionDesarrolloHandler>(
-            "Desarrollo", options => { });
-}
+builder.Services
+    .AddAuthentication("Desarrollo")
+    .AddScheme<AuthenticationSchemeOptions,
+        AutenticacionDesarrolloHandler>(
+        "Desarrollo", options => { });
 
 builder.Services.AddAuthorization(options =>
 {
+    options.AddPolicy("SeguridadGestionar", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireRole("ADMIN_PODOLOGA");
+    });
+
+    options.AddPolicy("PacientesVer", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireClaim("permiso", "PACIENTE_VER");
+    });
+
+    options.AddPolicy("PacientesCrear", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireClaim("permiso", "PACIENTE_CREAR");
+    });
+
+    options.AddPolicy("PacientesEditar", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireClaim("permiso", "PACIENTE_EDITAR");
+    });
+
+    options.AddPolicy("CitasVer", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireClaim("permiso", "CITA_VER");
+    });
+
+    options.AddPolicy("CitasCrear", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireClaim("permiso", "CITA_CREAR");
+    });
+
+    options.AddPolicy("CitasEditar", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireClaim("permiso", "CITA_EDITAR");
+    });
+
+    options.AddPolicy("CitasCancelar", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireClaim("permiso", "CITA_CANCELAR");
+    });
+
     options.AddPolicy("HistoriaClinicaGestionar", policy =>
     {
         policy.RequireAuthenticatedUser();
         policy.RequireClaim(
-            "permiso", "HISTORIA_GESTIONAR");
+            "permiso", "CLINICA_EDITAR");
     });
 
     options.AddPolicy("AuditoriaLeer", policy =>
@@ -185,17 +228,14 @@ builder.Services.AddAuthorization(options =>
     {
         policy.RequireAuthenticatedUser();
         policy.RequireClaim(
-            "permiso", "INVENTARIO_GESTIONAR");
+            "permiso", "INVENTARIO_GEST");
     });
 
     options.AddPolicy("FinanzasGestionar", policy =>
     {
         policy.RequireAuthenticatedUser();
-        policy.RequireClaim("permiso", "FINANZAS_GESTIONAR");
+        policy.RequireClaim("permiso", "PAGO_GEST");
     });
-
-    // Estas politicas son para lo de seguridad, comunicacion y lo de IA
-
 
     options.AddPolicy("PrivacidadGestionar", policy =>
     {
@@ -268,10 +308,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseAuthentication();
-}
+app.UseAuthentication();
 
 app.UseAuthorization();
 

@@ -2,9 +2,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace PodoFlow.Api.DTOs.Plantilla
 {
-    // Sin Estatus: la baja y la reactivación tienen sus propios endpoints.
-    // Solo se puede editar mientras ninguna notificación use la plantilla;
-    // después hay que crear una versión nueva para no cambiar lo que ya se envió.
     public class PlantillaActualizarDto
     {
         [Required, MaxLength(150)]

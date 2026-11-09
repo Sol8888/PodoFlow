@@ -277,7 +277,6 @@ namespace PodoFlow.Api.Servicios.Implementaciones
                 throw new ArgumentException("La identificación del titular no coincide con la del paciente.");
         }
 
-        // REPRESENTANTE: tipo obligatorio, formato válido y distinto del paciente.
         private static void ValidarRepresentante(
             string identificacion, string? tipoIdentificacion, string identificacionPaciente)
         {
@@ -306,7 +305,6 @@ namespace PodoFlow.Api.Servicios.Implementaciones
                 throw new ArgumentException("El pasaporte debe tener entre 6 y 9 letras o números.");
         }
 
-        // Quita espacios y guiones y pasa a mayúsculas (los pasaportes llevan letras).
         private static string LimpiarIdentificacion(string valor)
         {
             return valor.Trim()
@@ -315,7 +313,6 @@ namespace PodoFlow.Api.Servicios.Implementaciones
                 .ToUpperInvariant();
         }
 
-        // 10 dígitos, provincia 01–24 o 30, tercer dígito menor a 6 y verificador módulo 10.
         private static bool EsCedulaValida(string cedula)
         {
             if (cedula.Length != 10 || !cedula.All(char.IsAsciiDigit))
@@ -342,7 +339,6 @@ namespace PodoFlow.Api.Servicios.Implementaciones
             return verificador == cedula[9] - '0';
         }
 
-        // 6 a 9 caracteres alfanuméricos (ya limpio y en mayúsculas).
         private static bool EsPasaporteValido(string pasaporte)
         {
             return pasaporte.Length is >= 6 and <= 9

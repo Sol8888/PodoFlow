@@ -2,8 +2,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace PodoFlow.Api.DTOs.Riesgo
 {
-    // Sin TratamientoId: el riesgo pertenece a su tratamiento y no se mueve a otro.
-    // Sin Estado: se cambia por PATCH {id}/estado.
     public class RiesgoActualizarDto
     {
         [Required, MaxLength(2000)]

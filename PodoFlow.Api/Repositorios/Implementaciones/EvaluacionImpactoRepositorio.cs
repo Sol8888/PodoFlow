@@ -14,7 +14,6 @@ namespace PodoFlow.Api.Repositorios.Implementaciones
             _context = context;
         }
 
-        // De la más reciente a la más antigua.
         public async Task<List<EvaluacionImpacto>> ObtenerTodosAsync(string? estado, int pagina, int tamano)
         {
             var consulta = _context.EvaluacionesImpacto.AsNoTracking();

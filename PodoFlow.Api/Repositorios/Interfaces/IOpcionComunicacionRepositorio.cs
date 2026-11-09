@@ -9,10 +9,8 @@ namespace PodoFlow.Api.Repositorios.Interfaces
 
         Task<OpcionComunicacion?> ObtenerPorIdAsync(long id);
 
-        // Busca por la clave única (paciente, canal, finalidad), activa o no.
         Task<OpcionComunicacion?> ObtenerPorClaveAsync(long pacienteId, string canal, int finalidadId);
 
-        // El consentimiento del paciente para esa finalidad (hay uno como máximo), en cualquier estado.
         Task<Consentimiento?> ObtenerConsentimientoAsync(long pacienteId, int finalidadId);
 
         Task<bool> ExistePacienteActivoAsync(long pacienteId);

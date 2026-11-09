@@ -12,8 +12,6 @@ namespace PodoFlow.Api.Repositorios.Interfaces
 
         Task<bool> ExistePorPacienteYFinalidadAsync(long pacienteId, int finalidadId);
 
-        Task<bool> ExistePacienteActivoAsync(long pacienteId);
-
         Task<bool> ExisteUsuarioActivoAsync(long usuarioId);
 
         Task<Consentimiento> CrearAsync(Consentimiento consentimiento, EventoConsentimiento evento);
