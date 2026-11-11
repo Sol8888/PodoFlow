@@ -17,7 +17,7 @@ public class MovimientoCrearDto
     [MaxLength(20)]
     public string Tipo { get; set; } = string.Empty;
 
-    [Range(typeof(decimal), "0.01", "9999999999.99")]
+    [Range(typeof(decimal), "0,01", "9999999999,99")]
     public decimal Cantidad { get; set; }
 
     [Required]

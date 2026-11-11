@@ -18,10 +18,10 @@ public class PrestacionCrearDto
     [Range(1, long.MaxValue)]
     public long UsuarioId { get; set; }
 
-    [Range(typeof(decimal), "0", "9999999999.99")]
+    [Range(typeof(decimal), "0", "9999999999,99")]
     public decimal PrecioAplicado { get; set; }
 
-    [Range(typeof(decimal), "0.01", "99999999.99")]
+    [Range(typeof(decimal), "0,01", "99999999,99")]
     public decimal Cantidad { get; set; } = 1m;
 
     [MaxLength(1000)]
