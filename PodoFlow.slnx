@@ -3,4 +3,5 @@
     <File Path=".gitignore" />
   </Folder>
   <Project Path="PodoFlow.Api/PodoFlow.Api.csproj" />
+  <Project Path="PodoFlow.Api.Tests/PodoFlow.Api.Tests.csproj" />
 </Solution>
