@@ -104,6 +104,15 @@ namespace PodoFlow.Api.Servicios.Implementaciones
 
             ValidarResidual(dto.RiesgoResidual, nivel);
 
+            if (riesgo.RiEstad == Mitigado)
+            {
+                if (string.IsNullOrWhiteSpace(dto.MedidasMitigacion))
+                    throw new ArgumentException("Un riesgo MITIGADO debe mantener sus medidas de mitigación.");
+
+                if (!dto.RiesgoResidual.HasValue)
+                    throw new ArgumentException("Un riesgo MITIGADO debe mantener su riesgo residual.");
+            }
+
             riesgo.RiDescri = dto.Descripcion.Trim();
             riesgo.RiProba = dto.Probabilidad;
             riesgo.RiImpac = dto.Impacto;
