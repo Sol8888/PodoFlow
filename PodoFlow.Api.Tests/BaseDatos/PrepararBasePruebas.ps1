@@ -1,12 +1,22 @@
 ﻿param(
-    [Parameter(Mandatory = $true)]
-    [string]$ScriptOficial,
+    [string]$ScriptOficial = (Join-Path $PSScriptRoot 'PodoFlow_BD_Completa.sql'),
     [string]$Servidor = 'localhost\SQLEXPRESS',
+    [string]$Usuario,
     [switch]$Recrear
 )
 
 $ErrorActionPreference = 'Stop'
 $baseDatos = 'PODOFLOW_PRUEBAS'
+
+if ($Usuario) {
+    if (-not $env:SQLCMDPASSWORD) {
+        throw 'Con -Usuario la contraseña debe estar en la variable de entorno SQLCMDPASSWORD.'
+    }
+    $autenticacion = @('-U', $Usuario)
+}
+else {
+    $autenticacion = @('-E')
+}
 
 if (-not (Test-Path $ScriptOficial)) {
     throw "No se encontró el script oficial: $ScriptOficial"
@@ -40,21 +50,21 @@ $utf8 = New-Object System.Text.UTF8Encoding($true)
 
 try {
     if ($Recrear) {
-        sqlcmd -S $Servidor -E -C -b -Q "IF DB_ID(N'$baseDatos') IS NOT NULL BEGIN ALTER DATABASE [$baseDatos] SET SINGLE_USER WITH ROLLBACK IMMEDIATE; DROP DATABASE [$baseDatos]; END"
+        sqlcmd -S $Servidor @autenticacion -C -b -Q "IF DB_ID(N'$baseDatos') IS NOT NULL BEGIN ALTER DATABASE [$baseDatos] SET SINGLE_USER WITH ROLLBACK IMMEDIATE; DROP DATABASE [$baseDatos]; END"
         if ($LASTEXITCODE -ne 0) { throw 'No se pudo eliminar la base de pruebas.' }
     }
 
-    sqlcmd -S $Servidor -E -C -b -Q "IF DB_ID(N'$baseDatos') IS NULL CREATE DATABASE [$baseDatos];"
+    sqlcmd -S $Servidor @autenticacion -C -b -Q "IF DB_ID(N'$baseDatos') IS NULL CREATE DATABASE [$baseDatos];"
     if ($LASTEXITCODE -ne 0) { throw 'No se pudo crear la base de pruebas.' }
 
-    $tablas = sqlcmd -S $Servidor -E -C -b -d $baseDatos -h -1 -W -Q "SET NOCOUNT ON; SELECT COUNT(*) FROM sys.tables;"
+    $tablas = sqlcmd -S $Servidor @autenticacion -C -b -d $baseDatos -h -1 -W -Q "SET NOCOUNT ON; SELECT COUNT(*) FROM sys.tables;"
     if ([int]($tablas | Select-Object -First 1) -eq 0) {
-        sqlcmd -S $Servidor -E -C -b -I -d $baseDatos -i $temporal
+        sqlcmd -S $Servidor @autenticacion -C -b -I -d $baseDatos -i $temporal
         if ($LASTEXITCODE -ne 0) { throw 'Falló la creación del esquema en la base de pruebas.' }
     }
 
     $datos = Join-Path $PSScriptRoot 'DatosSinteticos.sql'
-    sqlcmd -S $Servidor -E -C -b -I -d $baseDatos -i $datos
+    sqlcmd -S $Servidor @autenticacion -C -b -I -d $baseDatos -i $datos
     if ($LASTEXITCODE -ne 0) { throw 'Falló la carga de datos sintéticos.' }
 
     Write-Host "Base $baseDatos lista en $Servidor."
