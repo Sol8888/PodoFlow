@@ -8,7 +8,7 @@ using PodoFlow.Api.Servicios.Interfaces;
 namespace PodoFlow.Api.Controladores;
 
 [ApiController]
-[Authorize(Policy = "HistoriaClinicaGestionar")]
+[Authorize(Policy = "InventarioGestionar")]
 [Route("api/insumos")]
 public class InsumoController : ControllerBase
 {

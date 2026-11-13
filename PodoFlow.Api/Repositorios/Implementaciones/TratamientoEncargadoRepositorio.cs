@@ -14,7 +14,6 @@ namespace PodoFlow.Api.Repositorios.Implementaciones
             _context = context;
         }
 
-        // Filtros opcionales: los encargados de un tratamiento, o los tratamientos en los que participa un encargado.
         public async Task<List<TratamientoEncargado>> ObtenerTodosAsync(
             int? tratamientoId, int? encargadoId, bool incluirInactivos, int pagina, int tamano)
         {

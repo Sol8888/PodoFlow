@@ -8,7 +8,6 @@ namespace PodoFlow.Api.Repositorios.Interfaces
 
         Task<Documento?> ObtenerPorIdAsync(long id);
 
-        // Otro documento con el mismo tipo, nombre y versión (activo o no), excluyendo un id.
         Task<Documento?> ObtenerDuplicadoAsync(string tipo, string nombre, string? version, long? excluirId);
 
         Task<bool> ExisteUsuarioActivoAsync(long usuarioId);

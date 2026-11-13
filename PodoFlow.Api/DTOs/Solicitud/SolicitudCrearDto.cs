@@ -8,12 +8,9 @@ namespace PodoFlow.Api.DTOs.Solicitud
         public long PacienteId { get; set; }
         public long? UsuarioId { get; set; }
 
-        // INFORMACION, ACCESO, CONSULTA, RECTIFICACION, ACTUALIZACION,
-        // ELIMINACION, OPOSICION, SUSPENSION, PORTABILIDAD
         [Required, MaxLength(25)]
         public string TipoDerecho { get; set; } = string.Empty;
 
-        // TITULAR o REPRESENTANTE
         [MaxLength(20)]
         public string TipoSolicitante { get; set; } = "TITULAR";
 

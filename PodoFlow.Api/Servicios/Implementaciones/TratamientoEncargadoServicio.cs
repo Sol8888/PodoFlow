@@ -98,7 +98,6 @@ namespace PodoFlow.Api.Servicios.Implementaciones
             if (asignacion.TeEstatus)
                 return true;
 
-            // No se reactiva una asignación cuyo tratamiento o encargado ya no estén activos.
             await ValidarReferenciasAsync(tratamientoId, encargadoId);
 
             asignacion.TeEstatus = true;

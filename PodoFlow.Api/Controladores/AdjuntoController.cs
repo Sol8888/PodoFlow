@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PodoFlow.Api.DTOs.Adjunto;
+using PodoFlow.Api.Servicios.Almacenamiento;
 using PodoFlow.Api.Servicios.Interfaces;
 
 namespace PodoFlow.Api.Controladores;
@@ -58,6 +59,60 @@ public class AdjuntoController : ControllerBase
             StatusCodes.Status410Gone,
             "Para registrar un adjunto utiliza " +
             "POST /api/adjuntos/archivos/atencion/{atencionId}.");
+    }
+
+    [HttpPost("archivos/atencion/{atencionId:long}")]
+    [Consumes("multipart/form-data")]
+    [RequestSizeLimit(AlmacenamientoAdjuntos.MaximoBytes + 1024 * 1024)]
+    [RequestFormLimits(MultipartBodyLengthLimit = AlmacenamientoAdjuntos.MaximoBytes + 1024 * 1024)]
+    public async Task<IActionResult> Subir(
+        long atencionId,
+        [FromForm] AdjuntoSubirDto dto,
+        CancellationToken ct)
+    {
+        try
+        {
+            var adjunto = await _servicio.SubirAsync(atencionId, dto, ct);
+
+            return CreatedAtAction(
+                nameof(ObtenerPorId),
+                new { id = adjunto.Id },
+                adjunto);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { mensaje = ex.Message });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Conflict(new { mensaje = ex.Message });
+        }
+        catch (DbUpdateException)
+        {
+            return Conflict(new { mensaje = "No se pudo registrar el adjunto." });
+        }
+    }
+
+    [HttpGet("{id:long}/archivo")]
+    public async Task<IActionResult> Descargar(long id, CancellationToken ct)
+    {
+        try
+        {
+            var archivo = await _servicio.AbrirArchivoAsync(id, ct);
+
+            if (archivo == null)
+                return NotFound(new { mensaje = "No se encontró el archivo." });
+
+            return File(archivo.Contenido, archivo.TipoMime, archivo.Nombre);
+        }
+        catch (InvalidDataException ex)
+        {
+            return Conflict(new { mensaje = ex.Message });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Conflict(new { mensaje = ex.Message });
+        }
     }
 
     [HttpPut("{id:long}")]

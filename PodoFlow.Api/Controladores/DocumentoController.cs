@@ -89,7 +89,6 @@ namespace PodoFlow.Api.Controladores
             }
         }
 
-        // Baja lógica: do_estatus = 0.
         [HttpDelete("{id:long}")]
         public async Task<IActionResult> Eliminar(long id)
         {

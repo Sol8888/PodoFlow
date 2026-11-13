@@ -238,6 +238,14 @@ public sealed class AlmacenamientoAdjuntos
         }
     }
 
+    public void Eliminar(string clave)
+    {
+        var ruta = Resolver(clave);
+
+        if (File.Exists(ruta))
+            File.Delete(ruta);
+    }
+
     private string Resolver(string clave)
     {
         if (!PatronClave.IsMatch(clave))

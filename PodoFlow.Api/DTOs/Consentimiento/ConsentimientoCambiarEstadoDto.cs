@@ -11,13 +11,19 @@ namespace PodoFlow.Api.DTOs.Consentimiento
         public string Medio { get; set; } = string.Empty;
         public int? AvisoId { get; set; }
 
-        [MaxLength(1000)]
+        [MaxLength(500)]
         public string? Observacion { get; set; }
 
         [MaxLength(1000)]
         public string? RutaEvidencia { get; set; }
 
         public long? UsuarioId { get; set; }
+
+        [MaxLength(150)]
+        public string? RepresentanteNombre { get; set; }
+
+        [MaxLength(50)]
+        public string? RepresentanteRelacion { get; set; }
 
         [Required]
         public byte[] Version { get; set; } = [];

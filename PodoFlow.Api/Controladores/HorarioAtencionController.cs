@@ -1,4 +1,5 @@
 ﻿
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PodoFlow.Api.DTOs.HorarioAtencion;
@@ -7,6 +8,7 @@ using PodoFlow.Api.Servicios.Interfaces;
 namespace PodoFlow.Api.Controladores;
 
 [ApiController]
+[Authorize(Policy = "CitasVer")]
 [Route("api/horarios-atencion")]
 public class HorarioAtencionController : ControllerBase
 {
@@ -42,6 +44,7 @@ public class HorarioAtencionController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Policy = "CitasEditar")]
     public async Task<IActionResult> Crear(
         HorarioAtencionCrearDto dto)
     {
@@ -69,6 +72,7 @@ public class HorarioAtencionController : ControllerBase
     }
 
     [HttpPut("{id:int}")]
+    [Authorize(Policy = "CitasEditar")]
     public async Task<IActionResult> Actualizar(
         int id,
         HorarioAtencionActualizarDto dto)
@@ -94,6 +98,7 @@ public class HorarioAtencionController : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
+    [Authorize(Policy = "CitasEditar")]
     public async Task<IActionResult> Eliminar(int id)
     {
         return await _servicio.EliminarAsync(id)
@@ -102,6 +107,7 @@ public class HorarioAtencionController : ControllerBase
     }
 
     [HttpPatch("{id:int}/reactivar")]
+    [Authorize(Policy = "CitasEditar")]
     public async Task<IActionResult> Reactivar(int id)
     {
         try

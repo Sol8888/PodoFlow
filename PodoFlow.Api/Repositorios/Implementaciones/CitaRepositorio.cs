@@ -140,7 +140,46 @@ public class CitaRepositorio : ICitaRepositorio
         var fecha = inicioLocal.Date;
 
         // 4. Comprobar horario de atención.
-        var horarios = await _context.HorariosAtencion
+        var horarios = await ConsultarHorariosAsync(
+            usuarioId, diaSemana, fecha);
+
+        return horarios.Any(x =>
+            x.HoHoraIni <= horaInicio &&
+            x.HoHoraFin >= horaFin);
+    }
+
+    public Task<short?> ObtenerDuracionServicioAsync(int id)
+    {
+        return _context.Servicios
+            .AsNoTracking()
+            .Where(x => x.SeId == id && x.SeEstatus)
+            .Select(x => (short?)x.SeDuracMin)
+            .FirstOrDefaultAsync();
+    }
+
+    public async Task<List<(DateTime InicioUtc, DateTime FinUtc)>>
+        ObtenerFranjasAtencionAsync(long? usuarioId, DateOnly fecha)
+    {
+        var dia = fecha.ToDateTime(TimeOnly.MinValue);
+        int diaSemana = ((int)dia.DayOfWeek + 6) % 7 + 1;
+
+        var horarios = await ConsultarHorariosAsync(
+            usuarioId, diaSemana, dia);
+
+        return horarios
+            .OrderBy(x => x.HoHoraIni)
+            .Select(x => (
+                TimeZoneInfo.ConvertTimeToUtc(
+                    dia + x.HoHoraIni, ZonaEcuador),
+                TimeZoneInfo.ConvertTimeToUtc(
+                    dia + x.HoHoraFin, ZonaEcuador)))
+            .ToList();
+    }
+
+    private Task<List<HorarioAtencion>> ConsultarHorariosAsync(
+        long? usuarioId, int diaSemana, DateTime fecha)
+    {
+        return _context.HorariosAtencion
             .AsNoTracking()
             .Where(x =>
                 x.HoEstatus &&
@@ -151,10 +190,6 @@ public class CitaRepositorio : ICitaRepositorio
                 (x.HoFechaHast == null ||
                  x.HoFechaHast >= fecha))
             .ToListAsync();
-
-        return horarios.Any(x =>
-            x.HoHoraIni <= horaInicio &&
-            x.HoHoraFin >= horaFin);
     }
 
     public async Task<Cita> CrearAsync(Cita cita)

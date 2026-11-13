@@ -14,7 +14,6 @@ namespace PodoFlow.Api.Repositorios.Implementaciones
             _context = context;
         }
 
-        // Del más reciente al más antiguo.
         public async Task<List<Documento>> ObtenerTodosAsync(string? tipo, bool incluirInactivos, int pagina, int tamano)
         {
             var consulta = _context.Documentos.AsNoTracking();
@@ -33,14 +32,12 @@ namespace PodoFlow.Api.Repositorios.Implementaciones
                 .ToListAsync();
         }
 
-        // Sin filtro de estatus: el detalle se muestra aunque esté dado de baja.
         public async Task<Documento?> ObtenerPorIdAsync(long id)
         {
             return await _context.Documentos
                 .FirstOrDefaultAsync(x => x.DoId == id);
         }
 
-        // La comparación la hace SQL Server, que por defecto no distingue mayúsculas.
         public async Task<Documento?> ObtenerDuplicadoAsync(string tipo, string nombre, string? version, long? excluirId)
         {
             return await _context.Documentos
