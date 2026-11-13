@@ -85,6 +85,10 @@ namespace PodoFlow.Api.Controladores
 
                 return NoContent();
             }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { mensaje = ex.Message });
+            }
             catch (DbUpdateConcurrencyException)
             {
                 return Conflict(new { mensaje = MensajeConcurrencia });

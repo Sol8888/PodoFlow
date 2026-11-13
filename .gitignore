@@ -6,6 +6,7 @@
 # .NET
 bin/
 obj/
+TestResults/
 
 # Configuración local sensible
 appsettings.Development.json

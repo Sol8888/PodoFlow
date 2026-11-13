@@ -14,7 +14,7 @@ public class CobroCrearDto
     [Range(1, long.MaxValue)]
     public long UsuarioId { get; set; }
 
-    [Range(typeof(decimal), "0.01", "9999999999.99")]
+    [Range(typeof(decimal), "0.01", "9999999999.99", ParseLimitsInInvariantCulture = true, ConvertValueInInvariantCulture = true)]
     public decimal Valor { get; set; }
 
     [MaxLength(150)]

@@ -1,0 +1,142 @@
+name: CI
+
+on:
+  push:
+    branches: [Develop, master]
+  pull_request:
+    branches: [Develop, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  COBERTURA_MINIMA: 70
+  SQLCMD_VERSION: v1.10.0
+
+jobs:
+  api:
+    name: API - compilación, pruebas y cobertura
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    services:
+      sqlserver:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        env:
+          ACCEPT_EULA: Y
+          MSSQL_PID: Developer
+          MSSQL_SA_PASSWORD: Pf-${{ github.run_id }}-Ci
+        ports:
+          - 1433:1433
+        options: >-
+          --health-cmd "/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P Pf-${{ github.run_id }}-Ci -Q 'SELECT 1' -b -o /dev/null"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 15
+          --health-start-period 20s
+
+    env:
+      SQLCMDPASSWORD: Pf-${{ github.run_id }}-Ci
+      PODOFLOW_PRUEBAS_ConnectionStrings__PodoFlowPruebas: "Server=localhost,1433;Database=PODOFLOW_PRUEBAS;User Id=sa;Password=Pf-${{ github.run_id }}-Ci;TrustServerCertificate=True;"
+      RESULTADOS: ${{ github.workspace }}/TestResults
+
+    steps:
+      - name: Obtener el código
+        uses: actions/checkout@v7
+
+      - name: Instalar .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+
+      - name: Restaurar dependencias
+        run: dotnet restore PodoFlow.slnx
+
+      - name: Compilar en Release
+        run: dotnet build PodoFlow.slnx --configuration Release --no-restore
+
+      - name: Restaurar herramientas locales
+        run: dotnet tool restore
+
+      - name: Instalar sqlcmd
+        run: |
+          mkdir -p "$RUNNER_TEMP/sqlcmd"
+          curl -sSfL "https://github.com/microsoft/go-sqlcmd/releases/download/${SQLCMD_VERSION}/sqlcmd-linux-amd64.tar.bz2" | tar -xj -C "$RUNNER_TEMP/sqlcmd"
+          echo "$RUNNER_TEMP/sqlcmd" >> "$GITHUB_PATH"
+
+      - name: Crear la base PODOFLOW_PRUEBAS
+        shell: pwsh
+        run: ./PodoFlow.Api.Tests/BaseDatos/PrepararBasePruebas.ps1 -Servidor 'localhost,1433' -Usuario sa
+
+      - name: Ejecutar pruebas con cobertura
+        run: >-
+          dotnet test PodoFlow.Api.Tests/PodoFlow.Api.Tests.csproj
+          --configuration Release
+          --no-build
+          --settings PodoFlow.Api.Tests/pruebas.runsettings
+          --collect:"XPlat Code Coverage"
+          --results-directory "$RESULTADOS"
+          --logger "trx;LogFileName=resultados-pruebas.trx"
+          --logger "html;LogFileName=resultados-pruebas.html"
+          --logger "console;verbosity=normal"
+
+      - name: Generar informe de cobertura
+        if: ${{ !cancelled() }}
+        run: |
+          cobertura=$(find "$RESULTADOS" -name coverage.cobertura.xml -print -quit)
+          if [ -z "$cobertura" ]; then
+            echo "::error::No se generó el archivo de cobertura."
+            exit 1
+          fi
+          dotnet reportgenerator \
+            "-reports:$cobertura" \
+            "-targetdir:$RESULTADOS/cobertura" \
+            "-reporttypes:Html;TextSummary;JsonSummary;MarkdownSummaryGithub" \
+            "-classfilters:+PodoFlow.Api.Servicios.*" \
+            "-title:PodoFlow - Cobertura de Servicios"
+          cat "$RESULTADOS/cobertura/SummaryGithub.md" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Validar cobertura mínima de Servicios
+        if: ${{ !cancelled() }}
+        shell: pwsh
+        run: |
+          $resumen = Get-Content (Join-Path $env:RESULTADOS 'cobertura/Summary.json') -Raw | ConvertFrom-Json
+          $lineas = [double]$resumen.summary.linecoverage
+          $minimo = [double]$env:COBERTURA_MINIMA
+          Write-Host "Cobertura de líneas de Servicios: $lineas % (mínimo $minimo %)"
+          if ($lineas -lt $minimo) {
+            Write-Host "::error::La cobertura de líneas de Servicios ($lineas %) es menor al mínimo de $minimo %."
+            exit 1
+          }
+
+      - name: Publicar resultados de pruebas
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: resultados-pruebas
+          path: |
+            TestResults/**/*.trx
+            TestResults/**/*.html
+            !TestResults/cobertura/**
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Publicar informe de cobertura
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: informe-cobertura
+          path: |
+            TestResults/cobertura/
+            TestResults/**/coverage.cobertura.xml
+          if-no-files-found: warn
+          retention-days: 14

@@ -133,7 +133,7 @@ namespace PodoFlow.Api.Servicios.Implementaciones
             if (consentimiento == null)
                 return false;
 
-            consentimiento.CoMedio = dto.Medio.Trim();
+            consentimiento.CoMedio = NormalizarMedio(dto.Medio);
             consentimiento.CoObser = dto.Observacion?.Trim();
 
             await _repositorio.ActualizarAsync(consentimiento, dto.Version);
